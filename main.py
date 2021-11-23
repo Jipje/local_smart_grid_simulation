@@ -26,7 +26,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                     except OverflowError:
                         imbalance_msg_interpreter.reset()
                         imbalance_msg_interpreter.update(float(environment_data[2]), float(environment_data[1]), float(environment_data[3]))
-                    rhino.take_action()
+                    rhino.take_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
                     print(imbalance_msg_interpreter.get_current_price())
                 steps_taken = steps_taken + 1
 
