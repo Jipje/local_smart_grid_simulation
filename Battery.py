@@ -38,3 +38,6 @@ class Battery(object):
             self.discharge(self.max_kw, discharge_price)
         else:
             self.wait()
+
+    def __str__(self):
+        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format(self.name, self.state_of_charge_kwh, self.earnings)
