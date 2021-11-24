@@ -19,10 +19,8 @@ class StrategyBattery(object):
         price_index = int(price_index)
         return price_index
 
-
     def upload_strategy(self, strategy_csv):
         strategy_df = pd.read_csv(strategy_csv)
-        print(strategy_df.to_string())
         assert(strategy_df['state_from'].min() == 0)
         assert(strategy_df['state_until'].max() == 100)
         highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(2).iloc[1] + self.price_step_size
