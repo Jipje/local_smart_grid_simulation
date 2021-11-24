@@ -52,7 +52,7 @@ class StrategyBattery(object):
         self.strategy_matrix = strategy_matrix
 
     def clean_price(self, price):
-        res = price
+        res = price + price % self.price_step_size
         if price > self.max_price:
             res = self.max_price
         elif price < self.min_price:
