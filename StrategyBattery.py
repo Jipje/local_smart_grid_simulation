@@ -7,6 +7,8 @@ class StrategyBattery(object):
         self.uploaded = False
         self.strategy_matrix = []
         self.upload_strategy(strategy_csv)
+        self.max_price = -9999
+        self.min_price = 9999
 
     def upload_strategy(self, strategy_csv):
         strategy_df = pd.read_csv(strategy_csv)
@@ -15,6 +17,9 @@ class StrategyBattery(object):
         assert(strategy_df['state_until'].max() == 100)
         highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(2).iloc[1] + 5
         lowest_price = strategy_df['price_until'].drop_duplicates(keep='last').nsmallest(2).iloc[1]
+
+        self.max_price = highest_price
+        self.min_price = lowest_price
 
         num_of_price_buckets = int((highest_price - lowest_price) / 5)
         strategy_matrix = []
@@ -36,14 +41,20 @@ class StrategyBattery(object):
         self.uploaded = True
         self.strategy_matrix = strategy_matrix
 
+    def clean_price(self, price):
+        res = price
+        if price > self.max_price:
+            res = self.max_price
+        elif price < self.min_price:
+            res = self.min_price
+        return res
+
     def make_decision(self, charge_price, discharge_price, state_of_charge):
         if not(self.uploaded):
-            raise Exception("A STRATEGY HAS NOT BEEN UPLOADED")
+            raise LookupError("A STRATEGY HAS NOT BEEN UPLOADED")
 
-        if charge_price < 0:
-            charge_price = 0
-        if discharge_price < 0:
-            discharge_price = 0
+        charge_price = self.clean_price(charge_price)
+        discharge_price = self.clean_price(discharge_price)
 
         soc_index = int(state_of_charge)
         charge_price_index = int(charge_price / 5)
