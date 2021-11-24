@@ -4,15 +4,16 @@ import random
 class Battery(object):
     def __init__(self, name, max_kwh, max_kw, starting_soc=0):
         self.name = name
-        self.state_of_charge_perc = starting_soc
         self.state_of_charge_kwh = starting_soc / 100 * max_kwh
 
         self.max_kwh = max_kwh
         self.max_kw = max_kw
         self.earnings = 0
 
-    def update_earnings(self, action, cost):
-        cost_of_action = action / 1000 * cost
+    def update_earnings(self, action_kw, cost):
+        # Discharge is a negative action. However that pays us money so we invert the action * cost
+        #     Same holds vice versa for charge. A positive action however it costs us money.
+        cost_of_action = -1 * (action_kw / 1000) * cost
         self.earnings = self.earnings + cost_of_action
 
     def charge(self, charge_kw, charge_price):
