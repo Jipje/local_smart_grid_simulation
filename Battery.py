@@ -57,7 +57,6 @@ class Battery(object):
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
     def ptu_reset(self, charge_price, discharge_price):
-        price_to_use = None
         if self.ptu_total_action > 0:
             price_to_use = charge_price
         elif self.ptu_total_action < 0:
