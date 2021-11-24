@@ -20,12 +20,18 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
                     break
                 else:
+                    try:
+                        mid_price_msg = float(environment_data[2])
+                        max_price_msg = float(environment_data[1])
+                        min_price_msg = float(environment_data[3])
+                    except ValueError:
+                        continue
                     # The environment should take a step here.
                     try:
-                        imbalance_msg_interpreter.update(float(environment_data[2]), float(environment_data[1]), float(environment_data[3]))
+                        imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
                     except OverflowError:
                         imbalance_msg_interpreter.reset()
-                        imbalance_msg_interpreter.update(float(environment_data[2]), float(environment_data[1]), float(environment_data[3]))
+                        imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
                     rhino.take_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
                 steps_taken = steps_taken + 1
 
