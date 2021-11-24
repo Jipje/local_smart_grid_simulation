@@ -55,8 +55,20 @@ class Battery(object):
         self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
-    def ptu_reset(self):
-        print('PTU reset. Action this PTU was: {}MWh'.format(self.ptu_total_action))
+    def ptu_reset(self, charge_price, discharge_price):
+        ptu_profits = 0
+
+        price_to_use = None
+        if self.ptu_total_action > 0:
+            price_to_use = charge_price
+        elif self.ptu_total_action < 0:
+            price_to_use = discharge_price
+        else:
+            price_to_use = 0
+
+        ptu_profits = -1 * (self.ptu_total_action / 1000) * price_to_use
+        print('PTU reset. Action this PTU was: {}kWh. Earned €{}'.format(self.ptu_total_action, ptu_profits))
+
         self.ptu_tracker = 0
         self.ptu_total_action = 0
 
@@ -96,7 +108,7 @@ class Battery(object):
                 chosen_action = 2
 
         if self.ptu_tracker > 15:
-            self.ptu_reset()
+            self.ptu_reset(charge_price, discharge_price)
         self.ptu_tracker += 1
 
         chosen_action = random.randint(0, 5)
