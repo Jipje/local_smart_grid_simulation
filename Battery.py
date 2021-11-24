@@ -45,6 +45,9 @@ class Battery(object):
         # The SoC can't be higher than the max. Or lower than 0.
         if future_soc > self.max_kwh or future_soc < 0:
             raise OverflowError('Battery action is overwriting battery state of charge constraints')
+        if abs(action) > self.max_kw:
+            raise OverflowError('Battery action is overwriting battery action constraints')
+
     def take_action(self, charge_price, discharge_price):
         chosen_action = random.randint(0, 5)
         if chosen_action == 0:
