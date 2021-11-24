@@ -18,19 +18,33 @@ class Battery(object):
 
     def charge(self, charge_kw, charge_price):
         charged_kw = int(charge_kw * 1/60)
-        self.state_of_charge_kwh = self.state_of_charge_kwh + charged_kw
-        print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(charged_kw, charge_price)
+        try:
+            self.check_action(charged_kw)
+            self.state_of_charge_kwh = self.state_of_charge_kwh + charged_kw
+            print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+            self.update_earnings(charged_kw, charge_price)
+        except OverflowError as err:
+            print('No charge action allowed: {}'.format(err.args))
 
     def discharge(self, discharge_kw, discharge_price):
         discharged_kw = -1 * int(discharge_kw * 1/60)
-        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kw
-        print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(discharged_kw, discharge_price)
+        try:
+            self.check_action(discharged_kw)
+            self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kw
+            print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+            self.update_earnings(discharged_kw, discharge_price)
+        except OverflowError as err:
+            print('No discharge action allowed: {}'.format(err.args))
 
     def wait(self):
         pass
 
+    def check_action(self, action):
+        current_soc = self.state_of_charge_kwh
+        future_soc = current_soc + action
+        # The SoC can't be higher than the max. Or lower than 0.
+        if future_soc > self.max_kwh or future_soc < 0:
+            raise OverflowError('Battery action is overwriting battery state of charge constraints')
     def take_action(self, charge_price, discharge_price):
         chosen_action = random.randint(0, 5)
         if chosen_action == 0:
