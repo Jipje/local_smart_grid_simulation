@@ -1,5 +1,6 @@
 from csv import reader
 from Battery import Battery
+from StrategyBattery import StrategyBattery
 from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
@@ -40,6 +41,6 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
 
 if __name__ == '__main__':
-    rhino_strat = StrategyBattery()
-    rhino_strat.upload_strategy('data/strategies/simplified_passive_imbalance_1.csv')
+    rhino_strat = StrategyBattery(strategy_csv='data/strategies/simplified_passive_imbalance_1.csv')
+    print(rhino_strat.make_decision(90, 90, 4))
     # run_simulation(100000, 100)

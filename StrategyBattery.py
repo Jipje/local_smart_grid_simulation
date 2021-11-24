@@ -2,10 +2,11 @@ import pandas as pd
 
 
 class StrategyBattery(object):
-    def __init__(self):
+    def __init__(self, strategy_csv='data/strategies/simplified_passive_imbalance_1.csv'):
         self.dayhead_tracker = False
         self.uploaded = False
         self.strategy_matrix = []
+        self.upload_strategy(strategy_csv)
 
     def upload_strategy(self, strategy_csv):
         strategy_df = pd.read_csv(strategy_csv)
