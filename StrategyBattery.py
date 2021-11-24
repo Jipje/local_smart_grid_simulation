@@ -6,22 +6,32 @@ class StrategyBattery(object):
         self.dayhead_tracker = False
         self.uploaded = False
         self.strategy_matrix = []
-        self.upload_strategy(strategy_csv)
+        self.price_step_size = 5
         self.max_price = -9999
         self.min_price = 9999
+
+        self.upload_strategy(strategy_csv)
+
+    def price_index(self, price):
+        price = self.clean_price(price)
+        price = price - self.min_price
+        price_index = price / self.price_step_size
+        price_index = int(price_index)
+        return price_index
+
 
     def upload_strategy(self, strategy_csv):
         strategy_df = pd.read_csv(strategy_csv)
         print(strategy_df.to_string())
         assert(strategy_df['state_from'].min() == 0)
         assert(strategy_df['state_until'].max() == 100)
-        highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(2).iloc[1] + 5
-        lowest_price = strategy_df['price_until'].drop_duplicates(keep='last').nsmallest(2).iloc[1]
+        highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(2).iloc[1] + self.price_step_size
+        lowest_price = strategy_df['price_until'].drop_duplicates(keep='last').nsmallest(2).iloc[1] - self.price_step_size
 
         self.max_price = highest_price
         self.min_price = lowest_price
 
-        num_of_price_buckets = int((highest_price - lowest_price) / 5)
+        num_of_price_buckets = int((highest_price - lowest_price) / self.price_step_size)
         strategy_matrix = []
         for i in range(100):
             strategy_matrix.append([])
@@ -32,9 +42,9 @@ class StrategyBattery(object):
             current_soc = strategy_line.state_from
             while current_soc < strategy_line.state_until:
                 current_soc_index = current_soc
-                for current_price in range(lowest_price, highest_price, 5):
+                for current_price in range(lowest_price, highest_price, self.price_step_size):
                     if strategy_line.price_from <= current_price <= strategy_line.price_until:
-                        current_price_index = int(current_price / 5)
+                        current_price_index = self.price_index(current_price)
                         strategy_matrix[current_soc_index][current_price_index] = strategy_line.command
                 current_soc += 1
 
@@ -57,8 +67,8 @@ class StrategyBattery(object):
         discharge_price = self.clean_price(discharge_price)
 
         soc_index = int(state_of_charge)
-        charge_price_index = int(charge_price / 5)
-        discharge_price_index = int(discharge_price / 5)
+        charge_price_index = self.price_index(charge_price)
+        discharge_price_index = self.price_index(discharge_price)
 
         charge_check_decision = self.strategy_matrix[soc_index][charge_price_index]
         if charge_check_decision == 'DISCHARGE':
@@ -78,7 +88,3 @@ class StrategyBattery(object):
             raise Exception('THIS SHOULD BE IMPOSSIBLE')
 
         return decision
-
-
-
-
