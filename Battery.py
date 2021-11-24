@@ -34,6 +34,7 @@ class Battery(object):
         #     Same holds vice versa for charge. A positive action however it costs us money.
         cost_of_action = -1 * (action_kwh / 1000) * cost
         self.earnings = self.earnings + cost_of_action
+        return cost_of_action
 
     def charge(self, charge_kw, charge_price):
         potential_charged_kwh = int(charge_kw * self.time_step)
@@ -56,8 +57,6 @@ class Battery(object):
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
     def ptu_reset(self, charge_price, discharge_price):
-        ptu_profits = 0
-
         price_to_use = None
         if self.ptu_total_action > 0:
             price_to_use = charge_price
@@ -66,7 +65,7 @@ class Battery(object):
         else:
             price_to_use = 0
 
-        ptu_profits = -1 * (self.ptu_total_action / 1000) * price_to_use
+        ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
         print('PTU reset. Action this PTU was: {}kWh. Earned €{}'.format(self.ptu_total_action, ptu_profits))
 
         self.ptu_tracker = 0
