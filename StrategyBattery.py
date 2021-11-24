@@ -35,14 +35,14 @@ class StrategyBattery(object):
         strategy_matrix = []
         for i in range(100):
             strategy_matrix.append([])
-            for _ in range(num_of_price_buckets):
+            for _ in range(num_of_price_buckets + 1):
                 strategy_matrix[i].append('WAIT')
 
         for _, strategy_line in strategy_df.iterrows():
             current_soc = strategy_line.state_from
             while current_soc < strategy_line.state_until:
                 current_soc_index = current_soc
-                for current_price in range(lowest_price, highest_price, self.price_step_size):
+                for current_price in range(lowest_price, highest_price + self.price_step_size, self.price_step_size):
                     if strategy_line.price_from <= current_price <= strategy_line.price_until:
                         current_price_index = self.price_index(current_price)
                         strategy_matrix[current_soc_index][current_price_index] = strategy_line.command
