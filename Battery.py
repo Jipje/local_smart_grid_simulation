@@ -2,12 +2,13 @@ import random
 
 
 class Battery(object):
-    def __init__(self, name, max_kwh, max_kw, starting_soc=0):
+    def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc=0):
         self.name = name
         self.state_of_charge_kwh = starting_soc / 100 * max_kwh
 
         self.max_kwh = max_kwh
         self.max_kw = max_kw
+        self.efficiency = battery_efficiency
         self.earnings = 0
 
     def update_earnings(self, action_kw, cost):
@@ -20,7 +21,7 @@ class Battery(object):
         charged_kw = int(charge_kw * 1/60)
         try:
             self.check_action(charged_kw)
-            self.state_of_charge_kwh = self.state_of_charge_kwh + charged_kw
+            self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kw * self.efficiency)
             print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
             self.update_earnings(charged_kw, charge_price)
         except OverflowError as err:
