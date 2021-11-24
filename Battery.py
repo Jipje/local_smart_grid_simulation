@@ -23,6 +23,8 @@ class Battery(object):
 
         self.max_kwh = max_kwh
         self.max_kw = max_kw
+        self.ptu_tracker = 0
+        self.ptu_total_action = 0
         self.efficiency = battery_efficiency
         self.earnings = 0
         self.time_step = 1/60
@@ -36,24 +38,27 @@ class Battery(object):
     def charge(self, charge_kw, charge_price):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
-
+        self.ptu_total_action = self.ptu_total_action + charged_kwh
         if potential_charged_kwh != charged_kwh:
             print('Charge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
         print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(charged_kwh, charge_price)
 
     def discharge(self, discharge_kw, discharge_price):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
-
+        self.ptu_total_action = self.ptu_total_action + discharged_kwh
         if potential_discharged_kwh != discharged_kwh:
             print('Discharge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(discharged_kwh, discharge_price)
+
+    def ptu_reset(self):
+        print('PTU reset. Action this PTU was: {}MWh'.format(self.ptu_total_action))
+        self.ptu_tracker = 0
+        self.ptu_total_action = 0
 
     def wait(self):
         pass
@@ -83,12 +88,18 @@ class Battery(object):
         if action is None:
             chosen_action = random.randint(0, 5)
         else:
-            if action == 'CHARGE':
                 chosen_action = 0
+            if action == 'CHARGE':
             elif action == 'DISCHARGE':
                 chosen_action = 1
             else:
                 chosen_action = 2
+
+        if self.ptu_tracker > 15:
+            self.ptu_reset()
+        self.ptu_tracker += 1
+
+        chosen_action = random.randint(0, 5)
 
         if chosen_action == 0:
             self.charge(self.max_kw, charge_price)
