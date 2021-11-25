@@ -75,7 +75,7 @@ class Battery(object):
         if future_soc > self.max_kwh:
             adjusted_action = int((self.max_kwh - current_soc) * 1 / self.efficiency)
         if future_soc < 0:
-            adjusted_action = current_soc - 0
+            adjusted_action = 0 - current_soc
 
         return adjusted_action
 
