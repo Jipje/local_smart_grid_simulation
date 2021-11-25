@@ -52,6 +52,27 @@ class TestBattery(unittest.TestCase):
         rhino_battery.update_earnings(-1000, -50)
         self.assertEqual(rhino_battery.earnings, 50)
 
+    def test_nice_charge_and_discharge(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
+        self.assertEqual(rhino_battery.earnings, 0)
+        rhino_battery.charge(6760, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3850)
+        self.assertEqual(rhino_battery.earnings, -56.0)
+        rhino_battery.discharge(6760, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3738)
+        self.assertEqual(rhino_battery.earnings, 0)
+
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
+        self.assertEqual(rhino_battery.earnings, 0)
+        rhino_battery.charge(6760, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3862)
+        self.assertEqual(rhino_battery.earnings, -56.0)
+        rhino_battery.discharge(6760, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
+        self.assertEqual(rhino_battery.earnings, 0)
+
 
 if __name__ == '__main__':
     unittest.main()
