@@ -33,24 +33,26 @@ class Battery(object):
         self.earnings = self.earnings + cost_of_action
 
     def charge(self, charge_kw, charge_price):
-        charged_kw = int(charge_kw * 1/60)
-        try:
-            charged_kw = self.check_action(charged_kw)
-            self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kw * self.efficiency)
-            print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-            self.update_earnings(charged_kw, charge_price)
-        except OverflowError as err:
-            print('No charge action allowed: {}'.format(err.args))
+        potential_charged_kw = int(charge_kw * 1/60)
+        charged_kw = self.check_action(potential_charged_kw)
+
+        if potential_charged_kw != charged_kw:
+            print('Charge action adjusted due to constraints')
+
+        self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kw * self.efficiency)
+        print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        self.update_earnings(charged_kw, charge_price)
 
     def discharge(self, discharge_kw, discharge_price):
-        discharged_kw = -1 * int(discharge_kw * 1/60)
-        try:
-            discharged_kw = self.check_action(discharged_kw)
-            self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kw
-            print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-            self.update_earnings(discharged_kw, discharge_price)
-        except OverflowError as err:
-            print('No discharge action allowed: {}'.format(err.args))
+        potential_discharged_kw = -1 * int(discharge_kw * 1/60)
+        discharged_kw = self.check_action(potential_discharged_kw)
+
+        if potential_discharged_kw != discharged_kw:
+            print('Discharge action adjusted due to constraints')
+
+        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kw
+        print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        self.update_earnings(discharged_kw, discharge_price)
 
     def wait(self):
         pass
@@ -59,13 +61,19 @@ class Battery(object):
         adjusted_action = action
         current_soc = self.state_of_charge_kwh
         future_soc = current_soc + action
-        # The SoC can't be higher than the max. Or lower than 0.
+        # The SoC can't be higher than the max_kwh. Or lower than 0.
         if future_soc > self.max_kwh:
             adjusted_action = self.max_kwh - current_soc
         if future_soc < 0:
             adjusted_action = current_soc - 0
+
+        # The action can't be larger than the max_kw
         if abs(action) > self.max_kw:
-            raise OverflowError('Battery action is overwriting battery action constraints')
+            if action > 0:
+                adjusted_action = max(self.max_kw, action)
+            elif action < 0:
+                adjusted_action = min(self.max_kw, action)
+
         return adjusted_action
 
     def take_action(self, charge_price, discharge_price):
