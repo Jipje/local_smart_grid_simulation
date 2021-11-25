@@ -25,34 +25,35 @@ class Battery(object):
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
         self.earnings = 0
+        self.time_step = 1/60
 
-    def update_earnings(self, action_kw, cost):
+    def update_earnings(self, action_kwh, cost):
         # Discharge is a negative action. However that pays us money so we invert the action * cost
         #     Same holds vice versa for charge. A positive action however it costs us money.
-        cost_of_action = -1 * (action_kw / 1000) * cost
+        cost_of_action = -1 * (action_kwh / 1000) * cost
         self.earnings = self.earnings + cost_of_action
 
     def charge(self, charge_kw, charge_price):
-        potential_charged_kw = int(charge_kw * 1/60)
-        charged_kw = self.check_action(potential_charged_kw)
+        potential_charged_kwh = int(charge_kw * self.time_step)
+        charged_kwh = self.check_action(potential_charged_kwh)
 
-        if potential_charged_kw != charged_kw:
+        if potential_charged_kwh != charged_kwh:
             print('Charge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kw * self.efficiency)
+        self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
         print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(charged_kw, charge_price)
+        self.update_earnings(charged_kwh, charge_price)
 
     def discharge(self, discharge_kw, discharge_price):
-        potential_discharged_kw = -1 * int(discharge_kw * 1/60)
-        discharged_kw = self.check_action(potential_discharged_kw)
+        potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
+        discharged_kwh = self.check_action(potential_discharged_kwh)
 
-        if potential_discharged_kw != discharged_kw:
+        if potential_discharged_kwh != discharged_kwh:
             print('Discharge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kw
+        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(discharged_kw, discharge_price)
+        self.update_earnings(discharged_kwh, discharge_price)
 
     def wait(self):
         pass
