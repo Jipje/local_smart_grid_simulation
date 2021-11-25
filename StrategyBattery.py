@@ -36,6 +36,10 @@ class StrategyBattery(object):
                 strategy_matrix[i].append('WAIT')
 
         for _, strategy_line in strategy_df.iterrows():
+            if strategy_line.command not in ['CHARGE', 'WAIT', 'DISCHARGE']:
+                raise ValueError('Strategies should only contain the following commands: CHARGE, WAIT, DISCHARGE')
+            if strategy_line.price_from % 5 != 0 or strategy_line.price_until % 5 != 0:
+                raise ValueError('Strategies should be defined in price steps of 5.')
             current_soc = strategy_line.state_from
             if strategy_line.state_until == 100:
                 strategy_line.state_until = 101

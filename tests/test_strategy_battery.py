@@ -13,6 +13,12 @@ class TestStrategyBattery(unittest.TestCase):
     def test_wrong_file_initialization(self):
         self.assertRaises(FileNotFoundError, StrategyBattery, strategy_csv='bla_bla_simplified_passive_imbalance_1.csv')
 
+    def test_weird_strategy_files(self):
+        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\weird_strategies\strategy_not_0.csv')
+        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\weird_strategies\strategy_not_100.csv')
+        self.assertRaises(ValueError, StrategyBattery, strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\weird_strategies\strategy_not_step_5.csv')
+        self.assertRaises(ValueError, StrategyBattery, strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\weird_strategies\strategy_unknown_action.csv')
+
     def test_faulty_soc_make_decision(self):
         rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
         self.assertRaises(ValueError, rhino_strategy.make_decision, 20, 20, -1)
