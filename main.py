@@ -41,4 +41,4 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
 
 if __name__ == '__main__':
-    run_simulation(0, 1000, verbose_lvl=2)
+    run_simulation(1440, 1440, verbose_lvl=2)
