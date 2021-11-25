@@ -4,7 +4,7 @@ from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv'):
-    rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc=50)
+    rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=50)
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
