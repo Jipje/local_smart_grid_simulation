@@ -59,17 +59,18 @@ class Battery(object):
         pass
 
     def check_action(self, action_kwh):
+        largest_kwh_action_battery = self.max_kw * self.time_step
         # The action can't be larger than the max_kw
-        if abs(action_kwh) > self.max_kw:
+        if abs(action_kwh) > largest_kwh_action_battery:
             if action_kwh > 0:
-                adjusted_action = max(self.max_kw, action_kwh)
+                adjusted_action = largest_kwh_action_battery
             elif action_kwh < 0:
-                adjusted_action = min(self.max_kw, action_kwh)
+                adjusted_action = -1 * largest_kwh_action_battery
         else:
             adjusted_action = action_kwh
 
         current_soc = self.state_of_charge_kwh
-        future_soc = current_soc + action_kwh
+        future_soc = current_soc + adjusted_action
         # The SoC can't be higher than the max_kwh. Or lower than 0.
         if future_soc > self.max_kwh:
             adjusted_action = int((self.max_kwh - current_soc) * 1 / self.efficiency)

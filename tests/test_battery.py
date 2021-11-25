@@ -73,6 +73,23 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
         self.assertEqual(rhino_battery.earnings, 0)
 
+    def test_weird_charge(self):
+        rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7400)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 7400)
+        self.assertEqual(rhino_battery.earnings, 0)
+        rhino_battery.charge(12000, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 7499)
+        self.assertEqual(rhino_battery.earnings, -55.5)
+
+        rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7200)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 7200)
+        self.assertEqual(rhino_battery.earnings, 0)
+        rhino_battery.charge(15000, 500)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 7380)
+        self.assertEqual(rhino_battery.earnings, -100)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
