@@ -14,7 +14,7 @@ class Battery(object):
                              'smaller than or equal to 1.'.format(name))
 
         if starting_soc_kwh is None:
-            self.state_of_charge_kwh = 0.5 * max_kwh
+            self.state_of_charge_kwh = int(0.5 * max_kwh)
         else:
             if starting_soc_kwh > max_kwh or starting_soc_kwh < 0:
                 raise ValueError('Error while initiating Battery {}. starting_soc cant be larger than max_kwh or '

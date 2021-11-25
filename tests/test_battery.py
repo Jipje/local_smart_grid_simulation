@@ -135,6 +135,23 @@ class TestBattery(unittest.TestCase):
         rhino_battery.discharge.assert_called_with(12000, 500)
         rhino_battery.wait.assert_called()
 
+    def test_wait(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        self.assertEqual(rhino_battery.name, 'TEST')
+        self.assertEqual(rhino_battery.efficiency, 0.9)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
+        self.assertEqual(rhino_battery.earnings, 0)
+        rhino_battery.wait()
+        self.assertEqual(rhino_battery.name, 'TEST')
+        self.assertEqual(rhino_battery.efficiency, 0.9)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
+        self.assertEqual(rhino_battery.earnings, 0)
+
+    def test_to_string(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        res = "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format('TEST', 3750, 0)
+        self.assertEqual(res, rhino_battery.__str__())
+
 
 if __name__ == '__main__':
     unittest.main()
