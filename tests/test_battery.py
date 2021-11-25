@@ -103,5 +103,21 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.state_of_charge_kwh, 300)
         self.assertEqual(rhino_battery.earnings, 100)
 
+    def test_check_action(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        self.assertEqual(200, rhino_battery.check_action(200))
+        self.assertEqual(200, rhino_battery.check_action(500))
+        self.assertEqual(-200, rhino_battery.check_action(-200))
+        self.assertEqual(-200, rhino_battery.check_action(-500))
+
+        rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7400)
+        self.assertEqual(111, rhino_battery.check_action(200))
+        self.assertEqual(111, rhino_battery.check_action(500))
+
+        rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=100)
+        self.assertEqual(-100, rhino_battery.check_action(-200))
+        self.assertEqual(-100, rhino_battery.check_action(-500))
+
+
 if __name__ == '__main__':
     unittest.main()
