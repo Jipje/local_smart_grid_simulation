@@ -31,13 +31,15 @@ class StrategyBattery(object):
 
         num_of_price_buckets = int((highest_price - lowest_price) / self.price_step_size)
         strategy_matrix = []
-        for i in range(100):
+        for i in range(100 + 1):
             strategy_matrix.append([])
             for _ in range(num_of_price_buckets + 1):
                 strategy_matrix[i].append('WAIT')
 
         for _, strategy_line in strategy_df.iterrows():
             current_soc = strategy_line.state_from
+            if strategy_line.state_until == 100:
+                strategy_line.state_until = 101
             while current_soc < strategy_line.state_until:
                 current_soc_index = current_soc
                 for current_price in range(lowest_price, highest_price + self.price_step_size, self.price_step_size):
@@ -57,16 +59,19 @@ class StrategyBattery(object):
             res = self.min_price
         return res
 
-    def make_decision(self, charge_price, discharge_price, state_of_charge):
-        if not(self.uploaded):
+    def make_decision(self, charge_price, discharge_price, state_of_charge_perc):
+        if not self.uploaded:
             raise LookupError("A STRATEGY HAS NOT BEEN UPLOADED")
 
         charge_price = self.clean_price(charge_price)
         discharge_price = self.clean_price(discharge_price)
-
-        soc_index = int(state_of_charge)
         charge_price_index = self.price_index(charge_price)
         discharge_price_index = self.price_index(discharge_price)
+
+        if state_of_charge_perc > 100 or state_of_charge_perc < 0:
+            raise ValueError("make_decision expects a state_of_charge_percent. Please offer a value between or equal "
+                             "to 0 and 100")
+        soc_index = int(state_of_charge_perc)
 
         charge_check_decision = self.strategy_matrix[soc_index][charge_price_index]
         if charge_check_decision == 'DISCHARGE':
