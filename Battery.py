@@ -100,6 +100,13 @@ class Battery(object):
         return adjusted_action
 
     def take_action(self, charge_price, discharge_price, action=None):
+        if self.ptu_tracker >= 15:
+            self.ptu_reset()
+        self.ptu_tracker += 1
+
+        self.ptu_charge_price = charge_price
+        self.ptu_discharge_price = discharge_price
+
         if action is None:
             chosen_action = random.randint(0, 5)
         else:
@@ -109,10 +116,6 @@ class Battery(object):
                 chosen_action = 1
             else:
                 chosen_action = 2
-
-        if self.ptu_tracker > 15:
-            self.ptu_reset(charge_price, discharge_price)
-        self.ptu_tracker += 1
 
         if chosen_action == 0:
             self.charge(self.max_kw, charge_price)

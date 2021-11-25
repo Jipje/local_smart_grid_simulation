@@ -181,6 +181,57 @@ class TestBattery(unittest.TestCase):
         rhino_battery.ptu_reset()
         rhino_battery.update_earnings.assert_called_with(0, 0)
 
+    def test_all_pos_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-40, 1000, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        self.assertEqual(3000, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(60, rhino_battery.earnings)
+
+    def test_first_pos_then_neg_end_pos_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.ptu_tracker = 10
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(4, rhino_battery.earnings)
+
+    # def first_pos_end_neg(self):
+    #
+    # def all_neg_ptu(self):
+    #
+    # def first_neg_then_pos_end_neg_ptu(self):
+    #
+    # def first_neg_end_pos(self):
+
+
+
 
 
 
