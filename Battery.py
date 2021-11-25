@@ -57,22 +57,23 @@ class Battery(object):
     def wait(self):
         pass
 
-    def check_action(self, action):
-        adjusted_action = action
+    def check_action(self, action_kwh):
+        # The action can't be larger than the max_kw
+        if abs(action_kwh) > self.max_kw:
+            if action_kwh > 0:
+                adjusted_action = max(self.max_kw, action_kwh)
+            elif action_kwh < 0:
+                adjusted_action = min(self.max_kw, action_kwh)
+        else:
+            adjusted_action = action_kwh
+
         current_soc = self.state_of_charge_kwh
-        future_soc = current_soc + action
+        future_soc = current_soc + action_kwh
         # The SoC can't be higher than the max_kwh. Or lower than 0.
         if future_soc > self.max_kwh:
             adjusted_action = self.max_kwh - current_soc
         if future_soc < 0:
             adjusted_action = current_soc - 0
-
-        # The action can't be larger than the max_kw
-        if abs(action) > self.max_kw:
-            if action > 0:
-                adjusted_action = max(self.max_kw, action)
-            elif action < 0:
-                adjusted_action = min(self.max_kw, action)
 
         return adjusted_action
 
