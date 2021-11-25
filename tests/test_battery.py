@@ -37,6 +37,21 @@ class TestBattery(unittest.TestCase):
         self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, starting_soc_kwh=-100)
         self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, starting_soc_kwh=7501)
 
+    def test_nice_update_earnings(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        # Charge 1 MWh for 50 €/MWh
+        rhino_battery.update_earnings(1000, 50)
+        self.assertEqual(rhino_battery.earnings, -50)
+        # Discharge 2 MWh for 50 €/MWh
+        rhino_battery.update_earnings(-2000, 50)
+        self.assertEqual(rhino_battery.earnings, 50)
+        # Charge 1 MWh for -50 €/MWh
+        rhino_battery.update_earnings(1000, -50)
+        self.assertEqual(rhino_battery.earnings, 100)
+        # Discharge 1 MWh for -50 €/MWh
+        rhino_battery.update_earnings(-1000, -50)
+        self.assertEqual(rhino_battery.earnings, 50)
+
 
 if __name__ == '__main__':
     unittest.main()
