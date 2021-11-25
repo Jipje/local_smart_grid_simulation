@@ -79,8 +79,17 @@ class Battery(object):
 
         return adjusted_action
 
-    def take_action(self, charge_price, discharge_price):
-        chosen_action = random.randint(0, 5)
+    def take_action(self, charge_price, discharge_price, action=None):
+        if action is None:
+            chosen_action = random.randint(0, 5)
+        else:
+            if action == 'CHARGE':
+                chosen_action = 0
+            elif action == 'DISCHARGE':
+                chosen_action = 1
+            else:
+                chosen_action = 2
+
         if chosen_action == 0:
             self.charge(self.max_kw, charge_price)
         elif chosen_action == 1:

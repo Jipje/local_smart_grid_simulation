@@ -1,5 +1,8 @@
+from unittest.mock import MagicMock
+
 from Battery import Battery
 import unittest
+import mock
 
 
 class TestBattery(unittest.TestCase):
@@ -117,6 +120,20 @@ class TestBattery(unittest.TestCase):
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=100)
         self.assertEqual(-100, rhino_battery.check_action(-200))
         self.assertEqual(-100, rhino_battery.check_action(-500))
+
+    def test_take_action(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.charge = MagicMock(name='charge', return_value=0)
+        rhino_battery.discharge = MagicMock(name='charge', return_value=1)
+        rhino_battery.wait = MagicMock(name='charge', return_value=2)
+
+        rhino_battery.take_action(-20, 500, action='CHARGE')
+        rhino_battery.take_action(-20, 500, action='DISCHARGE')
+        rhino_battery.take_action(-20, 500, action='WAIT')
+
+        rhino_battery.charge.assert_called_with(12000, -20)
+        rhino_battery.discharge.assert_called_with(12000, 500)
+        rhino_battery.wait.assert_called()
 
 
 if __name__ == '__main__':
