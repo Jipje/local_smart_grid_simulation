@@ -24,7 +24,12 @@ class Battery(object):
         self.max_kwh = max_kwh
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
+
         self.earnings = 0
+        self.ptu_tracker = 0
+        self.ptu_total_action = 0
+        self.ptu_charge_price = 9999
+        self.ptu_discharge_price = -9999
         self.time_step = 1/60
 
     def update_earnings(self, action_kwh, cost):
@@ -32,28 +37,43 @@ class Battery(object):
         #     Same holds vice versa for charge. A positive action however it costs us money.
         cost_of_action = -1 * (action_kwh / 1000) * cost
         self.earnings = self.earnings + cost_of_action
+        return cost_of_action
 
     def charge(self, charge_kw, charge_price):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
+        self.ptu_total_action = self.ptu_total_action + charged_kwh
 
         if potential_charged_kwh != charged_kwh:
             print('Charge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
         print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(charged_kwh, charge_price)
 
     def discharge(self, discharge_kw, discharge_price):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
+        self.ptu_total_action = self.ptu_total_action + discharged_kwh
 
         if potential_discharged_kwh != discharged_kwh:
             print('Discharge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
-        self.update_earnings(discharged_kwh, discharge_price)
+
+    def ptu_reset(self):
+        if self.ptu_total_action > 0:
+            price_to_use = self.ptu_charge_price
+        elif self.ptu_total_action < 0:
+            price_to_use = self.ptu_discharge_price
+        else:
+            price_to_use = 0
+
+        ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
+        print('PTU reset. Action this PTU was: {}kWh. Earned €{}'.format(self.ptu_total_action, ptu_profits))
+
+        self.ptu_tracker = 0
+        self.ptu_total_action = 0
 
     def wait(self):
         pass
@@ -80,6 +100,13 @@ class Battery(object):
         return adjusted_action
 
     def take_action(self, charge_price, discharge_price, action=None):
+        if self.ptu_tracker >= 15:
+            self.ptu_reset()
+        self.ptu_tracker += 1
+
+        self.ptu_charge_price = charge_price
+        self.ptu_discharge_price = discharge_price
+
         if action is None:
             chosen_action = random.randint(0, 5)
         else:

@@ -59,55 +59,41 @@ class TestBattery(unittest.TestCase):
     def test_nice_charge_and_discharge(self):
         rhino_battery = Battery('TEST', 7500, 12000)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.charge(6760, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3850)
-        self.assertEqual(rhino_battery.earnings, -56.0)
         rhino_battery.discharge(6760, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3738)
-        self.assertEqual(rhino_battery.earnings, 0)
 
         rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.charge(6760, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3862)
-        self.assertEqual(rhino_battery.earnings, -56.0)
         rhino_battery.discharge(6760, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
 
     def test_weird_charge(self):
         # Battery too full
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7400)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7400)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.charge(12000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7499)
-        self.assertEqual(rhino_battery.earnings, -55.5)
         # Asking too much power from battery
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7200)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7200)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.charge(15000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7380)
-        self.assertEqual(rhino_battery.earnings, -100)
 
     def test_weird_discharge(self):
         # Battery too empty
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=100)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 100)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.discharge(12000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 0)
-        self.assertEqual(rhino_battery.earnings, 50)
         # Discharge too large
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 500)
-        self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.discharge(15000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 300)
-        self.assertEqual(rhino_battery.earnings, 100)
 
     def test_check_action(self):
         # Battery not powerful enough
@@ -155,6 +141,159 @@ class TestBattery(unittest.TestCase):
         rhino_battery = Battery('TEST', 7500, 12000)
         res = "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format('TEST', 3750, 0)
         self.assertEqual(res, rhino_battery.__str__())
+
+    def test_ptu_reset(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=1500)
+        rhino_battery.ptu_total_action = -3000
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
+        rhino_battery.update_earnings.assert_called_with(-3000, 500)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.ptu_total_action = -3000
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
+        self.assertEqual(1500, rhino_battery.earnings)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=60)
+        rhino_battery.ptu_total_action = 3000
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
+        rhino_battery.update_earnings.assert_called_with(3000, -20)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.ptu_total_action = 3000
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
+        self.assertEqual(60, rhino_battery.earnings)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=0)
+        rhino_battery.ptu_total_action = 0
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
+        rhino_battery.update_earnings.assert_called_with(0, 0)
+
+    def test_all_pos_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-40, 1000, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        self.assertEqual(3000, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(60, rhino_battery.earnings)
+
+    def test_first_pos_then_neg_end_pos_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.ptu_tracker = 10
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(4, rhino_battery.earnings)
+
+    def test_first_pos_end_neg_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.ptu_tracker = 10
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        self.assertEqual(-600, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(300, rhino_battery.earnings)
+
+    def test_all_neg_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-40, 9999, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        self.assertEqual(-3000, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(1500, rhino_battery.earnings)
+
+    def test_first_neg_then_pos_end_neg_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.ptu_tracker = 10
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        self.assertEqual(-200, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(100, rhino_battery.earnings)
+
+    def test_first_neg_end_pos_ptu(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=1)
+        rhino_battery.ptu_tracker = 10
+        rhino_battery.take_action(-20, 500, 'DISCHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        rhino_battery.take_action(-20, 500, 'CHARGE')
+        self.assertEqual(600, rhino_battery.ptu_total_action)
+        self.assertEqual(15, rhino_battery.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings)
+        rhino_battery.take_action(50, 50, 'CHARGE')
+        self.assertEqual(200, rhino_battery.ptu_total_action)
+        self.assertEqual(1, rhino_battery.ptu_tracker)
+        self.assertEqual(12, rhino_battery.earnings)
 
 
 if __name__ == '__main__':
