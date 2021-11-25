@@ -1,4 +1,5 @@
 import random
+from StrategyBattery import StrategyBattery
 
 
 class Battery(object):
@@ -24,6 +25,8 @@ class Battery(object):
         self.max_kwh = max_kwh
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
+
+        self.strategy = StrategyBattery()
 
         self.earnings = 0
         self.ptu_tracker = 0
@@ -108,14 +111,15 @@ class Battery(object):
         self.ptu_discharge_price = discharge_price
 
         if action is None:
-            chosen_action = random.randint(0, 5)
+            soc_perc = int(self.state_of_charge_kwh / self.max_kwh * 100)
+            action = self.strategy.make_decision(charge_price, discharge_price, soc_perc)
+
+        if action == 'CHARGE':
+            chosen_action = 0
+        elif action == 'DISCHARGE':
+            chosen_action = 1
         else:
-            if action == 'CHARGE':
-                chosen_action = 0
-            elif action == 'DISCHARGE':
-                chosen_action = 1
-            else:
-                chosen_action = 2
+            chosen_action = 2
 
         if chosen_action == 0:
             self.charge(self.max_kw, charge_price)

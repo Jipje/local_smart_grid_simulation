@@ -93,11 +93,17 @@ class StrategyBattery(object):
         if discharge_check_decision == 'CHARGE':
             discharge_check_decision = 'WAIT'
 
+        decision = None
         if charge_check_decision == 'WAIT' and discharge_check_decision == 'WAIT':
             decision = 'WAIT'
         elif charge_check_decision == 'CHARGE' and discharge_check_decision == 'WAIT':
             decision = 'CHARGE'
         elif charge_check_decision == 'WAIT' and discharge_check_decision == 'DISCHARGE':
             decision = 'DISCHARGE'
+        elif charge_check_decision == 'CHARGE' and discharge_check_decision == 'DISCHARGE':
+            if state_of_charge_perc > 50:
+                decision = 'DISCHARGE'
+            else:
+                decision = 'CHARGE'
 
         return decision
