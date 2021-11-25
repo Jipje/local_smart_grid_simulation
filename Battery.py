@@ -40,6 +40,7 @@ class Battery(object):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
         self.ptu_total_action = self.ptu_total_action + charged_kwh
+
         if potential_charged_kwh != charged_kwh:
             print('Charge action adjusted due to constraints')
 
@@ -50,6 +51,7 @@ class Battery(object):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
         self.ptu_total_action = self.ptu_total_action + discharged_kwh
+
         if potential_discharged_kwh != discharged_kwh:
             print('Discharge action adjusted due to constraints')
 
@@ -98,8 +100,8 @@ class Battery(object):
         if action is None:
             chosen_action = random.randint(0, 5)
         else:
-                chosen_action = 0
             if action == 'CHARGE':
+                chosen_action = 0
             elif action == 'DISCHARGE':
                 chosen_action = 1
             else:
@@ -108,8 +110,6 @@ class Battery(object):
         if self.ptu_tracker > 15:
             self.ptu_reset(charge_price, discharge_price)
         self.ptu_tracker += 1
-
-        chosen_action = random.randint(0, 5)
 
         if chosen_action == 0:
             self.charge(self.max_kw, charge_price)
