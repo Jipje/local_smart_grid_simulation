@@ -7,18 +7,19 @@ import mock
 
 class TestBattery(unittest.TestCase):
     def test_nice_initialization(self):
+        # Empty battery
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=0)
         self.assertEqual(rhino_battery.name, 'TEST')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 0)
         self.assertEqual(rhino_battery.earnings, 0)
-
+        # Less efficient battery
         rhino_battery = Battery('TEST', 7500, 12000, battery_efficiency=0.8)
         self.assertEqual(rhino_battery.name, 'TEST')
         self.assertEqual(rhino_battery.efficiency, 0.8)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
         self.assertEqual(rhino_battery.earnings, 0)
-
+        # Different starting SoC
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=3000)
         self.assertEqual(rhino_battery.name, 'TEST')
         self.assertEqual(rhino_battery.efficiency, 0.9)
@@ -77,13 +78,14 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.earnings, 0)
 
     def test_weird_charge(self):
+        # Battery too full
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7400)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7400)
         self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.charge(12000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7499)
         self.assertEqual(rhino_battery.earnings, -55.5)
-
+        # Asking too much power from battery
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7200)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 7200)
         self.assertEqual(rhino_battery.earnings, 0)
@@ -92,13 +94,14 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.earnings, -100)
 
     def test_weird_discharge(self):
+        # Battery too empty
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=100)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 100)
         self.assertEqual(rhino_battery.earnings, 0)
         rhino_battery.discharge(12000, 500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 0)
         self.assertEqual(rhino_battery.earnings, 50)
-
+        # Discharge too large
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=500)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 500)
         self.assertEqual(rhino_battery.earnings, 0)
@@ -107,16 +110,17 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.earnings, 100)
 
     def test_check_action(self):
+        # Battery not powerful enough
         rhino_battery = Battery('TEST', 7500, 12000)
         self.assertEqual(200, rhino_battery.check_action(200))
         self.assertEqual(200, rhino_battery.check_action(500))
         self.assertEqual(-200, rhino_battery.check_action(-200))
         self.assertEqual(-200, rhino_battery.check_action(-500))
-
+        # Battery too full. Keeps track of battery efficiency
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=7400)
         self.assertEqual(111, rhino_battery.check_action(200))
         self.assertEqual(111, rhino_battery.check_action(500))
-
+        # Battery too empty
         rhino_battery = Battery('TEST', 7500, 12000, starting_soc_kwh=100)
         self.assertEqual(-100, rhino_battery.check_action(-200))
         self.assertEqual(-100, rhino_battery.check_action(-500))
@@ -130,7 +134,7 @@ class TestBattery(unittest.TestCase):
         rhino_battery.take_action(-20, 500, action='CHARGE')
         rhino_battery.take_action(-20, 500, action='DISCHARGE')
         rhino_battery.take_action(-20, 500, action='WAIT')
-
+        # Test that the correct charge price is used for charge action and vice versa with discharge
         rhino_battery.charge.assert_called_with(12000, -20)
         rhino_battery.discharge.assert_called_with(12000, 500)
         rhino_battery.wait.assert_called()
