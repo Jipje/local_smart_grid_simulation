@@ -146,29 +146,39 @@ class TestBattery(unittest.TestCase):
         rhino_battery = Battery('TEST', 7500, 12000)
         rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=1500)
         rhino_battery.ptu_total_action = -3000
-        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
         rhino_battery.update_earnings.assert_called_with(-3000, 500)
 
         rhino_battery = Battery('TEST', 7500, 12000)
         rhino_battery.ptu_total_action = -3000
-        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
         self.assertEqual(1500, rhino_battery.earnings)
 
         rhino_battery = Battery('TEST', 7500, 12000)
         rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=60)
         rhino_battery.ptu_total_action = 3000
-        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
         rhino_battery.update_earnings.assert_called_with(3000, -20)
 
         rhino_battery = Battery('TEST', 7500, 12000)
         rhino_battery.ptu_total_action = 3000
-        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
         self.assertEqual(60, rhino_battery.earnings)
 
         rhino_battery = Battery('TEST', 7500, 12000)
         rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=0)
         rhino_battery.ptu_total_action = 0
-        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.ptu_charge_price = -20
+        rhino_battery.ptu_discharge_price = 500
+        rhino_battery.ptu_reset()
         rhino_battery.update_earnings.assert_called_with(0, 0)
 
 

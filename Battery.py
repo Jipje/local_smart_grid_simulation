@@ -23,10 +23,13 @@ class Battery(object):
 
         self.max_kwh = max_kwh
         self.max_kw = max_kw
+        self.efficiency = battery_efficiency
+
+        self.earnings = 0
         self.ptu_tracker = 0
         self.ptu_total_action = 0
-        self.efficiency = battery_efficiency
-        self.earnings = 0
+        self.ptu_charge_price = 9999
+        self.ptu_discharge_price = -9999
         self.time_step = 1/60
 
     def update_earnings(self, action_kwh, cost):
@@ -58,11 +61,11 @@ class Battery(object):
         self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
         print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
-    def ptu_reset(self, charge_price, discharge_price):
+    def ptu_reset(self):
         if self.ptu_total_action > 0:
-            price_to_use = charge_price
+            price_to_use = self.ptu_charge_price
         elif self.ptu_total_action < 0:
-            price_to_use = discharge_price
+            price_to_use = self.ptu_discharge_price
         else:
             price_to_use = 0
 
