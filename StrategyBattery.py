@@ -4,7 +4,6 @@ import pandas as pd
 class StrategyBattery(object):
     def __init__(self, strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv'):
         self.dayhead_tracker = False
-        self.uploaded = False
         self.strategy_matrix = []
         self.price_step_size = 5
         self.max_price = -9999
@@ -67,9 +66,6 @@ class StrategyBattery(object):
         return res
 
     def make_decision(self, charge_price, discharge_price, state_of_charge_perc):
-        if not self.uploaded:
-            raise LookupError("A STRATEGY HAS NOT BEEN UPLOADED")
-
         charge_price = self.clean_price(charge_price, discharge_price=False)
         discharge_price = self.clean_price(discharge_price, discharge_price=True)
         charge_price_index = self.price_index(charge_price)
@@ -87,14 +83,11 @@ class StrategyBattery(object):
         if discharge_check_decision == 'CHARGE':
             discharge_check_decision = 'WAIT'
 
-        decision = 'WAIT'
         if charge_check_decision == 'WAIT' and discharge_check_decision == 'WAIT':
             decision = 'WAIT'
         elif charge_check_decision == 'CHARGE' and discharge_check_decision == 'WAIT':
             decision = 'CHARGE'
         elif charge_check_decision == 'WAIT' and discharge_check_decision == 'DISCHARGE':
             decision = 'DISCHARGE'
-        else:
-            raise Exception('THIS SHOULD BE IMPOSSIBLE')
 
         return decision
