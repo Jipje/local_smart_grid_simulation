@@ -22,6 +22,16 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
         self.assertEqual(rhino_battery.earnings, 0)
 
+    def test_faulty_initialization(self):
+        self.assertRaises(ValueError, Battery, 'TEST', 0, 12000)
+        self.assertRaises(ValueError, Battery, 'TEST', -7500, 12000)
+        self.assertRaises(ValueError, Battery, 'TEST', 7500, 0)
+        self.assertRaises(ValueError, Battery, 'TEST', 7500, -12000)
+        self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, battery_efficiency=-0.9)
+        self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, battery_efficiency=0)
+        self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, battery_efficiency=1.1)
+
+
 
 if __name__ == '__main__':
     unittest.main()

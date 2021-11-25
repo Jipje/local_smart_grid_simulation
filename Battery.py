@@ -4,6 +4,14 @@ import random
 class Battery(object):
     def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc=0):
         self.name = name
+        if max_kwh <= 0:
+            raise ValueError('Error while initiating Battery {}. max_kwh should be larger than 0.'.format(name))
+        if max_kw <= 0:
+            raise ValueError('Error while initiating Battery {}. max_kw should be larger than 0.'.format(name))
+        if battery_efficiency <= 0 or battery_efficiency > 1:
+            raise ValueError('Error while initiating Battery {}. battery_efficiency should be larger than 0 and '
+                             'smaller than or equal to 1.'.format(name))
+
         self.state_of_charge_kwh = starting_soc / 100 * max_kwh
 
         self.max_kwh = max_kwh
