@@ -4,8 +4,8 @@ from StrategyBattery import StrategyBattery
 from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
-def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv'):
-    rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750)
+def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
+    rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
@@ -41,6 +41,4 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
 
 if __name__ == '__main__':
-    # rhino_strat = StrategyBattery()
-    # print(rhino_strat.make_decision(-20, 500, 50))
-    run_simulation(0, 1000)
+    run_simulation(0, 1000, verbose_lvl=2)
