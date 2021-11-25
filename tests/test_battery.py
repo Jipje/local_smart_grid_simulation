@@ -142,6 +142,37 @@ class TestBattery(unittest.TestCase):
         res = "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format('TEST', 3750, 0)
         self.assertEqual(res, rhino_battery.__str__())
 
+    def test_ptu_reset(self):
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=1500)
+        rhino_battery.ptu_total_action = -3000
+        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.update_earnings.assert_called_with(-3000, 500)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.ptu_total_action = -3000
+        rhino_battery.ptu_reset(-20, 500)
+        self.assertEqual(1500, rhino_battery.earnings)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=60)
+        rhino_battery.ptu_total_action = 3000
+        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.update_earnings.assert_called_with(3000, -20)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.ptu_total_action = 3000
+        rhino_battery.ptu_reset(-20, 500)
+        self.assertEqual(60, rhino_battery.earnings)
+
+        rhino_battery = Battery('TEST', 7500, 12000)
+        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=0)
+        rhino_battery.ptu_total_action = 0
+        rhino_battery.ptu_reset(-20, 500)
+        rhino_battery.update_earnings.assert_called_with(0, 0)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
