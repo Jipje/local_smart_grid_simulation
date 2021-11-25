@@ -2,7 +2,7 @@ import random
 
 
 class Battery(object):
-    def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc_kwh=None):
+    def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
         self.name = name
 
         if max_kwh <= 0:
@@ -30,7 +30,9 @@ class Battery(object):
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
         self.ptu_discharge_price = -9999
+
         self.time_step = 1/60
+        self.verbose_lvl = verbose_lvl
 
     def update_earnings(self, action_kwh, cost):
         # Discharge is a negative action. However that pays us money so we invert the action * cost
@@ -44,22 +46,24 @@ class Battery(object):
         charged_kwh = self.check_action(potential_charged_kwh)
         self.ptu_total_action = self.ptu_total_action + charged_kwh
 
-        if potential_charged_kwh != charged_kwh:
+        if potential_charged_kwh != charged_kwh and self.verbose_lvl > 2:
             print('Charge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
-        print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        if self.verbose_lvl > 2:
+            print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
     def discharge(self, discharge_kw, discharge_price):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
         self.ptu_total_action = self.ptu_total_action + discharged_kwh
 
-        if potential_discharged_kwh != discharged_kwh:
+        if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 2:
             print('Discharge action adjusted due to constraints')
 
         self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
-        print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        if self.verbose_lvl > 2:
+            print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
     def ptu_reset(self):
         if self.ptu_total_action > 0:
@@ -70,7 +74,8 @@ class Battery(object):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        print('PTU reset. Action this PTU was: {}kWh. Earned €{}'.format(self.ptu_total_action, ptu_profits))
+        if self.verbose_lvl > 2 or self.verbose_lvl > 1 and abs(ptu_profits) > 50:
+            print('PTU reset. Action this PTU was: {}kWh. Earned €{}'.format(self.ptu_total_action, ptu_profits))
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
@@ -125,4 +130,4 @@ class Battery(object):
             self.wait()
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format(self.name, self.state_of_charge_kwh, self.earnings)
+        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}\n".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
