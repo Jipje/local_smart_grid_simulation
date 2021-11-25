@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class StrategyBattery(object):
-    def __init__(self, strategy_csv='data/strategies/simplified_passive_imbalance_1.csv'):
+    def __init__(self, strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv'):
         self.dayhead_tracker = False
         self.uploaded = False
         self.strategy_matrix = []
@@ -23,8 +23,8 @@ class StrategyBattery(object):
         strategy_df = pd.read_csv(strategy_csv)
         assert(strategy_df['state_from'].min() == 0)
         assert(strategy_df['state_until'].max() == 100)
-        highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(2).iloc[1] + self.price_step_size
-        lowest_price = strategy_df['price_until'].drop_duplicates(keep='last').nsmallest(2).iloc[1] - self.price_step_size
+        highest_price = strategy_df['price_from'].drop_duplicates(keep='last').nlargest(1).iloc[0] + self.price_step_size
+        lowest_price = strategy_df['price_until'].drop_duplicates(keep='last').nsmallest(1).iloc[0] - self.price_step_size
 
         self.max_price = highest_price
         self.min_price = lowest_price
@@ -51,8 +51,15 @@ class StrategyBattery(object):
         self.uploaded = True
         self.strategy_matrix = strategy_matrix
 
-    def clean_price(self, price):
-        res = price + price % self.price_step_size
+    def clean_price(self, price, discharge_price=True):
+        if price % self.price_step_size == 0:
+            res = price
+        else:
+            if discharge_price:
+                res = price - price % self.price_step_size
+            else:
+                res = price + self.price_step_size - (price % self.price_step_size)
+
         if price > self.max_price:
             res = self.max_price
         elif price < self.min_price:
@@ -63,8 +70,8 @@ class StrategyBattery(object):
         if not self.uploaded:
             raise LookupError("A STRATEGY HAS NOT BEEN UPLOADED")
 
-        charge_price = self.clean_price(charge_price)
-        discharge_price = self.clean_price(discharge_price)
+        charge_price = self.clean_price(charge_price, discharge_price=False)
+        discharge_price = self.clean_price(discharge_price, discharge_price=True)
         charge_price_index = self.price_index(charge_price)
         discharge_price_index = self.price_index(discharge_price)
 

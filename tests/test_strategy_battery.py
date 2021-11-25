@@ -5,16 +5,21 @@ import unittest
 class TestStrategyBattery(unittest.TestCase):
 
     def test_nice_initialization(self):
-        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\simplified_passive_imbalance_1.csv')
+        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
         self.assertEqual(rhino_strategy.max_price, 105)
         self.assertEqual(rhino_strategy.min_price, -5)
         self.assertEqual(rhino_strategy.price_step_size, 5)
 
     def test_wrong_file_initialization(self):
-        self.assertRaises(FileNotFoundError, StrategyBattery, strategy_csv='simplified_passive_imbalance_1.csv')
+        self.assertRaises(FileNotFoundError, StrategyBattery, strategy_csv='bla_bla_simplified_passive_imbalance_1.csv')
+
+    def test_faulty_soc_make_decision(self):
+        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
+        self.assertRaises(ValueError, rhino_strategy.make_decision, 20, 20, -1)
+        self.assertRaises(ValueError, rhino_strategy.make_decision, 20, 20, 101)
 
     def test_nice_charge_buckets(self):
-        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\simplified_passive_imbalance_1.csv')
+        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
         # Second bucket
         self.assertEqual(rhino_strategy.make_decision(-50, -50, 5), 'CHARGE')
         self.assertEqual(rhino_strategy.make_decision(0, 0, 6), 'CHARGE')
@@ -31,10 +36,25 @@ class TestStrategyBattery(unittest.TestCase):
         self.assertEqual(rhino_strategy.make_decision(-50, -50, 93), 'CHARGE')
         self.assertEqual(rhino_strategy.make_decision(-1, -1, 94), 'CHARGE')
 
-        self.assertEqual(rhino_strategy.make_decision(60, 60, 9), 'WAIT')
-        self.assertEqual(rhino_strategy.make_decision(100, 100, 10), 'WAIT')
+    def test_nice_waiting_charge_buckets(self):
+        rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
+        # Second bucket
+        self.assertEqual(rhino_strategy.make_decision(51, 51, 5), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(98, 98, 6), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(52, 52, 38), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(99, 99, 39), 'WAIT')
+        # Third bucket
+        self.assertEqual(rhino_strategy.make_decision(52, 52, 40), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(78, 78, 41), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(51, 51, 68), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(79, 79, 69), 'WAIT')
+        # Fourth bucket
+        self.assertEqual(rhino_strategy.make_decision(1, 1, 70), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(63, 63, 93), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(2, 2, 71), 'WAIT')
+        self.assertEqual(rhino_strategy.make_decision(64, 64, 94), 'WAIT')
 
-    def test_charge_extreme_buckets(self):
+    def test_extreme_buckets(self):
         rhino_strategy = StrategyBattery(strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv')
         # First bucket
         self.assertEqual(rhino_strategy.make_decision(100, 100, 0), 'CHARGE')
@@ -50,4 +70,3 @@ class TestStrategyBattery(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
