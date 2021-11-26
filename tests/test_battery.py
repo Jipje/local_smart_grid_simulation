@@ -1,8 +1,6 @@
 from unittest.mock import MagicMock
-
 from Battery import Battery
 import unittest
-import mock
 
 
 class TestBattery(unittest.TestCase):
@@ -139,7 +137,7 @@ class TestBattery(unittest.TestCase):
 
     def test_to_string(self):
         rhino_battery = Battery('TEST', 7500, 12000)
-        res = "{} battery:\nCurrent SoC: {}\nTotal Earnings: {}\n".format('TEST', 3750, 0)
+        res = "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}".format('TEST', 3750, 0)
         self.assertEqual(res, rhino_battery.__str__())
 
     def test_ptu_reset(self):
