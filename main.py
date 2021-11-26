@@ -14,6 +14,15 @@ def run_random_thirty_days(scenario='data/tennet_balans_delta_nov_2020_nov_2021.
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
 
 
+def run_full_scenario(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=1):
+    starting_timestep = 0
+    with open(scenario) as file:
+        number_of_steps = len(file.readlines()) + 1
+    print('Running full scenario {}'.format(scenario))
+    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl)
+    print('Just ran full scenario {}'.format(scenario))
+
+
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
 
@@ -72,11 +81,13 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
     num_of_days = int(steps_taken / 60 / 24)
     print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}\n'.format(steps_taken, steps_taken / 15, num_of_days))
-    earnings_per_day = round(rhino.earnings / num_of_days, 2)
     print(rhino)
+    if num_of_days != 0:
+        earnings_per_day = round(rhino.earnings / num_of_days, 2)
     print('Average earnings per day: {}'.format(earnings_per_day))
 
 
 if __name__ == '__main__':
-    # run_simulation(1440, 1440, verbose_lvl=2)
-    run_random_thirty_days(verbose_lvl=2)
+    # run_simulation(525500, 1440, verbose_lvl=3)
+    run_full_scenario()
+    # run_random_thirty_days(verbose_lvl=2)
