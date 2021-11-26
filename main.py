@@ -53,8 +53,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                 if steps_taken == number_of_steps and verbose_lvl >= 0:
                     print('End of simulation, final PTU: {}'.format(environment_data[0]))
 
-    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}\n'.format(steps_taken, steps_taken / 15, steps_taken / 60 / 24))
+    num_of_days = int(steps_taken / 60 / 24)
+    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}\n'.format(steps_taken, steps_taken / 15, num_of_days))
+    earnings_per_day = round(rhino.earnings / num_of_days, 2)
     print(rhino)
+    print('Average earnings per day: {}'.format(earnings_per_day))
 
 
 if __name__ == '__main__':
