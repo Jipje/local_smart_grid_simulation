@@ -77,7 +77,7 @@ class Battery(object):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        if self.verbose_lvl > 2 or self.verbose_lvl > 1 and abs(ptu_profits) > 50:
+        if self.verbose_lvl > 2 or self.verbose_lvl > 1 and abs(ptu_profits) > 100:
             print('PTU reset. Action this PTU was: {}kWh. Prices were {} charge, {} discharge. Earned €{}'.format(self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
 
         self.ptu_tracker = 0

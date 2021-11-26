@@ -23,6 +23,10 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
         steps_taken = 0
         imbalance_msg_interpreter = ImbalanceMessageInterpreter()
 
+        curr_day = 0
+        old_day = 0
+        old_earnings = 0
+
         # Open the scenario
         for environment_data in csv_reader:
             if starting_time_step >= 0:  # Skip lines until we reach the starting step.
@@ -31,6 +35,15 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                 time_step_dt = dt.datetime.strptime(environment_data[0], '%Y-%m-%dT%H:%M:%S.000Z')
                 time_step_dt = time_step_dt.astimezone(tz=dt.timezone.utc)
                 time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
+
+                curr_day = time_step_dt.day
+                if curr_day != old_day:
+                    if verbose_lvl > 0:
+                        day_earnings = round(rhino.earnings - old_earnings, 2)
+                        print('Earnings for {}: €{}'.format(time_step_string, day_earnings))
+                    old_day = curr_day
+                    old_earnings = rhino.earnings
+
                 if steps_taken == 0 and verbose_lvl >= 0:
                     print('Starting simulation from PTU {}'.format(time_step_string))
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
@@ -66,4 +79,4 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
 if __name__ == '__main__':
     # run_simulation(1440, 1440, verbose_lvl=2)
-    run_random_thirty_days(verbose_lvl=1)
+    run_random_thirty_days(verbose_lvl=2)
