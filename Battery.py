@@ -134,4 +134,4 @@ class Battery(object):
             self.wait()
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}\n".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))

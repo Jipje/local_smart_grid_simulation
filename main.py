@@ -8,7 +8,9 @@ def run_random_thirty_days(scenario='data/tennet_balans_delta_nov_2020_nov_2021.
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
     number_of_steps = 30 * 24 * 60
+    print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl)
+    print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
 
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
@@ -35,6 +37,8 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                         max_price_msg = float(environment_data[1])
                         min_price_msg = float(environment_data[3])
                     except ValueError:
+                        if verbose_lvl > 2:
+                            print("Skipping timestep {} as data is missing".format(environment_data[0]))
                         continue
                     # The environment should take a step here.
                     try:
@@ -49,7 +53,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                 if steps_taken == number_of_steps and verbose_lvl >= 0:
                     print('End of simulation, final PTU: {}'.format(environment_data[0]))
 
-    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\n'.format(steps_taken, steps_taken / 15))
+    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}\n'.format(steps_taken, steps_taken / 15, steps_taken / 60 / 24))
     print(rhino)
 
 
