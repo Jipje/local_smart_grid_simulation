@@ -4,7 +4,7 @@ from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 import random
 
 
-def run_random_month(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=2):
+def run_random_thirty_days(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=2):
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
     number_of_steps = 30 * 24 * 60
@@ -25,6 +25,8 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
             if starting_time_step >= 0:  # Skip lines until we reach the starting step.
                 starting_time_step = starting_time_step - 1
             else:
+                if steps_taken == 0 and verbose_lvl >= 0:
+                    print('Starting simulation from PTU {}'.format(environment_data[0]))
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
                     break
                 else:
@@ -38,15 +40,19 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                     try:
                         imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
                     except OverflowError:
+                        if verbose_lvl > 2:
+                            print('Start of PTU {}'.format(environment_data[0]))
                         imbalance_msg_interpreter.reset()
                         imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
                     rhino.take_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
                 steps_taken = steps_taken + 1
+                if steps_taken == number_of_steps and verbose_lvl >= 0:
+                    print('End of simulation, final PTU: {}'.format(environment_data[0]))
 
-    print('END OF SIMULATION, TOOK {} STEPS'.format(steps_taken))
+    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\n'.format(steps_taken, steps_taken / 15))
     print(rhino)
 
 
 if __name__ == '__main__':
     # run_simulation(1440, 1440, verbose_lvl=2)
-    run_random_month(verbose_lvl=2)
+    run_random_thirty_days(verbose_lvl=1)
