@@ -41,5 +41,4 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
 
 if __name__ == '__main__':
-    # rhino_strat = StrategyBattery(strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
-    run_simulation(100000, 100, verbose_lvl=2)
+    run_simulation(1440, 1440, verbose_lvl=2)
