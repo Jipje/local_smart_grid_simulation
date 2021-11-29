@@ -48,7 +48,8 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
 
                 # Give an update of how it is going in the mean_time
                 curr_day = time_step_dt.day
-                if curr_day != old_day and verbose_lvl > 0:
+                day_diff = abs(curr_day - old_day)
+                if curr_day != old_day and verbose_lvl > 1 or day_diff >= 7 and verbose_lvl > 0:
                     msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
                     print(msg)
                     old_day = curr_day
