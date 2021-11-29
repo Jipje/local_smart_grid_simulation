@@ -107,7 +107,7 @@ class Battery(object):
 
         return adjusted_action
 
-    def take_action(self, charge_price, discharge_price, action=None):
+    def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
             self.ptu_reset()
         self.ptu_tracker += 1

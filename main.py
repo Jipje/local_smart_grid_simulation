@@ -74,7 +74,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                             print('Start of PTU {}'.format(time_step_string))
                         imbalance_msg_interpreter.reset()
                         imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
-                    rhino.take_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
+                    rhino.take_imbalance_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
                 steps_taken = steps_taken + 1
                 if steps_taken == number_of_steps and verbose_lvl >= 0:
                     print('End of simulation, final PTU: {}'.format(time_step_string))
