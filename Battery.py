@@ -1,10 +1,11 @@
 import random
 from StrategyBattery import StrategyBattery
+from NetworkObject import NetworkObject
 
 
-class Battery(object):
+class Battery(NetworkObject):
     def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
-        self.name = name
+        super().__init__(name)
 
         if max_kwh <= 0:
             raise ValueError('Error while initiating Battery {}. max_kwh should be larger than 0.'.format(name))
