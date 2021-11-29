@@ -32,11 +32,9 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
     # open file in read mode
     with open(scenario, 'r') as read_obj:
         csv_reader = reader(read_obj)
-        steps_taken = 0
 
-        curr_day = 0
+        steps_taken = 0
         old_day = 0
-        old_earnings = 0
 
         # Open the scenario
         for environment_data in csv_reader:
@@ -48,15 +46,14 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                 time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
 
                 curr_day = time_step_dt.day
-                if curr_day != old_day:
-                    if verbose_lvl > 0:
-                        day_earnings = round(rhino.earnings - old_earnings, 2)
-                        print('Earnings for {}: €{}'.format(time_step_string, day_earnings))
+                if curr_day != old_day and verbose_lvl > 0:
+                    msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
+                    print(msg)
                     old_day = curr_day
-                    old_earnings = rhino.earnings
 
                 if steps_taken == 0 and verbose_lvl >= 0:
                     print('Starting simulation from PTU {}'.format(time_step_string))
+
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
                     break
                 else:

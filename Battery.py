@@ -30,6 +30,7 @@ class Battery(NetworkObject):
         self.strategy = StrategyBattery()
 
         self.earnings = 0
+        self.old_earnings = self.earnings
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
@@ -134,5 +135,11 @@ class Battery(NetworkObject):
         else:
             self.wait()
 
+    def done_in_mean_time(self):
+        earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
+        self.old_earnings = self.earnings
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time)
+        return msg
+
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))

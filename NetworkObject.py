@@ -7,3 +7,6 @@ class NetworkObject(object):
 
     def wait(self):
         pass
+
+    def done_in_mean_time(self):
+        return ''
