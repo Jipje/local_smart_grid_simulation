@@ -1,5 +1,6 @@
 from csv import reader
 from Battery import Battery
+from ImbalanceEnvironment import ImbalanceEnvironment
 from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 import random
 import datetime as dt
@@ -24,13 +25,14 @@ def run_full_scenario(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv',
 
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
+    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl)
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(rhino)
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
         csv_reader = reader(read_obj)
         steps_taken = 0
-        imbalance_msg_interpreter = ImbalanceMessageInterpreter()
 
         curr_day = 0
         old_day = 0
@@ -67,14 +69,8 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                             print("Skipping timestep {} as data is missing".format(time_step_string))
                         continue
                     # The environment should take a step here.
-                    try:
-                        imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
-                    except OverflowError:
-                        if verbose_lvl > 2:
-                            print('Start of PTU {}'.format(time_step_string))
-                        imbalance_msg_interpreter.reset()
-                        imbalance_msg_interpreter.update(mid_price_msg, max_price_msg, min_price_msg)
-                    rhino.take_imbalance_action(imbalance_msg_interpreter.get_charge_price(), imbalance_msg_interpreter.get_discharge_price())
+                    imbalance_environment.take_step(mid_price_msg, max_price_msg, min_price_msg)
+
                 steps_taken = steps_taken + 1
                 if steps_taken == number_of_steps and verbose_lvl >= 0:
                     print('End of simulation, final PTU: {}'.format(time_step_string))
