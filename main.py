@@ -1,12 +1,14 @@
 from csv import reader
 from Battery import Battery
 from ImbalanceEnvironment import ImbalanceEnvironment
-from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
+import os
 import random
 import datetime as dt
 
+base_scenario = 'data{}tennet_balans_delta_nov_2020_nov_2021.csv'.format(os.path.sep)
 
-def run_random_thirty_days(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=2):
+
+def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2):
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
     number_of_steps = 30 * 24 * 60
@@ -15,7 +17,7 @@ def run_random_thirty_days(scenario='data/tennet_balans_delta_nov_2020_nov_2021.
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
 
 
-def run_full_scenario(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=1):
+def run_full_scenario(scenario=base_scenario, verbose_lvl=1):
     starting_timestep = 0
     with open(scenario) as file:
         number_of_steps = len(file.readlines()) + 1
@@ -24,7 +26,7 @@ def run_full_scenario(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv',
     print('Just ran full scenario {}'.format(scenario))
 
 
-def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
+def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3):
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies'
                                                                '/cleaner_simplified_passive_imbalance_1.csv',
