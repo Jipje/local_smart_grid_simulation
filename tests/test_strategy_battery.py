@@ -2,7 +2,7 @@ from StrategyBattery import StrategyBattery
 import unittest
 import os
 
-strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
 
 
 class TestStrategyBattery(unittest.TestCase):
@@ -17,10 +17,10 @@ class TestStrategyBattery(unittest.TestCase):
         self.assertRaises(FileNotFoundError, StrategyBattery, strategy_csv='bla_bla_simplified_passive_imbalance_1.csv')
 
     def test_weird_strategy_files(self):
-        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='..{0}data{0}strategies{0}weird_strategies{0}strategy_not_0.csv'.format(os.path.sep))
-        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='..{0}data{0}strategies{0}weird_strategies{0}strategy_not_100.csv'.format(os.path.sep))
-        self.assertRaises(ValueError, StrategyBattery, strategy_csv='..{0}data{0}strategies{0}weird_strategies{0}strategy_not_step_5.csv'.format(os.path.sep))
-        self.assertRaises(ValueError, StrategyBattery, strategy_csv='..{0}data{0}strategies{0}weird_strategies{0}strategy_unknown_action.csv'.format(os.path.sep))
+        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='data{0}strategies{0}weird_strategies{0}strategy_not_0.csv'.format(os.path.sep))
+        self.assertRaises(AssertionError, StrategyBattery, strategy_csv='data{0}strategies{0}weird_strategies{0}strategy_not_100.csv'.format(os.path.sep))
+        self.assertRaises(ValueError, StrategyBattery, strategy_csv='data{0}strategies{0}weird_strategies{0}strategy_not_step_5.csv'.format(os.path.sep))
+        self.assertRaises(ValueError, StrategyBattery, strategy_csv='data{0}strategies{0}weird_strategies{0}strategy_unknown_action.csv'.format(os.path.sep))
 
     def test_faulty_soc_make_decision(self):
         rhino_strategy = StrategyBattery(strategy_csv=strategy_one_path)

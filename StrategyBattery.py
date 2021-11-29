@@ -20,9 +20,6 @@ class StrategyBattery(object):
         return price_index
 
     def upload_strategy(self, strategy_csv):
-        print(os.getcwd())
-        print('Trying to find file: {}'.format(strategy_csv))
-
         strategy_df = pd.read_csv(strategy_csv)
         assert(strategy_df['state_from'].min() == 0)
         assert(strategy_df['state_until'].max() == 100)
