@@ -1,10 +1,11 @@
 import random
 from StrategyBattery import StrategyBattery
+from NetworkObject import NetworkObject
 
 
-class Battery(object):
+class Battery(NetworkObject):
     def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
-        self.name = name
+        super().__init__(name)
 
         if max_kwh <= 0:
             raise ValueError('Error while initiating Battery {}. max_kwh should be larger than 0.'.format(name))
@@ -29,6 +30,7 @@ class Battery(object):
         self.strategy = StrategyBattery()
 
         self.earnings = 0
+        self.old_earnings = self.earnings
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
@@ -107,7 +109,7 @@ class Battery(object):
 
         return adjusted_action
 
-    def take_action(self, charge_price, discharge_price, action=None):
+    def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
             self.ptu_reset()
         self.ptu_tracker += 1
@@ -133,5 +135,11 @@ class Battery(object):
         else:
             self.wait()
 
+    def done_in_mean_time(self):
+        earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
+        self.old_earnings = self.earnings
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time)
+        return msg
+
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
