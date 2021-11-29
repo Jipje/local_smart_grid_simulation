@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class StrategyBattery(object):
-    def __init__(self, strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv'):
+    def __init__(self, strategy_csv='F:\Documents\GitHub\local_smart_grid_simulation\data\strategies\cleaner_simplified_passive_imbalance_1.csv'):
         self.dayhead_tracker = False
         self.strategy_matrix = []
         self.price_step_size = 5
