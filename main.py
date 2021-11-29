@@ -41,22 +41,27 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
             if starting_time_step >= 0:  # Skip lines until we reach the starting step.
                 starting_time_step = starting_time_step - 1
             else:
+                # Figure out date of the data
                 time_step_dt = dt.datetime.strptime(environment_data[0], '%Y-%m-%dT%H:%M:%S.000Z')
                 time_step_dt = time_step_dt.astimezone(tz=dt.timezone.utc)
                 time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
 
+                # Give an update of how it is going in the mean_time
                 curr_day = time_step_dt.day
                 if curr_day != old_day and verbose_lvl > 0:
                     msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
                     print(msg)
                     old_day = curr_day
 
+                # Announce start of simulation
                 if steps_taken == 0 and verbose_lvl >= 0:
                     print('Starting simulation from PTU {}'.format(time_step_string))
 
+                # End simulation here if number of steps have been taken.
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
                     break
                 else:
+                    # Otherwise, ensure data of enviroment steps is correct
                     try:
                         mid_price_msg = float(environment_data[2])
                         max_price_msg = float(environment_data[1])
@@ -68,7 +73,9 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/ten
                     # The environment should take a step here.
                     imbalance_environment.take_step(mid_price_msg, max_price_msg, min_price_msg)
 
+                # Update steps taken
                 steps_taken = steps_taken + 1
+                # Print information at the end of the simulation.
                 if steps_taken == number_of_steps and verbose_lvl >= 0:
                     print('End of simulation, final PTU: {}'.format(time_step_string))
 
