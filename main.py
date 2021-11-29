@@ -26,7 +26,10 @@ def run_full_scenario(scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv',
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario='data/tennet_balans_delta_nov_2020_nov_2021.csv', verbose_lvl=3):
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl)
-    rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies'
+                                                               '/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=3750,
+                    verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino)
 
     # open file in read mode

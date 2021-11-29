@@ -4,7 +4,7 @@ from NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
-    def __init__(self, name, max_kwh, max_kw, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
+    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
         super().__init__(name)
 
         if max_kwh <= 0:
@@ -27,7 +27,7 @@ class Battery(NetworkObject):
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
 
-        self.strategy = StrategyBattery()
+        self.strategy = StrategyBattery(strategy_csv=battery_strategy_csv)
 
         self.earnings = 0
         self.old_earnings = self.earnings
