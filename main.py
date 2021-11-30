@@ -1,5 +1,5 @@
 from csv import reader
-from Battery import Battery
+from network_objects.Battery import Battery
 from ImbalanceEnvironment import ImbalanceEnvironment
 import os
 import random
