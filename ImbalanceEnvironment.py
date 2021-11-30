@@ -1,4 +1,4 @@
-from Environment import Environment
+from environment.Environment import Environment
 from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
