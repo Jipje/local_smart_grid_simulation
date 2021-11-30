@@ -1,6 +1,6 @@
 from csv import reader
 from network_objects.Battery import Battery
-from ImbalanceEnvironment import ImbalanceEnvironment
+from environment.ImbalanceEnvironment import ImbalanceEnvironment
 import os
 import random
 import datetime as dt
