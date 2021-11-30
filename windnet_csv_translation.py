@@ -9,7 +9,7 @@ utc = dateutil.tz.tzutc()
 def trivial_kw_per_minute(total_kwh, number_of_minutes=5):
     kwh_per_minute = total_kwh / number_of_minutes
     kw_per_minute = kwh_per_minute * 60
-
+    kw_per_minute = round(kw_per_minute, 2)
     return kw_per_minute
 
 
@@ -38,5 +38,6 @@ if __name__ == '__main__':
                     time_tracker_str = time_tracker.strftime('%Y-%m-%dT%H:%M:%S.000Z')
                     csv_row = [time_tracker_str, neushoorntocht_consumed_kw, neushoorntocht_produced_kw, mammoettocht_consumed_kw, mammoettocht_produced_kw]
                     csv_writer.writerow(csv_row)
+                    if time_tracker.hour == 20 and time_tracker.minute == 20:
+                        print(csv_row)
                     time_tracker += dt.timedelta(minutes=1)
-                break
