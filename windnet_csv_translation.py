@@ -5,6 +5,14 @@ import dateutil.tz
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
+
+def trivial_kw_per_minute(total_kwh, number_of_minutes=5):
+    kwh_per_minute = total_kwh / number_of_minutes
+    kw_per_minute = kwh_per_minute * 60
+
+    return kw_per_minute
+
+
 if __name__ == '__main__':
     with open('data/wind_net_csv.csv', 'r') as read_obj:
         csv_reader = reader(read_obj)
