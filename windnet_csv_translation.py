@@ -26,8 +26,17 @@ if __name__ == '__main__':
             start_of_5m_interval = end_of_5m_interval - dt.timedelta(minutes=5)
             print(start_of_5m_interval)
             print(end_of_5m_interval)
-            neushoorntocht_produced_kwh = float(wind_net_data[2])
-            print(neushoorntocht_produced_kwh)
-            mammoettocht_produced_kwh = float(wind_net_data[4])
-            print(mammoettocht_produced_kwh)
+
+            time_tracker = start_of_5m_interval
+            neushoorntocht_consumed_kw = trivial_kw_per_minute(float(wind_net_data[1]))
+            neushoorntocht_produced_kw = trivial_kw_per_minute(float(wind_net_data[2]))
+            mammoettocht_consumed_kw = trivial_kw_per_minute(float(wind_net_data[3]))
+            mammoettocht_produced_kw = trivial_kw_per_minute(float(wind_net_data[4]))
+            while time_tracker < end_of_5m_interval:
+                print(time_tracker)
+                print(neushoorntocht_consumed_kw)
+                print(neushoorntocht_produced_kw)
+                print(mammoettocht_consumed_kw)
+                print(mammoettocht_produced_kw)
+                time_tracker += dt.timedelta(minutes=1)
             break
