@@ -1,5 +1,5 @@
 from helper_objects.StrategyBattery import StrategyBattery
-from NetworkObject import NetworkObject
+from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
