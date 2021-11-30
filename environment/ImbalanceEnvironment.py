@@ -1,5 +1,5 @@
 from environment.Environment import Environment
-from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
+from helper_objects.ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
 class ImbalanceEnvironment(Environment):
