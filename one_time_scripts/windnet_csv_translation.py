@@ -14,11 +14,11 @@ def trivial_kw_per_minute(total_kwh, number_of_minutes=5):
 
 
 if __name__ == '__main__':
-    with open('data/windnet/trivial_cleaned_windnet_data_sep_2020_sep_2021.csv', 'w+', newline='') as new_file:
+    with open('../data/trivial_cleaned_windnet_data_sep_2020_sep_2021.csv', 'w+', newline='') as new_file:
         csv_writer = writer(new_file)
         csv_writer.writerow(['time', 'neushoorntocht_consumed_kw', 'neushoorntocht_produced_kw',
                              'mammoettocht_consumed_kw', 'mammoettocht_produced_kw'])
-        with open('data/base_windnet_data_sep_2020_sep_2021.csv', 'r') as read_obj:
+        with open('../data/base_windnet_data_sep_2020_sep_2021.csv', 'r') as read_obj:
             csv_reader = reader(read_obj)
             header = False
             for wind_net_data in csv_reader:
