@@ -9,32 +9,29 @@ import datetime as dt
 base_scenario = 'data{0}tennet_and_windnet{0}tennet_balans_delta_and_trivial_windnet.csv'.format(os.path.sep)
 
 
-def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2):
+def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
     number_of_steps = 30 * 24 * 60
     print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
-    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl)
+    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
 
 
-def run_full_scenario(scenario=base_scenario, verbose_lvl=1):
+def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environment=None):
     starting_timestep = 0
     with open(scenario) as file:
         number_of_steps = len(file.readlines()) + 1
     print('Running full scenario {}'.format(scenario))
-    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl)
+    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran full scenario {}'.format(scenario))
 
 
-def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, imbalance_environment=None):
-    if imbalance_environment is None:
-        imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, simulation_environment=None):
+    if simulation_environment is None:
+        simulation_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
         rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-        imbalance_environment.add_object(rhino, [1, 3])
-
-    # windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
-    # imbalance_environment.add_object(windnet)
+        simulation_environment.add_object(rhino, [1, 3])
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
@@ -82,7 +79,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                             print("Skipping timestep {} as data is missing".format(time_step_string))
                         continue
                     # The environment should take a step here.
-                    imbalance_environment.take_step(environment_data)
+                    simulation_environment.take_step(environment_data)
 
                 # Update steps taken
                 steps_taken = steps_taken + 1
@@ -100,6 +97,16 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
 
 if __name__ == '__main__':
-    # run_simulation(25900, 10000, scenario='data/tennet_balans_delta_and_trivial_windnet.csv', verbose_lvl=2)
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', verbose_lvl=1)
-    # run_random_thirty_days(verbose_lvl=2)
+    # Baseline Rhino simulation
+    verbose_lvl = 1
+    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(rhino, [1, 3])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
+
+    # Baseline Windnet simulation
+    verbose_lvl = 2
+    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 7])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
