@@ -1,4 +1,4 @@
-from NetworkObject import NetworkObject
+from network_objects.NetworkObject import NetworkObject
 
 
 class WindFarm(NetworkObject):

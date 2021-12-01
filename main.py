@@ -103,5 +103,5 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
 if __name__ == '__main__':
     # run_simulation(25900, 10000, scenario='data/tennet_balans_delta_and_trivial_windnet.csv', verbose_lvl=2)
-    run_full_scenario(scenario='data/tennet_balans_delta_and_trivial_windnet.csv', verbose_lvl=1)
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', verbose_lvl=1)
     # run_random_thirty_days(verbose_lvl=2)
