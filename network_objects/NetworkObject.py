@@ -2,7 +2,7 @@ class NetworkObject(object):
     def __init__(self, name):
         self.name = name
 
-    def take_imbalance_action(self, charge_price, discharge_price, action=None):
+    def take_step(self, environment_step, action_parameters):
         pass
 
     def wait(self):

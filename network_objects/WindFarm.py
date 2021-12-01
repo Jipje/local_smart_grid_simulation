@@ -21,6 +21,14 @@ class WindFarm(NetworkObject):
     def set_available_kw_this_action(self, available_kw):
         self.available_kw = available_kw
 
+    def take_step(self, environment_step, action_parameters):
+        charge_price = environment_step[action_parameters[0]]
+        discharge_price = environment_step[action_parameters[1]]
+        available_kw = environment_step[action_parameters[2]]
+
+        self.set_available_kw_this_action(-1 * available_kw)
+        self.take_imbalance_action(charge_price, discharge_price)
+
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
             self.ptu_reset()

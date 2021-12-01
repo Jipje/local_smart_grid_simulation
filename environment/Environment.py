@@ -3,12 +3,17 @@ class Environment(object):
     def __init__(self, verbose_lvl=2):
         self.network_objects = []
         self.verbose_lvl = verbose_lvl
+        self.network_object_parameters = []
 
-    def add_object(self, network_object):
+    def add_object(self, network_object, action_parameters):
         self.network_objects.append(network_object)
+        self.network_object_parameters.append(action_parameters)
 
-    def take_step(self):
-        pass
+    def take_step(self, environment_step):
+        for object_index in range(len(self.network_objects)):
+            network_object = self.network_objects[object_index]
+            action_parameters = self.network_object_parameters[object_index]
+            network_object.take_step(environment_step, action_parameters)
 
     def done_in_mean_time(self):
         res_msg = ''
