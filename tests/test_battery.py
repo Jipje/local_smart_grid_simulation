@@ -58,6 +58,8 @@ class TestBattery(unittest.TestCase):
         # Charge 1 MWh for 50 €/MWh
         rhino_battery.update_earnings(1000, 50)
         self.assertEqual(rhino_battery.earnings, -50)
+        base_msg = 'TEST battery - Current SoC: 3750kWh - Earnings since last time: €'
+        self.assertEqual(base_msg + '-50.0', rhino_battery.done_in_mean_time())
         # Discharge 2 MWh for 50 €/MWh
         rhino_battery.update_earnings(-2000, 50)
         self.assertEqual(rhino_battery.earnings, 50)
@@ -67,6 +69,7 @@ class TestBattery(unittest.TestCase):
         # Discharge 1 MWh for -50 €/MWh
         rhino_battery.update_earnings(-1000, -50)
         self.assertEqual(rhino_battery.earnings, 50)
+        self.assertEqual(base_msg + '100.0', rhino_battery.done_in_mean_time())
 
     def test_nice_charge_and_discharge(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
@@ -136,6 +139,9 @@ class TestBattery(unittest.TestCase):
         rhino_battery.charge.assert_called_with(12000, -20)
         rhino_battery.discharge.assert_called_with(12000, 500)
         rhino_battery.wait.assert_called()
+
+        rhino_battery.take_imbalance_action(500, 500)
+        rhino_battery.charge.assert_called_with(12000, -20)
 
     def test_wait(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
@@ -306,6 +312,16 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(200, rhino_battery.ptu_total_action)
         self.assertEqual(1, rhino_battery.ptu_tracker)
         self.assertEqual(12, rhino_battery.earnings)
+
+    def test_take_step(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
+
+        rhino_battery.take_imbalance_action = MagicMock(name='take_imbalance_action', return_value=0)
+        rhino_battery.take_step([0, 1, 2, 3, 4, 5, 6, 7], [2, 5])
+        rhino_battery.take_imbalance_action.assert_called_with(2, 5)
+
+        rhino_battery.take_step([0, 1, 2, 3, 4, 5, 6, 7], [2, 1])
+        rhino_battery.take_imbalance_action.assert_called_with(2, 1)
 
 
 if __name__ == '__main__':
