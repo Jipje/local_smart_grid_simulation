@@ -108,6 +108,11 @@ class Battery(NetworkObject):
 
         return adjusted_action
 
+    def take_step(self, environment_step, action_parameters):
+        charge_price = environment_step[action_parameters[0]]
+        discharge_price = environment_step[action_parameters[1]]
+        self.take_imbalance_action(charge_price, discharge_price)
+
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
             self.ptu_reset()

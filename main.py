@@ -6,7 +6,7 @@ import os
 import random
 import datetime as dt
 
-base_scenario = 'data{}tennet_balans_delta_nov_2020_nov_2021.csv'.format(os.path.sep)
+base_scenario = 'data{0}tennet_and_windnet{0}tennet_balans_delta_and_trivial_windnet.csv'.format(os.path.sep)
 
 
 def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2):
@@ -27,16 +27,14 @@ def run_full_scenario(scenario=base_scenario, verbose_lvl=1):
     print('Just ran full scenario {}'.format(scenario))
 
 
-def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3):
-    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl)
-    # rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies'
-    #                                                            '/cleaner_simplified_passive_imbalance_1.csv',
-    #                 battery_efficiency=0.9, starting_soc_kwh=3750,
-    #                 verbose_lvl=verbose_lvl)
-    # imbalance_environment.add_object(rhino)
+def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, imbalance_environment=None):
+    if imbalance_environment is None:
+        imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+        rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+        imbalance_environment.add_object(rhino, [1, 3])
 
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(windnet)
+    # windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    # imbalance_environment.add_object(windnet)
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
@@ -75,16 +73,16 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                     try:
                         if environment_data[1] == 'nan':
                             raise ValueError
-                        mid_price_msg = float(environment_data[2])
-                        max_price_msg = float(environment_data[1])
-                        min_price_msg = float(environment_data[3])
+                        environment_data[2] = float(environment_data[2])
+                        environment_data[1] = float(environment_data[1])
+                        environment_data[3] = float(environment_data[3])
+                        environment_data[7] = float(environment_data[7])
                     except ValueError:
                         if verbose_lvl > 2:
                             print("Skipping timestep {} as data is missing".format(time_step_string))
                         continue
                     # The environment should take a step here.
-                    imbalance_environment.network_objects[0].set_available_kw_this_action(-1 * float(environment_data[7]))
-                    imbalance_environment.take_step(mid_price_msg, max_price_msg, min_price_msg)
+                    imbalance_environment.take_step(environment_data)
 
                 # Update steps taken
                 steps_taken = steps_taken + 1
