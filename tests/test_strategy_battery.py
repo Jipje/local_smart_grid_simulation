@@ -1,4 +1,4 @@
-from StrategyBattery import StrategyBattery
+from helper_objects.StrategyBattery import StrategyBattery
 import unittest
 import os
 

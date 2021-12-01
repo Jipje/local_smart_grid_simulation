@@ -1,6 +1,5 @@
-import random
-from StrategyBattery import StrategyBattery
-from NetworkObject import NetworkObject
+from helper_objects.StrategyBattery import StrategyBattery
+from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
