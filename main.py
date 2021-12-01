@@ -1,7 +1,7 @@
 from csv import reader
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
-from WindFarm import WindFarm
+from network_objects.WindFarm import WindFarm
 import os
 import random
 import datetime as dt
