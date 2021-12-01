@@ -1,4 +1,4 @@
-from ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
+from helper_objects.ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 import unittest
 
 max_def = -99999

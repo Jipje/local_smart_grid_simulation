@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock
-from Battery import Battery
+from network_objects.Battery import Battery
 import unittest
 import os
 
