@@ -109,6 +109,13 @@ if __name__ == '__main__':
     # Baseline Windnet simulation
     verbose_lvl = 1
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 7])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
+
+    # Windnet with a PPA simulation
+    verbose_lvl = 1
+    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl, ppa=40)
     imbalance_environment.add_object(windnet, [1, 3, 7])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
