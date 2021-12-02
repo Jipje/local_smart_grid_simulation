@@ -24,7 +24,7 @@ def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environm
         number_of_steps = len(file.readlines()) + 1
     print('Running full scenario {}'.format(scenario))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
-    print('Just ran full scenario {}'.format(scenario))
+    print('Just ran full scenario {}\n'.format(scenario))
 
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, simulation_environment=None):
@@ -39,6 +39,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
         steps_taken = 0
         old_day = 0
+        old_month = 0
 
         # Open the scenario
         for environment_data in csv_reader:
@@ -50,17 +51,18 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 time_step_dt = time_step_dt.astimezone(tz=dt.timezone.utc)
                 time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
 
-                # Give an update of how it is going in the mean_time
-                curr_day = time_step_dt.day
-                day_diff = abs(curr_day - old_day)
-                if curr_day != old_day and verbose_lvl > 1 or day_diff >= 7 and verbose_lvl > 0:
-                    msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
-                    print(msg)
-                    old_day = curr_day
-
                 # Announce start of simulation
                 if steps_taken == 0 and verbose_lvl >= 0:
                     print('Starting simulation from PTU {}'.format(time_step_string))
+
+                # Give an update of how it is going in the mean_time
+                curr_month = time_step_dt.month
+                curr_day = time_step_dt.day
+                if curr_day != old_day and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
+                    msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
+                    print(msg)
+                    old_day = curr_day
+                    old_month = curr_month
 
                 # End simulation here if number of steps have been taken.
                 if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
@@ -88,7 +90,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                     print('End of simulation, final PTU: {}'.format(time_step_string))
 
     num_of_days = int(steps_taken / 60 / 24)
-    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}\n'.format(steps_taken, steps_taken / 15, num_of_days))
+    print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}'.format(steps_taken, steps_taken / 15, num_of_days))
     for network_object in imbalance_environment.network_objects:
         print(network_object)
         if num_of_days != 0:
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
 
     # Baseline Windnet simulation
-    verbose_lvl = 2
+    verbose_lvl = 1
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 7])
