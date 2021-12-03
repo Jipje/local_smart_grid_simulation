@@ -113,9 +113,14 @@ if __name__ == '__main__':
     # run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
 
     # Rhino with limited charging simulation
-    verbose_lvl = 3
+    verbose_lvl = 1
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    rhino = LimitedChargeOrDischargeCapacity(rhino, 7, -1)
+    limited_charge_capacity_decorator = LimitedChargeOrDischargeCapacity(rhino, 7, -1)
+
+    rhino.take_step = limited_charge_capacity_decorator.take_step
+    rhino.check_action = limited_charge_capacity_decorator.check_action
+
     imbalance_environment.add_object(rhino, [1, 3])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
+    run_random_thirty_days(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    # run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)

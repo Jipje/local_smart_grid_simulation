@@ -7,6 +7,9 @@ class LimitedChargeOrDischargeCapacity:
         self.maximum_charge_kwh = 0
         self.maximum_discharge_kwh = 0
 
+        self.original_check = self.network_object.check_action
+        self.original_step = self.network_object.take_step
+
     def set_maximum_charge(self, maximum_charge):
         self.maximum_charge_kwh = maximum_charge
 
@@ -15,13 +18,26 @@ class LimitedChargeOrDischargeCapacity:
 
     def check_action(self, action_kwh):
         adjusted_action = action_kwh
+
         if adjusted_action > self.maximum_charge_kwh:
             adjusted_action = self.maximum_charge_kwh
         elif adjusted_action < self.maximum_discharge_kwh:
             adjusted_action = self.maximum_discharge_kwh
-        return self.network_object.check_action(adjusted_action)
+
+        if adjusted_action != action_kwh and self.network_object.verbose_lvl > 2:
+            print('Action was limited due to not enough power generation')
+
+        return self.original_check(adjusted_action)
 
     def take_step(self, environment_step, action_parameters):
-        self.set_maximum_charge(environment_step[self.max_charge_index])
-        self.set_maximum_discharge(environment_step[self.max_discharge_index])
-        return self.network_object.take_step(environment_step, action_parameters)
+        if self.max_charge_index > 0:
+            self.set_maximum_charge(int(environment_step[self.max_charge_index]))
+        else:
+            self.set_maximum_charge(99999)
+
+        if self.max_discharge_index > 0:
+            self.set_maximum_discharge(int(environment_step[self.max_discharge_index]))
+        else:
+            self.set_maximum_discharge(-99999)
+
+        return self.original_step(environment_step, action_parameters)
