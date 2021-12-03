@@ -7,8 +7,11 @@ class LimitedChargeOrDischargeCapacity:
         self.maximum_charge_kwh = 0
         self.maximum_discharge_kwh = 0
 
+        # Assign the correct functions to each object
         self.original_check = self.network_object.check_action
         self.original_step = self.network_object.take_step
+        self.network_object.take_step = self.take_step
+        self.network_object.check_action = self.check_action
 
     def set_maximum_charge(self, maximum_charge):
         self.maximum_charge_kwh = maximum_charge
