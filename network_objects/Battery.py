@@ -30,6 +30,8 @@ class Battery(NetworkObject):
 
         self.earnings = 0
         self.old_earnings = self.earnings
+        self.naive_cycle_counter = 0
+
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
@@ -45,6 +47,16 @@ class Battery(NetworkObject):
         self.earnings = self.earnings + cost_of_action
         return cost_of_action
 
+    def update_state_of_charge(self, action_kwh):
+        physical_action = action_kwh
+        if action_kwh > 0:
+            physical_action = int(action_kwh * self.efficiency)
+
+        self.state_of_charge_kwh = self.state_of_charge_kwh + physical_action
+
+        naive_cycle_count = abs(physical_action) / self.max_kwh / 2
+        self.naive_cycle_counter += naive_cycle_count
+
     def charge(self, charge_kw, charge_price):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
@@ -53,7 +65,7 @@ class Battery(NetworkObject):
         if potential_charged_kwh != charged_kwh and self.verbose_lvl > 2:
             print('Charge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
+        self.update_state_of_charge(charged_kwh)
         if self.verbose_lvl > 2:
             print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
@@ -65,7 +77,7 @@ class Battery(NetworkObject):
         if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 2:
             print('Discharge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
+        self.update_state_of_charge(discharged_kwh)
         if self.verbose_lvl > 2:
             print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
@@ -142,8 +154,8 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time)
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Total cycles: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, round(self.naive_cycle_counter, 2))
         return msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.naive_cycle_counter, 2), round(self.earnings, 2))
