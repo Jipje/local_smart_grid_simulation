@@ -120,11 +120,13 @@ class Battery(NetworkObject):
 
         current_soc = self.state_of_charge_kwh
         future_soc = current_soc + adjusted_action
+        adjusted_max = int(0.95 * self.max_kwh)
+        adjusted_min = int(0.05 * self.max_kwh)
         # The SoC can't be higher than the max_kwh. Or lower than 0.
-        if future_soc > self.max_kwh:
-            adjusted_action = int((self.max_kwh - current_soc) * 1 / self.efficiency)
-        if future_soc < 0:
-            adjusted_action = 0 - current_soc
+        if future_soc > adjusted_max:
+            adjusted_action = int((adjusted_max - current_soc) * 1 / self.efficiency)
+        if future_soc < adjusted_min:
+            adjusted_action = adjusted_min - current_soc
 
         return adjusted_action
 
