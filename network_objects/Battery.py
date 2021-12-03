@@ -45,7 +45,7 @@ class Battery(NetworkObject):
         self.earnings = self.earnings + cost_of_action
         return cost_of_action
 
-    def charge(self, charge_kw, charge_price):
+    def charge(self, charge_kw):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
         self.ptu_total_action = self.ptu_total_action + charged_kwh
@@ -57,7 +57,7 @@ class Battery(NetworkObject):
         if self.verbose_lvl > 2:
             print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
-    def discharge(self, discharge_kw, discharge_price):
+    def discharge(self, discharge_kw):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
         self.ptu_total_action = self.ptu_total_action + discharged_kwh
@@ -133,9 +133,9 @@ class Battery(NetworkObject):
             chosen_action = 2
 
         if chosen_action == 0:
-            self.charge(self.max_kw, charge_price)
+            self.charge(self.max_kw)
         elif chosen_action == 1:
-            self.discharge(self.max_kw, discharge_price)
+            self.discharge(self.max_kw)
         else:
             self.wait()
 
