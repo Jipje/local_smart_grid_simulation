@@ -2,10 +2,11 @@ from network_objects.NetworkObject import NetworkObject
 
 
 class WindFarm(NetworkObject):
-    def __init__(self, name, max_kw, verbose_lvl=3):
+    def __init__(self, name, max_kw, ppa=None, verbose_lvl=3):
         super().__init__(name=name)
         self.max_kw = max_kw
         self.available_kw = 0
+        self.ppa = ppa
 
         self.earnings = 0
         self.old_earnings = self.earnings
@@ -63,6 +64,8 @@ class WindFarm(NetworkObject):
     def update_earnings(self, action_kwh, cost):
         # Discharge is a negative action. However that pays us money so we invert the action * cost
         #     Same holds vice versa for charge. A positive action however it costs us money.
+        if self.ppa is not None:
+            cost = self.ppa
         cost_of_action = -1 * (action_kwh / 1000) * cost
         self.earnings = self.earnings + cost_of_action
         return cost_of_action
