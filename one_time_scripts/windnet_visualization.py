@@ -86,29 +86,18 @@ def make_base_graphs(windnet_df):
     plt.show()
 
 
-if __name__ == '__main__':
-    # headers = ['time', 'neushoorntocht_consumed_kw', 'neushoorntocht_produced_kw', 'mammoettocht_consumed_kw', 'mammoettocht_produced_kw']
-    base_windnet_filename = '../data/windnet/base_windnet_data_sep_2020_sep_2021.csv'
-    windnet_df = pd.read_csv(base_windnet_filename, parse_dates=[0], date_parser=date_parser)
-    windnet_df.index = pd.to_datetime(windnet_df['date'], errors='coerce', utc=True)
-
-    windnet_df['nht_production_kw'] = windnet_df['nht_production_kwh'] / 5 * 60
-    windnet_df['hour_of_production'] = windnet_df.index.hour
-    windnet_df['minute_of_production'] = windnet_df.index.minute
-
-    congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
-    print(congestion_windnet_df.sort_index())
-
-    # make_base_graphs(windnet_df)
-
+def get_congestion_points_of_interest(windnet_df, congestion_index=None):
     dates_of_interest = [dt.datetime(2020, 12, 27, 3, tzinfo=utc), dt.datetime(2020, 12, 27, 7, tzinfo=utc),
                          dt.datetime(2020, 12, 27, 11, tzinfo=utc), dt.datetime(2021, 2, 6, 21, 30, tzinfo=utc),
                          dt.datetime(2021, 4, 5, 10, tzinfo=utc), dt.datetime(2021, 4, 5, 20, tzinfo=utc),
                          dt.datetime(2021, 4, 7, 8, 45, tzinfo=utc)]
-    random_index = random.randint(0, len(dates_of_interest) - 1)
-    chosen_date = dates_of_interest[random_index]
-    start_of_set, end_of_set = situation_sketch(congestion_windnet_df, chosen_date=chosen_date)
-    situation_df = windnet_df[start_of_set :end_of_set]
+
+    if congestion_index is None:
+        congestion_index = random.randint(0, len(dates_of_interest) - 1)
+
+    chosen_date = dates_of_interest[congestion_index]
+    start_of_set, end_of_set = situation_sketch(windnet_df, chosen_date=chosen_date)
+    situation_df = windnet_df[start_of_set:end_of_set]
     # print(situation_df.to_string())
 
     plt.plot(situation_df.index, situation_df['nht_production_kw'])
@@ -121,4 +110,18 @@ if __name__ == '__main__':
     plt.title('Generated power by wind farm Neushoorntocht on {}'.format(chosen_date.strftime('%a %d %b %Y')))
     plt.show()
 
-#     56
+
+if __name__ == '__main__':
+    # headers = ['time', 'neushoorntocht_consumed_kw', 'neushoorntocht_produced_kw', 'mammoettocht_consumed_kw', 'mammoettocht_produced_kw']
+    base_windnet_filename = '../data/windnet/base_windnet_data_sep_2020_sep_2021.csv'
+    windnet_df = pd.read_csv(base_windnet_filename, parse_dates=[0], date_parser=date_parser)
+    windnet_df.index = pd.to_datetime(windnet_df['date'], errors='coerce', utc=True)
+
+    windnet_df['nht_production_kw'] = windnet_df['nht_production_kwh'] / 5 * 60
+    windnet_df['hour_of_production'] = windnet_df.index.hour
+    windnet_df['minute_of_production'] = windnet_df.index.minute
+
+    congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
+
+    # make_base_graphs(windnet_df)
+    get_congestion_points_of_interest(windnet_df, 3)
