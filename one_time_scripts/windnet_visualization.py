@@ -17,6 +17,7 @@ if __name__ == '__main__':
     windnet_df = pd.read_csv(base_windnet_filename, parse_dates=[0], date_parser=date_parser)
     windnet_df.index = pd.to_datetime(windnet_df['date'], errors='coerce', utc=True)
 
+def make_base_graphs(windnet_df):
     windnet_df['nht_production_kw'] = windnet_df['nht_production_kwh'] / 5 * 60
     windnet_df['hour_of_production'] = windnet_df.index.hour
     windnet_df['minute_of_production'] = windnet_df.index.minute
@@ -59,3 +60,9 @@ if __name__ == '__main__':
     plt.show()
 
 
+if __name__ == '__main__':
+    # headers = ['time', 'neushoorntocht_consumed_kw', 'neushoorntocht_produced_kw', 'mammoettocht_consumed_kw', 'mammoettocht_produced_kw']
+    base_windnet_filename = '../data/windnet/base_windnet_data_sep_2020_sep_2021.csv'
+    windnet_df = pd.read_csv(base_windnet_filename, parse_dates=[0], date_parser=date_parser)
+    windnet_df.index = pd.to_datetime(windnet_df['date'], errors='coerce', utc=True)
+    make_base_graphs(windnet_df)
