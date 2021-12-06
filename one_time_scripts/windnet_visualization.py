@@ -42,7 +42,7 @@ def situation_sketch(df, moment=None, chosen_date=None):
     if chosen_date is not None:
         middle_of_set = chosen_date
 
-    window_size = 180
+    window_size = 360
     start_of_set = round_to_ptu(middle_of_set - dt.timedelta(minutes=window_size), 'DOWN')
     end_of_set = round_to_ptu(middle_of_set + dt.timedelta(minutes=window_size), 'UP')
     return start_of_set, end_of_set
@@ -73,15 +73,15 @@ def make_base_graphs(windnet_df):
 
     congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
 
-    plt.scatter(congestion_windnet_df['hour_of_production'], congestion_windnet_df['nht_production_kw'])
-    plt.ylabel('Average Generated power per 5m (kW)')
-    plt.xlabel('Hour in which power was generated')
-    plt.title('Scatterplot of generated power by wind farm Neushoorntocht')
-    plt.show()
-
     plt.scatter(congestion_windnet_df['minute_of_production'], congestion_windnet_df['nht_production_kw'])
     plt.ylabel('Average Generated power per 5m (kW)')
     plt.xlabel('Minute in which power was generated')
+    plt.title('Scatterplot of generated power by wind farm Neushoorntocht')
+    plt.show()
+
+    plt.scatter(congestion_windnet_df['hour_of_production'], congestion_windnet_df['nht_production_kw'])
+    plt.ylabel('Average Generated power per 5m (kW)')
+    plt.xlabel('Hour in which power was generated')
     plt.title('Scatterplot of generated power by wind farm Neushoorntocht')
     plt.show()
 
@@ -123,6 +123,7 @@ if __name__ == '__main__':
 
     congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
 
-    # make_base_graphs(windnet_df)
+    make_base_graphs(windnet_df)
     for i in range(0, 7):
         get_congestion_points_of_interest(windnet_df, i)
+    # get_congestion_points_of_interest(windnet_df, 3)
