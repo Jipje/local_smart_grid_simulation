@@ -1,9 +1,10 @@
 from helper_objects.StrategyBattery import StrategyBattery
+from helper_objects.cycle_counters.NaiveCycleCounter import NaiveCycleCounter
 from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
-    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
+    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
         super().__init__(name)
 
         if max_kwh <= 0:
@@ -26,10 +27,16 @@ class Battery(NetworkObject):
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
 
+        if cycle_counter is None:
+            self.cycle_counter = NaiveCycleCounter(self.max_kwh)
+        else:
+            self.cycle_counter = cycle_counter
+
         self.strategy = StrategyBattery(strategy_csv=battery_strategy_csv)
 
         self.earnings = 0
         self.old_earnings = self.earnings
+
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
@@ -45,6 +52,14 @@ class Battery(NetworkObject):
         self.earnings = self.earnings + cost_of_action
         return cost_of_action
 
+    def update_state_of_charge(self, action_kwh):
+        physical_action = action_kwh
+        if action_kwh > 0:
+            physical_action = int(action_kwh * self.efficiency)
+
+        self.cycle_counter.add_cycle(physical_action)
+        self.state_of_charge_kwh = self.state_of_charge_kwh + physical_action
+
     def charge(self, charge_kw):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
@@ -53,7 +68,7 @@ class Battery(NetworkObject):
         if potential_charged_kwh != charged_kwh and self.verbose_lvl > 2:
             print('Charge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + int(charged_kwh * self.efficiency)
+        self.update_state_of_charge(charged_kwh)
         if self.verbose_lvl > 2:
             print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
@@ -65,7 +80,7 @@ class Battery(NetworkObject):
         if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 2:
             print('Discharge action adjusted due to constraints')
 
-        self.state_of_charge_kwh = self.state_of_charge_kwh + discharged_kwh
+        self.update_state_of_charge(discharged_kwh)
         if self.verbose_lvl > 2:
             print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
 
@@ -142,8 +157,8 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time)
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, self.cycle_counter.done_in_mean_time())
         return msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
