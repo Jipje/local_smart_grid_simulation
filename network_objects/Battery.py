@@ -30,14 +30,15 @@ class Battery(NetworkObject):
 
         self.earnings = 0
         self.old_earnings = self.earnings
-        self.average_soc_tracker = self.state_of_charge_kwh
+        self.average_soc_tracker = 0
+        self.average_soc = 0
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
         self.ptu_discharge_price = -9999
 
-        self.number_of_steps = 1
+        self.number_of_steps = 0
         self.time_step = 1/60
         self.verbose_lvl = verbose_lvl
 
@@ -117,6 +118,7 @@ class Battery(NetworkObject):
 
         self.number_of_steps += 1
         self.average_soc_tracker = self.average_soc_tracker + self.state_of_charge_kwh
+        self.average_soc = int(self.average_soc_tracker / self.number_of_steps)
 
         self.take_imbalance_action(charge_price, discharge_price)
 
@@ -149,11 +151,9 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        average_soc = int(self.average_soc_tracker / self.number_of_steps)
 
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Average SoC: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, average_soc)
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Average SoC: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, self.average_soc)
         return msg
 
     def __str__(self):
-        average_soc = int(self.average_soc_tracker / self.number_of_steps)
-        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}\nAverage SoC: {}kWh".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2), average_soc)
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal Earnings: €{}\nAverage SoC: {}kWh".format(self.name, self.state_of_charge_kwh, round(self.earnings, 2), self.average_soc)
