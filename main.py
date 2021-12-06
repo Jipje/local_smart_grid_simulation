@@ -100,6 +100,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
 
 if __name__ == '__main__':
+    verbose_lvl = 1
     # Baseline Rhino simulation
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
