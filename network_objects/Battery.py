@@ -1,9 +1,10 @@
 from helper_objects.StrategyBattery import StrategyBattery
+from helper_objects.cycle_counters.NaiveCycleCounter import NaiveCycleCounter
 from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
-    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
+    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
         super().__init__(name)
 
         if max_kwh <= 0:
@@ -26,11 +27,15 @@ class Battery(NetworkObject):
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
 
+        if cycle_counter is None:
+            self.cycle_counter = NaiveCycleCounter(self.max_kwh)
+        else:
+            self.cycle_counter = cycle_counter
+
         self.strategy = StrategyBattery(strategy_csv=battery_strategy_csv)
 
         self.earnings = 0
         self.old_earnings = self.earnings
-        self.naive_cycle_counter = 0
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
@@ -52,10 +57,8 @@ class Battery(NetworkObject):
         if action_kwh > 0:
             physical_action = int(action_kwh * self.efficiency)
 
+        self.cycle_counter.add_cycle(physical_action)
         self.state_of_charge_kwh = self.state_of_charge_kwh + physical_action
-
-        naive_cycle_count = abs(physical_action) / self.max_kwh / 2
-        self.naive_cycle_counter += naive_cycle_count
 
     def charge(self, charge_kw, charge_price):
         potential_charged_kwh = int(charge_kw * self.time_step)
@@ -154,8 +157,8 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Total cycles: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, round(self.naive_cycle_counter, 2))
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Total cycles: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, round(self.cycle_counter.cycle_count, 2))
         return msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.naive_cycle_counter, 2), round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
