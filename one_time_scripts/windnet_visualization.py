@@ -33,3 +33,13 @@ if __name__ == '__main__':
     plt.xlabel('Generated power in 5m (kWh)')
     plt.title('Histogram of generated power by wind farm Neushoorntocht')
     plt.show()
+
+    plt.hist(windnet_df['nht_production_kw'], bins=100)
+    plt.ylim(0, 200)
+    plt.axvline(x=22630, color='red')
+    plt.ylabel('Number of occurences')
+    plt.xlabel('Average Generated power per 5m (kW)')
+    plt.title('Histogram of generated power by wind farm Neushoorntocht')
+    plt.show()
+
+    print(windnet_df['nht_production_kw'].nlargest(100))
