@@ -14,13 +14,18 @@ def date_parser(string):
 
 def round_to_ptu(dt_object, round='UP'):
     num_of_minutes = dt_object.minute
+    corrected_hour = dt_object.hour
+
     if num_of_minutes % 15 != 0:
-        leftovers = num_of_minutes % 5
+        leftovers = num_of_minutes % 15
         if round == 'UP':
-            num_of_minutes += leftovers
+            num_of_minutes += (15 - leftovers)
+            if num_of_minutes == 60:
+                corrected_hour += 1
+                num_of_minutes = 0
         else:
             num_of_minutes -= leftovers
-    dt_object = dt_object.replace(minute=num_of_minutes)
+    dt_object = dt_object.replace(hour=corrected_hour, minute=num_of_minutes)
     return dt_object
 
 
