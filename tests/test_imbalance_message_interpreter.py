@@ -28,7 +28,6 @@ class TestImbalanceMessageInterpreter(unittest.TestCase):
         self.assertEqual(max_price, imbalance_message_interpreter.get_charge_price())
         self.assertEqual(min_price, imbalance_message_interpreter.get_discharge_price())
 
-
     def test_nice_forecast_min(self):
         imbalance_message_interpreter = ImbalanceMessageInterpreter()
         mid_prices = [32.12, 32.12, 32.12, 32.12, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62, 35.62]

@@ -10,3 +10,6 @@ class NetworkObject(object):
 
     def done_in_mean_time(self):
         return ''
+
+    def check_action(self, action_kwh):
+        return action_kwh
