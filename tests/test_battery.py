@@ -58,9 +58,8 @@ class TestBattery(unittest.TestCase):
         # Charge 1 MWh for 50 €/MWh
         rhino_battery.update_earnings(1000, 50)
         self.assertEqual(rhino_battery.earnings, -50)
-        base_msg = 'TEST battery - Current SoC: 3750kWh - Earnings since last time: €'
-        end_msg =  ' - Cycles in mean time: 0'
-        self.assertEqual(base_msg + '-50.0' + end_msg, rhino_battery.done_in_mean_time())
+        base_msg = 'TEST battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Earnings since last time: €'
+        self.assertEqual(base_msg + '-50.0', rhino_battery.done_in_mean_time())
         # Discharge 2 MWh for 50 €/MWh
         rhino_battery.update_earnings(-2000, 50)
         self.assertEqual(rhino_battery.earnings, 50)
@@ -70,7 +69,7 @@ class TestBattery(unittest.TestCase):
         # Discharge 1 MWh for -50 €/MWh
         rhino_battery.update_earnings(-1000, -50)
         self.assertEqual(rhino_battery.earnings, 50)
-        self.assertEqual(base_msg + '100.0' + end_msg, rhino_battery.done_in_mean_time())
+        self.assertEqual(base_msg + '100.0', rhino_battery.done_in_mean_time())
 
     def test_nice_charge_and_discharge(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
@@ -158,7 +157,7 @@ class TestBattery(unittest.TestCase):
 
     def test_to_string(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
-        res = "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0)
+        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
         self.assertEqual(res, rhino_battery.__str__())
 
     def test_ptu_reset(self):

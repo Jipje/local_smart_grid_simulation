@@ -36,12 +36,14 @@ class Battery(NetworkObject):
 
         self.earnings = 0
         self.old_earnings = self.earnings
-
+        self.average_soc_tracker = 0
+        self.average_soc = 0
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
         self.ptu_discharge_price = -9999
 
+        self.number_of_steps = 0
         self.time_step = 1/60
         self.verbose_lvl = verbose_lvl
 
@@ -126,6 +128,11 @@ class Battery(NetworkObject):
     def take_step(self, environment_step, action_parameters):
         charge_price = environment_step[action_parameters[0]]
         discharge_price = environment_step[action_parameters[1]]
+
+        self.number_of_steps += 1
+        self.average_soc_tracker = self.average_soc_tracker + self.state_of_charge_kwh
+        self.average_soc = int(self.average_soc_tracker / self.number_of_steps)
+
         self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
@@ -157,8 +164,8 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, self.cycle_counter.done_in_mean_time())
+        msg = "{} battery - Current SoC: {}kWh - Average SoC: {}kWh - {} - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), earnings_in_mean_time)
         return msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
