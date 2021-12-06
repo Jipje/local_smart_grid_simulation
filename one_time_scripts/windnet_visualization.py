@@ -124,4 +124,5 @@ if __name__ == '__main__':
     congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
 
     # make_base_graphs(windnet_df)
-    get_congestion_points_of_interest(windnet_df, 3)
+    for i in range(0, 7):
+        get_congestion_points_of_interest(windnet_df, i)
