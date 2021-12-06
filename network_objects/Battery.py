@@ -157,7 +157,7 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - Total cycles: {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, round(self.cycle_counter.cycle_count, 2))
+        msg = "{} battery - Current SoC: {}kWh - Earnings since last time: €{} - {}".format(self.name, self.state_of_charge_kwh, earnings_in_mean_time, self.cycle_counter.done_in_mean_time())
         return msg
 
     def __str__(self):
