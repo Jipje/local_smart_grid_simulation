@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import pandas as pd
 import datetime as dt
 import dateutil.tz
@@ -29,21 +30,26 @@ def round_to_ptu(dt_object, round='UP'):
     return dt_object
 
 
-def situation_sketch(df, moment=None):
-    if moment is None:
+def situation_sketch(df, moment=None, chosen_date=None):
+    if moment is None and chosen_date is None:
         moment = random.randint(0, len(df))
-    single_row = df.iloc[moment]
-    middle_of_set = single_row.name
-    start_of_set = round_to_ptu(middle_of_set - dt.timedelta(minutes=30), 'DOWN')
-    end_of_set = round_to_ptu(middle_of_set + dt.timedelta(minutes=30), 'UP')
-    print('Start scenario {}. End scenario {}.'.format(start_of_set, end_of_set))
+        print(moment)
+
+    if moment is not None:
+        single_row = df.iloc[moment]
+        middle_of_set = single_row.name
+
+    if chosen_date is not None:
+        middle_of_set = chosen_date
+
+    window_size = 180
+    start_of_set = round_to_ptu(middle_of_set - dt.timedelta(minutes=window_size), 'DOWN')
+    end_of_set = round_to_ptu(middle_of_set + dt.timedelta(minutes=window_size), 'UP')
+    return start_of_set, end_of_set
+    # print('Start scenario {}. End scenario {}.'.format(start_of_set, end_of_set))
 
 
 def make_base_graphs(windnet_df):
-    windnet_df['nht_production_kw'] = windnet_df['nht_production_kwh'] / 5 * 60
-    windnet_df['hour_of_production'] = windnet_df.index.hour
-    windnet_df['minute_of_production'] = windnet_df.index.minute
-
     plt.hist(windnet_df['nht_production_kwh'], bins=100)
     plt.ylabel('Number of occurences')
     plt.xlabel('Generated power in 5m (kWh)')
@@ -86,6 +92,33 @@ if __name__ == '__main__':
     windnet_df = pd.read_csv(base_windnet_filename, parse_dates=[0], date_parser=date_parser)
     windnet_df.index = pd.to_datetime(windnet_df['date'], errors='coerce', utc=True)
 
+    windnet_df['nht_production_kw'] = windnet_df['nht_production_kwh'] / 5 * 60
+    windnet_df['hour_of_production'] = windnet_df.index.hour
+    windnet_df['minute_of_production'] = windnet_df.index.minute
+
+    congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
+    print(congestion_windnet_df.sort_index())
+
     # make_base_graphs(windnet_df)
 
-    situation_sketch(windnet_df)
+    dates_of_interest = [dt.datetime(2020, 12, 27, 3, tzinfo=utc), dt.datetime(2020, 12, 27, 7, tzinfo=utc),
+                         dt.datetime(2020, 12, 27, 11, tzinfo=utc), dt.datetime(2021, 2, 6, 21, 30, tzinfo=utc),
+                         dt.datetime(2021, 4, 5, 10, tzinfo=utc), dt.datetime(2021, 4, 5, 20, tzinfo=utc),
+                         dt.datetime(2021, 4, 7, 8, 45, tzinfo=utc)]
+    random_index = random.randint(0, len(dates_of_interest) - 1)
+    chosen_date = dates_of_interest[random_index]
+    start_of_set, end_of_set = situation_sketch(congestion_windnet_df, chosen_date=chosen_date)
+    situation_df = windnet_df[start_of_set :end_of_set]
+    # print(situation_df.to_string())
+
+    plt.plot(situation_df.index, situation_df['nht_production_kw'])
+    ax = plt.gca()
+    formatter = mdates.DateFormatter('%H:%M')
+    ax.xaxis.set_major_formatter(formatter)
+    plt.ylim(16000, 26000)
+    plt.ylabel('Average Generated power per 5m (kW)')
+    plt.xlabel('Hour in which power was generated (UTC)')
+    plt.title('Generated power by wind farm Neushoorntocht on {}'.format(chosen_date.strftime('%a %d %b %Y')))
+    plt.show()
+
+#     56
