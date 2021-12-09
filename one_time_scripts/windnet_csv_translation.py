@@ -49,7 +49,7 @@ def make_trivial_windnet_csv():
                     time_tracker += dt.timedelta(minutes=1)
 
 
-def viusalise_trivial_windnet_interpolation():
+def viusalise_windnet_interpolation(interpolation_function=trivial_kw_per_minute):
     with open('../data/windnet/base_windnet_data_sep_2020_sep_2021.csv', 'r') as read_obj:
         csv_reader = reader(read_obj)
 
@@ -64,10 +64,10 @@ def viusalise_trivial_windnet_interpolation():
             end_of_5m_interval = end_of_5m_interval.astimezone(utc)
             start_of_5m_interval = end_of_5m_interval - dt.timedelta(minutes=5)
 
-            neushoorntocht_consumed_kw = trivial_kw_per_minute(float(wind_net_data[1]))
-            neushoorntocht_produced_kw = trivial_kw_per_minute(float(wind_net_data[2]))
-            mammoettocht_consumed_kw = trivial_kw_per_minute(float(wind_net_data[3]))
-            mammoettocht_produced_kw = trivial_kw_per_minute(float(wind_net_data[4]))
+            neushoorntocht_consumed_kw = interpolation_function(float(wind_net_data[1]))
+            neushoorntocht_produced_kw = interpolation_function(float(wind_net_data[2]))
+            mammoettocht_consumed_kw = interpolation_function(float(wind_net_data[3]))
+            mammoettocht_produced_kw = interpolation_function(float(wind_net_data[4]))
 
             for i in range(5):
                 time_tracker = start_of_5m_interval + dt.timedelta(minutes=i)
@@ -95,4 +95,4 @@ def viusalise_trivial_windnet_interpolation():
 
 
 if __name__ == '__main__':
-    viusalise_trivial_windnet_interpolation()
+    viusalise_windnet_interpolation()
