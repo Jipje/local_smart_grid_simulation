@@ -13,7 +13,7 @@ def trivial_kw_per_minute(total_kwh, number_of_minutes=5):
     return kw_per_minute
 
 
-if __name__ == '__main__':
+def make_trivial_windnet_csv():
     with open('../data/trivial_cleaned_windnet_data_sep_2020_sep_2021.csv', 'w+', newline='') as new_file:
         csv_writer = writer(new_file)
         csv_writer.writerow(['time', 'neushoorntocht_consumed_kw', 'neushoorntocht_produced_kw',
@@ -41,3 +41,7 @@ if __name__ == '__main__':
                     if time_tracker.hour == 20 and time_tracker.minute == 20:
                         print(csv_row)
                     time_tracker += dt.timedelta(minutes=1)
+
+
+if __name__ == '__main__':
+    make_trivial_windnet_csv()
