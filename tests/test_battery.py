@@ -58,7 +58,7 @@ class TestBattery(unittest.TestCase):
         # Charge 1 MWh for 50 €/MWh
         rhino_battery.update_earnings(1000, 50)
         self.assertEqual(rhino_battery.earnings, -50)
-        base_msg = 'TEST battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Earnings since last time: €'
+        base_msg = 'TEST battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Number of changes of direction: 0 - Earnings since last time: €'
         self.assertEqual(base_msg + '-50.0', rhino_battery.done_in_mean_time())
         # Discharge 2 MWh for 50 €/MWh
         rhino_battery.update_earnings(-2000, 50)
@@ -88,27 +88,27 @@ class TestBattery(unittest.TestCase):
 
     def test_weird_charge(self):
         # Battery too full
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=7400)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 7400)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=7025)
+        self.assertEqual(7025, rhino_battery.state_of_charge_kwh)
         rhino_battery.charge(12000)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 7499)
+        self.assertEqual(7124, rhino_battery.state_of_charge_kwh)
         # Asking too much power from battery
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=7200)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 7200)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=6825)
+        self.assertEqual(6825, rhino_battery.state_of_charge_kwh)
         rhino_battery.charge(15000)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 7380)
+        self.assertEqual(7005, rhino_battery.state_of_charge_kwh)
 
     def test_weird_discharge(self):
         # Battery too empty
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=100)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 100)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=475)
+        self.assertEqual(475, rhino_battery.state_of_charge_kwh)
         rhino_battery.discharge(12000)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 0)
+        self.assertEqual(375, rhino_battery.state_of_charge_kwh)
         # Discharge too large
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=500)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 500)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=875)
+        self.assertEqual(875, rhino_battery.state_of_charge_kwh)
         rhino_battery.discharge(15000)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 300)
+        self.assertEqual(675, rhino_battery.state_of_charge_kwh)
 
     def test_check_action(self):
         # Battery not powerful enough
@@ -118,11 +118,11 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(-200, rhino_battery.check_action(-200))
         self.assertEqual(-200, rhino_battery.check_action(-500))
         # Battery too full. Keeps track of battery efficiency
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=7400)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=7025)
         self.assertEqual(111, rhino_battery.check_action(200))
         self.assertEqual(111, rhino_battery.check_action(500))
         # Battery too empty
-        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=100)
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=475)
         self.assertEqual(-100, rhino_battery.check_action(-200))
         self.assertEqual(-100, rhino_battery.check_action(-500))
 
@@ -157,7 +157,7 @@ class TestBattery(unittest.TestCase):
 
     def test_to_string(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
-        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
+        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: 0\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
         self.assertEqual(res, rhino_battery.__str__())
 
     def test_ptu_reset(self):

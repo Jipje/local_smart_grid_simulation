@@ -38,6 +38,9 @@ class Battery(NetworkObject):
         self.old_earnings = self.earnings
         self.average_soc_tracker = 0
         self.average_soc = 0
+        self.last_action = 'WAIT'
+        self.change_of_direction_tracker = 0
+
         self.ptu_tracker = 0
         self.ptu_total_action = 0
         self.ptu_charge_price = 9999
@@ -117,11 +120,13 @@ class Battery(NetworkObject):
 
         current_soc = self.state_of_charge_kwh
         future_soc = current_soc + adjusted_action
+        adjusted_max = int(0.95 * self.max_kwh)
+        adjusted_min = int(0.05 * self.max_kwh)
         # The SoC can't be higher than the max_kwh. Or lower than 0.
-        if future_soc > self.max_kwh:
-            adjusted_action = int((self.max_kwh - current_soc) * 1 / self.efficiency)
-        if future_soc < 0:
-            adjusted_action = 0 - current_soc
+        if future_soc > adjusted_max:
+            adjusted_action = int((adjusted_max - current_soc) * 1 / self.efficiency)
+        if future_soc < adjusted_min:
+            adjusted_action = adjusted_min - current_soc
 
         return adjusted_action
 
@@ -147,6 +152,10 @@ class Battery(NetworkObject):
             soc_perc = int(self.state_of_charge_kwh / self.max_kwh * 100)
             action = self.strategy.make_decision(charge_price, discharge_price, soc_perc)
 
+        if action != 'WAIT' and action != self.last_action:
+            self.change_of_direction_tracker += 1
+            self.last_action = action
+
         if action == 'CHARGE':
             chosen_action = 0
         elif action == 'DISCHARGE':
@@ -164,8 +173,13 @@ class Battery(NetworkObject):
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
         self.old_earnings = self.earnings
-        msg = "{} battery - Current SoC: {}kWh - Average SoC: {}kWh - {} - Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), earnings_in_mean_time)
+        msg = "{} battery - " \
+              "Current SoC: {}kWh - " \
+              "Average SoC: {}kWh - " \
+              "{} - " \
+              "Number of changes of direction: {} - " \
+              "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), self.change_of_direction_tracker, earnings_in_mean_time)
         return msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: {}\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.change_of_direction_tracker, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
