@@ -76,6 +76,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                         environment_data[2] = float(environment_data[2])
                         environment_data[1] = float(environment_data[1])
                         environment_data[3] = float(environment_data[3])
+                        environment_data[5] = float(environment_data[5])
                         environment_data[7] = float(environment_data[7])
                     except ValueError:
                         if verbose_lvl > 2:
@@ -97,6 +98,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         if num_of_days != 0:
             earnings_per_day = round(network_object.earnings / num_of_days, 2)
             print('Average earnings per day: {}'.format(earnings_per_day))
+            try:
+                cycles_per_day = round(network_object.cycle_counter.cycle_count / num_of_days, 2)
+                print('Average cycles per day: {}'.format(cycles_per_day))
+            except:
+                pass
 
 
 if __name__ == '__main__':
@@ -110,7 +116,7 @@ if __name__ == '__main__':
     # Rhino with limited charging simulation
     imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    LimitedChargeOrDischargeCapacity(rhino, 7, -1)
+    LimitedChargeOrDischargeCapacity(rhino, 5, -1)
     imbalance_environment.add_object(rhino, [1, 3])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_trivial_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
