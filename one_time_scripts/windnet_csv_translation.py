@@ -51,7 +51,7 @@ def make_trivial_windnet_csv():
                     time_tracker += dt.timedelta(minutes=1)
 
 
-def viusalise_cool_windnet_interpolation(interpolation_function=trivial_kw_per_minute):
+def viusalise_windnet_interpolation(interpolation_function=trivial_kw_per_minute, title='Trivially extrapolated 5m wind data'):
     base_windnet_df = pd.read_csv('../data/windnet/base_windnet_data_sep_2020_sep_2021.csv')
 
     df2 = pd.DataFrame([[None, None, None, None, None], [None, None, None, None, None]],
@@ -102,7 +102,28 @@ def viusalise_cool_windnet_interpolation(interpolation_function=trivial_kw_per_m
     res_df = res_df.drop(['time'], axis=1)
 
     plt.plot(res_df.index, res_df['neushoorntocht_produced_kw'])
-    plt.title('Trivially extrapolated 5m wind data')
+    plt.title(title)
+    plt.xlabel('Time')
+    plt.ylabel('Produced power (kW)')
+    plt.ylim(0, 1100)
+    plt.show()
+
+
+def pandas_linear_interpolation():
+    base_windnet_df = pd.read_csv('../data/windnet/base_windnet_data_sep_2020_sep_2021.csv')
+
+    base_windnet_df.index = pd.to_datetime(base_windnet_df['date'], utc=False, errors='coerce')
+    base_windnet_df.index = base_windnet_df.index.tz_localize(ams, ambiguous='infer')
+    base_windnet_df = base_windnet_df.drop(['date'], axis=1)
+
+    base_windnet_df['neushoorntocht_produced_kw'] = base_windnet_df['nht_production_kwh'] * 12
+
+    base_windnet_df = base_windnet_df.resample('1T').interpolate()
+
+    filtered_df = base_windnet_df.iloc[800:1440]
+
+    plt.plot(filtered_df.index, filtered_df['neushoorntocht_produced_kw'])
+    plt.title('Pandas linear interpolation 5m wind data')
     plt.xlabel('Time')
     plt.ylabel('Produced power (kW)')
     plt.ylim(0, 1100)
@@ -110,6 +131,7 @@ def viusalise_cool_windnet_interpolation(interpolation_function=trivial_kw_per_m
 
 
 if __name__ == '__main__':
-    viusalise_cool_windnet_interpolation()
+    viusalise_windnet_interpolation()
     smart_windnet_interpolater = SmartWindnetInterpolater()
-    viusalise_cool_windnet_interpolation(smart_windnet_interpolater.kw_per_minute)
+    viusalise_windnet_interpolation(smart_windnet_interpolater.kw_per_minute, title='Own faulty interpolation 5m wind data')
+    pandas_linear_interpolation()
