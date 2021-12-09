@@ -49,7 +49,7 @@ def make_trivial_windnet_csv():
                     time_tracker += dt.timedelta(minutes=1)
 
 
-def make_smarter_windnet_csv():
+def viusalise_trivial_windnet_interpolation():
     with open('../data/windnet/base_windnet_data_sep_2020_sep_2021.csv', 'r') as read_obj:
         csv_reader = reader(read_obj)
 
@@ -95,4 +95,4 @@ def make_smarter_windnet_csv():
 
 
 if __name__ == '__main__':
-    make_smarter_windnet_csv()
+    viusalise_trivial_windnet_interpolation()
