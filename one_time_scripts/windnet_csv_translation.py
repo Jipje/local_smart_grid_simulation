@@ -8,6 +8,9 @@ from one_time_scripts.helper_objects.SmartWindnetInterpolater import SmartWindne
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
+start_graph = 900
+end_graph = 1200
+
 
 def trivial_kw_per_minute(total_kwh, previous_kwh, next_kwh, number_of_minutes=5):
     kwh_per_minute = total_kwh / number_of_minutes
@@ -92,10 +95,10 @@ def viusalise_windnet_interpolation(interpolation_function=trivial_kw_per_minute
                 'mammoettocht_consumed_kw': mammoettocht_consumed_kw[i],
                 'mammoettocht_produced_kw': mammoettocht_produced_kw[i]
             }
-            if counter > 800:
+            if counter > start_graph:
                 res_list.append(new_row)
             counter += 1
-        if counter >= 1440:
+        if counter >= end_graph:
             break
     res_df = pd.DataFrame(res_list)
     res_df.index = pd.to_datetime(res_df['time'], utc=False, errors='coerce')
@@ -120,7 +123,7 @@ def pandas_linear_interpolation():
 
     base_windnet_df = base_windnet_df.resample('1T').interpolate()
 
-    filtered_df = base_windnet_df.iloc[800:1440]
+    filtered_df = base_windnet_df.iloc[start_graph:end_graph]
 
     plt.plot(filtered_df.index, filtered_df['neushoorntocht_produced_kw'])
     plt.title('Pandas linear interpolation 5m wind data')
@@ -142,7 +145,7 @@ def pandas_linear_interpolation_pad_halfway_then_interpolate():
     base_windnet_df = base_windnet_df.resample('2.5T').pad()
     base_windnet_df = base_windnet_df.resample('1T').interpolate()
 
-    filtered_df = base_windnet_df.iloc[800:1440]
+    filtered_df = base_windnet_df.iloc[start_graph:end_graph]
 
     plt.plot(filtered_df.index, filtered_df['neushoorntocht_produced_kw'])
     plt.title('Pandas pad 2.5m then linear interpolation of original 5m wind data')
