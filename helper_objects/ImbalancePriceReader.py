@@ -10,7 +10,6 @@ class ImbalancePriceReader(object):
     def __init__(self, market_data='../data/tennet_balans_delta/tennet_balans_delta_15m.csv'):
         market_df = pd.read_csv(market_data, parse_dates=True)
         market_df.index = pd.to_datetime(market_df['time'], utc=True)
-        print(market_df)
 
         market_df = market_df.drop('time', axis=1)
         self.market_df = market_df
