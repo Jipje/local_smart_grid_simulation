@@ -71,7 +71,7 @@ def make_base_graphs(windnet_df):
     plt.title('Histogram of generated power by wind farm Neushoorntocht')
     plt.show()
 
-    congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
+    congestion_windnet_df = windnet_df.nlargest(n=1000, columns='nht_production_kw')
 
     plt.scatter(congestion_windnet_df['minute_of_production'], congestion_windnet_df['nht_production_kw'])
     plt.ylabel('Average Generated power per 5m (kW)')

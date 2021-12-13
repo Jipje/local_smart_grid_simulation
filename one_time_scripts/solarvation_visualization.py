@@ -30,3 +30,13 @@ if __name__ == '__main__':
     plt.xlabel('Generated power 1h (kW)')
     plt.title('Histogram of generated power by solar field Solarvation')
     plt.show()
+
+    solarvation_df['hour_of_production'] = solarvation_df.index.hour
+    solarvation_df['minute_of_production'] = solarvation_df.index.minute
+    congestion_solarvation_df = solarvation_df.nlargest(n=1000, columns='power_generation')
+
+    plt.scatter(congestion_solarvation_df['hour_of_production'], congestion_solarvation_df['power_generation'])
+    plt.ylabel('Generated power 1h (kW)')
+    plt.xlabel('Hour in which power was generated (UTC)')
+    plt.title('Scatterplot of generated power by solar field Solarvation')
+    plt.show()
