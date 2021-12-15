@@ -7,8 +7,8 @@ from one_time_scripts.helper_objects.SmartWindnetInterpolater import SmartWindne
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
-start_graph = dt.datetime(2021, 3, 10, 8, tzinfo=utc)
-end_graph = start_graph + dt.timedelta(minutes=1000)
+start_graph = dt.datetime(2021, 3, 14, 16, tzinfo=utc)
+end_graph = start_graph + dt.timedelta(minutes=500)
 
 
 def trivial_interpolation_windnet():
@@ -40,14 +40,6 @@ def pandas_linear_interpolation_windnet():
     base_windnet_df['mmt_production_kwh'] = base_windnet_df['mmt_production_kw'] / 60
 
     return base_windnet_df
-
-    # filtered_df = base_windnet_df.loc[start_graph:end_graph]
-    #
-    # plt.plot(filtered_df.index, filtered_df['nht_production_kw'])
-    # plt.title('Pandas linear interpolation 5m wind data')
-    # plt.xlabel('Time')
-    # plt.ylabel('Produced power (kW)')
-    # plt.show()
 
 
 def smarter_interpolation_windnet():
@@ -109,7 +101,23 @@ def smarter_interpolation_windnet():
     return res_df
 
 
+def make_simple_graph(filtered_df, title):
+    plt.plot(filtered_df.index, filtered_df['nht_production_kw'])
+    plt.title(title)
+    plt.xlabel('Time')
+    plt.ylabel('Produced power (kW)')
+    plt.show()
+
+
 if __name__ == '__main__':
-    print(trivial_interpolation_windnet())
-    print(pandas_linear_interpolation_windnet())
-    print(smarter_interpolation_windnet())
+    trivial_df = trivial_interpolation_windnet()
+    pandas_df = pandas_linear_interpolation_windnet()
+    own_df = smarter_interpolation_windnet()
+
+    trivial_df = trivial_df[trivial_df.index.to_series().between(start_graph, end_graph)]
+    pandas_df = pandas_df[pandas_df.index.to_series().between(start_graph, end_graph)]
+    own_df = own_df[own_df.index.to_series().between(start_graph, end_graph)]
+
+    make_simple_graph(trivial_df, title='Trivial interpolation.')
+    make_simple_graph(pandas_df, title='Pandas interpolation.')
+    make_simple_graph(own_df, title='Own interpolation.')
