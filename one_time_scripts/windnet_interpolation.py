@@ -101,6 +101,20 @@ def smarter_interpolation_windnet():
     return res_df
 
 
+def csv_maker():
+    trivial_df = trivial_interpolation_windnet()
+    pandas_df = pandas_linear_interpolation_windnet()
+    own_df = smarter_interpolation_windnet()
+
+    print(trivial_df)
+    print(pandas_df)
+    print(own_df)
+
+    trivial_df.to_csv('../data/windnet/trivial_cleaned_windnet_data_sep_2020_sep_2021.csv')
+    trivial_df.to_csv('../data/windnet/trivial_interpolation_windnet.csv')
+    pandas_df.to_csv('../data/windnet/pandas_interpolation_windnet.csv')
+    own_df.to_csv('../data/windnet/own_interpolation_windnet.csv')
+
 def make_simple_graph(filtered_df, title):
     plt.plot(filtered_df.index, filtered_df['nht_production_kw'])
     plt.title(title)
@@ -110,14 +124,16 @@ def make_simple_graph(filtered_df, title):
 
 
 if __name__ == '__main__':
-    trivial_df = trivial_interpolation_windnet()
-    pandas_df = pandas_linear_interpolation_windnet()
-    own_df = smarter_interpolation_windnet()
+    csv_maker()
 
-    trivial_df = trivial_df[trivial_df.index.to_series().between(start_graph, end_graph)]
-    pandas_df = pandas_df[pandas_df.index.to_series().between(start_graph, end_graph)]
-    own_df = own_df[own_df.index.to_series().between(start_graph, end_graph)]
-
-    make_simple_graph(trivial_df, title='Trivial interpolation.')
-    make_simple_graph(pandas_df, title='Pandas interpolation.')
-    make_simple_graph(own_df, title='Own interpolation.')
+    # trivial_df = trivial_interpolation_windnet()
+    # pandas_df = pandas_linear_interpolation_windnet()
+    # own_df = smarter_interpolation_windnet()
+    #
+    # trivial_df = trivial_df[trivial_df.index.to_series().between(start_graph, end_graph)]
+    # pandas_df = pandas_df[pandas_df.index.to_series().between(start_graph, end_graph)]
+    # own_df = own_df[own_df.index.to_series().between(start_graph, end_graph)]
+    #
+    # make_simple_graph(trivial_df, title='Trivial interpolation.')
+    # make_simple_graph(pandas_df, title='Pandas interpolation.')
+    # make_simple_graph(own_df, title='Own interpolation.')
