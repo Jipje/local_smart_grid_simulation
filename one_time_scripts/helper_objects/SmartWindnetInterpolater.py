@@ -7,11 +7,11 @@ class SmartWindnetInterpolater(object):
         return round(total_kwh / self.number_of_minutes * 60, 2)
 
     def kw_per_minute(self, current_kw, previous_kw=None, next_kw=None):
-        average_diff = abs(current_kw - previous_kw) + abs(current_kw - next_kw) / 2
-        smallest_diff = min(current_kw, average_diff)
+        smallest_diff = min(abs(current_kw - previous_kw), abs(current_kw - next_kw))
+        smallest_diff = min(current_kw, smallest_diff)
 
-        slope_factor = 0.3
-        parabole_factor = 0.2
+        slope_factor = 0.2
+        parabole_factor = 0.5
 
         if previous_kw > current_kw and next_kw > current_kw:
             # current_kw is a dip
