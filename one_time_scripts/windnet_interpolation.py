@@ -81,7 +81,7 @@ def smarter_interpolation_windnet():
             time_tracker = start_of_5m_interval + dt.timedelta(minutes=i)
             time_tracker_str = time_tracker.strftime('%Y-%m-%dT%H:%M:%S%z')
             new_row = {
-                'time': time_tracker_str,
+                'date': time_tracker_str,
                 'nht_usage_kw': neushoorntocht_consumed_kw[i],
                 'nht_production_kw': neushoorntocht_produced_kw[i],
                 'mmt_usage_kw': mammoettocht_consumed_kw[i],
@@ -90,8 +90,8 @@ def smarter_interpolation_windnet():
             res_list.append(new_row)
 
     res_df = pd.DataFrame(res_list)
-    res_df.index = pd.to_datetime(res_df['time'], utc=True, errors='coerce')
-    res_df = res_df.drop(['time'], axis=1)
+    res_df.index = pd.to_datetime(res_df['date'], utc=True, errors='coerce')
+    res_df = res_df.drop(['date'], axis=1)
 
     res_df['nht_usage_kwh'] = res_df['nht_usage_kw'] / 60
     res_df['nht_production_kwh'] = res_df['nht_production_kw'] / 60
