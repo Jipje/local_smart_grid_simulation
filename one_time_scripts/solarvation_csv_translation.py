@@ -20,6 +20,6 @@ if __name__ == '__main__':
                 time_dt = dt.datetime.strptime(solarvation_data[0], '%d/%m/%Y %H:%M')
                 time_dt = time_dt.replace(year=2021, tzinfo=ams)
                 time_dt = time_dt.astimezone(utc)
-                time_str = time_dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                time_str = time_dt.strftime('%Y-%m-%dT%H:%M:%S%z')
                 csv_row = [time_str, solarvation_data[1], solarvation_data[2], solarvation_data[3], solarvation_data[4]]
                 csv_writer.writerow(csv_row)
