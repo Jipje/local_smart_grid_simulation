@@ -8,7 +8,7 @@ utc = dateutil.tz.tzutc()
 
 
 def date_parser(string):
-    return dt.datetime.strptime(string, '%Y-%m-%dT%H:%M:%S.000Z').replace(tzinfo=utc)
+    return dt.datetime.strptime(string, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=utc)
 
 
 if __name__ == '__main__':
