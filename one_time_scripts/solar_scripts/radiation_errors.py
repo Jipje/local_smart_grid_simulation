@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import pandas as pd
 import datetime as dt
 import dateutil.tz
@@ -69,17 +70,38 @@ if __name__ == '__main__':
     print('RMSE d-5')
     print(mean_squared_error(radiation_df['radiation'], radiation_df['radiation_d_5'], squared=False))
 
-    radiation_df = radiation_df.resample('15T').pad()
-    start_of_set = dt.datetime(2021, 8, 10, tzinfo=utc)
-    end_of_set = dt.datetime(2021, 8, 12, tzinfo=utc)
-    radiation_df = radiation_df[start_of_set:end_of_set]
+    print('-----------------------------------')
 
-    plt.plot(radiation_df.index, radiation_df['radiation'], label='Measured radiation')
-    plt.plot(radiation_df.index, radiation_df['radiation_d_1'], label='Radiation forecast d-1')
-    plt.plot(radiation_df.index, radiation_df['radiation_d_3'], label='Radiation forecast d-3')
-    plt.plot(radiation_df.index, radiation_df['radiation_d_5'], label='Radiation forecast d-5')
+    # Investigating max of a day to determine if radiation incorporates cloud spread
+    start_of_set = dt.datetime(2021, 8, 1, tzinfo=utc)
+    end_of_set = dt.datetime(2021, 10, 1, tzinfo=utc)
+    day_df = radiation_df[start_of_set:end_of_set]
+    day_df = day_df.resample('1D').max()
+
+    plt.plot(day_df.index, day_df['radiation'], label='Measured radiation')
+    ax = plt.gca()
+    max_formatter = mdates.DateFormatter('%d-%m')
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=6))
+    ax.xaxis.set_major_formatter(max_formatter)
+    plt.ylabel('Solar radiation (W/m2)')
+    plt.xlabel('Time (UTC)')
+    plt.title('Solar radiation max value measured on a day')
+    plt.show()
+
+    start_of_set = dt.datetime(2021, 7, 15, tzinfo=utc)
+    end_of_set = dt.datetime(2021, 7, 19, tzinfo=utc)
+    smaller_df = radiation_df[start_of_set:end_of_set]
+
+    plt.plot(smaller_df.index, smaller_df['radiation'], label='Measured radiation')
+    plt.plot(smaller_df.index, smaller_df['radiation_d_1'], label='Radiation forecast d-1')
+    plt.plot(smaller_df.index, smaller_df['radiation_d_3'], label='Radiation forecast d-3')
+    plt.plot(smaller_df.index, smaller_df['radiation_d_5'], label='Radiation forecast d-5')
+    ax = plt.gca()
+    max_formatter = mdates.DateFormatter('%d-%m')
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_major_formatter(max_formatter)
     plt.ylabel('Solar radiation (W/m2)')
     plt.xlabel('Time (UTC)')
     plt.title('Solar radiation measured and forecast')
-    plt.legend()
+    plt.legend(loc='lower right')
     plt.show()
