@@ -4,6 +4,7 @@ import pandas as pd
 import datetime as dt
 import dateutil.tz
 import random
+from helper_objects.ImbalancePriceReader import ImbalancePriceReader
 
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
@@ -86,7 +87,7 @@ def make_base_graphs(windnet_df):
     plt.show()
 
 
-def get_congestion_points_of_interest(windnet_df, congestion_index=None):
+def get_congestion_points_of_interest(windnet_df, congestion_index=None, imbalance_price_reader=None):
     dates_of_interest = [dt.datetime(2020, 12, 27, 3, tzinfo=utc), dt.datetime(2020, 12, 27, 7, tzinfo=utc),
                          dt.datetime(2020, 12, 27, 11, tzinfo=utc), dt.datetime(2021, 2, 6, 21, 30, tzinfo=utc),
                          dt.datetime(2021, 4, 5, 10, tzinfo=utc), dt.datetime(2021, 4, 5, 20, tzinfo=utc),
@@ -97,21 +98,34 @@ def get_congestion_points_of_interest(windnet_df, congestion_index=None):
 
     chosen_date = dates_of_interest[congestion_index]
     start_of_set, end_of_set = situation_sketch(windnet_df, chosen_date=chosen_date)
+    imbalance_df = imbalance_price_reader.get_specific_time(start_of_set, end_of_set)
+    imbalance_df = imbalance_df.resample('5T').pad()
     situation_df = windnet_df[start_of_set:end_of_set]
+    situation_df = situation_df.merge(imbalance_df, how='left', left_index=True, right_index=True)
     # print(situation_df.to_string())
 
-    plt.plot(situation_df.index, situation_df['nht_production_kw'])
-    ax = plt.gca()
+    fig, ax1 = plt.subplots()
+
+    ax1.plot(situation_df.index, situation_df['nht_production_kw'])
     max_formatter = mdates.DateFormatter('%d-%m')
     min_formatter = mdates.DateFormatter('%H:%M')
-    ax.xaxis.set_major_locator(mdates.DayLocator())
-    ax.xaxis.set_major_formatter(max_formatter)
-    ax.xaxis.set_minor_locator(mdates.HourLocator(interval=4))
-    ax.xaxis.set_minor_formatter(min_formatter)
-    plt.ylim(16000, 26000)
-    plt.ylabel('Average Generated power per 5m (kW)')
-    plt.xlabel('Hour in which power was generated (UTC)')
-    plt.title('Generated power by wind farm Neushoorntocht on {}'.format(chosen_date.strftime('%a %d %b %Y')))
+    ax1.xaxis.set_major_locator(mdates.DayLocator())
+    ax1.xaxis.set_major_formatter(max_formatter)
+    ax1.xaxis.set_minor_locator(mdates.HourLocator(interval=4))
+    ax1.xaxis.set_minor_formatter(min_formatter)
+    ax1.set_ylabel('Average Generated power per 5m (kW)')
+    ax1.set_xlabel('Hour in which power was generated (UTC)')
+
+    color = 'tab:red'
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Imbalance price (€/MWh)')
+    ax2.plot(situation_df.index, situation_df['min_price'], color=color)
+
+    ax2.set_ylim(-200, 500)
+    ax1.set_ylim(16000, 26000)
+
+    ax1.set_title('Generated power by wind farm Neushoorntocht on {}'.format(chosen_date.strftime('%a %d %b %Y')))
+    fig.tight_layout()
     plt.show()
 
 
@@ -127,7 +141,9 @@ if __name__ == '__main__':
 
     congestion_windnet_df = windnet_df.nlargest(n=100, columns='nht_production_kw')
 
+    imbalance_price_reader = ImbalancePriceReader()
+
     make_base_graphs(windnet_df)
     for i in range(0, 7):
-        get_congestion_points_of_interest(windnet_df, i)
-    # get_congestion_points_of_interest(windnet_df, 3)
+        get_congestion_points_of_interest(windnet_df, i, imbalance_price_reader)
+    # get_congestion_points_of_interest(windnet_df, 3, imbalance_price_reader)
