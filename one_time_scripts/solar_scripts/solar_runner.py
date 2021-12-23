@@ -30,7 +30,8 @@ if __name__ == '__main__':
     res_df = solar_power_mw_df.merge(radiation_df, how='inner', left_index=True, right_index=True)
     # print(res_df)
 
-    my_solar_farm_m2 = 10
+    my_solar_farm_m2 = 45
+    my_solar_farm_kwp = 36350
 
     # Second method
     res_df['solar_farms_m2'] = res_df['solar_mw'] * 1000 / res_df['radiation']
@@ -56,9 +57,12 @@ if __name__ == '__main__':
     # Fourth method
     res_df['kw_my_solar_farm_4'] = res_df['cloud_coverage_rolling'] * my_solar_farm_m2 * res_df['radiation']
 
+    # Fifth method
+    res_df['kw_my_solar_farm_5'] = res_df['cloud_coverage'] * my_solar_farm_kwp
+
     res_df['hour_of_production'] = res_df.index.hour
 
-    plt.scatter(res_df['hour_of_production'], res_df['kw_my_solar_farm_4'])
+    plt.scatter(res_df['hour_of_production'], res_df['kw_my_solar_farm_5'])
     plt.ylabel('Generated power 15m (kW)')
     plt.xlabel('Hour in which power was generated (UTC)')
     plt.title('Scatterplot of generated power by generic solar farm')
@@ -72,6 +76,7 @@ if __name__ == '__main__':
     plt.plot(res_df.index, res_df['kw_my_solar_farm_2'], label='m2 of solar farms')
     plt.plot(res_df.index, res_df['kw_my_solar_farm_3'], label='Cloud coverage large max')
     plt.plot(res_df.index, res_df['kw_my_solar_farm_4'], label='Cloud coverage rolling window')
+    plt.plot(res_df.index, res_df['kw_my_solar_farm_5'], label='Power cloud coverage on max kW')
     ax = plt.gca()
     max_formatter = mdates.DateFormatter('%d-%m')
     ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
