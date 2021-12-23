@@ -7,8 +7,8 @@ from one_time_scripts.helper_objects.SmartWindnetInterpolater import SmartWindne
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
-start_graph = dt.datetime(2021, 3, 14, 19, tzinfo=utc)
-end_graph = start_graph + dt.timedelta(minutes=120)
+start_graph = dt.datetime(2021, 3, 20, 18, tzinfo=utc)
+end_graph = start_graph + dt.timedelta(minutes=240)
 
 
 def trivial_interpolation_windnet():
@@ -126,21 +126,30 @@ def make_simple_graph(filtered_df, title):
 if __name__ == '__main__':
     # csv_maker()
 
+    original_df = pd.read_csv('../data/windnet/cleaned_windnet_data_aug_2020_sep_2021.csv')
+    original_df.index = pd.to_datetime(original_df['date'], utc=True, errors='coerce')
+    original_df.index = original_df.index - dt.timedelta(minutes=5)
+    original_df = original_df.drop(['date'], axis=1)
+
     trivial_df = pd.read_csv('../data/windnet/trivial_interpolation_windnet.csv')
     trivial_df.index = pd.to_datetime(trivial_df['date'])
 
-    own_df = smarter_interpolation_windnet()
+    # own_df = smarter_interpolation_windnet()
+    own_df = pd.read_csv('../data/windnet/own_interpolation_windnet.csv')
+    own_df.index = pd.to_datetime(own_df['date'])
 
     pandas_df = pd.read_csv('../data/windnet/pandas_interpolation_windnet.csv')
     pandas_df.index = pd.to_datetime(pandas_df['date'])
 
+    original_df = original_df[original_df.index.to_series().between(start_graph, end_graph)]
     trivial_df = trivial_df[trivial_df.index.to_series().between(start_graph, end_graph)]
     pandas_df = pandas_df[pandas_df.index.to_series().between(start_graph, end_graph)]
     own_df = own_df[own_df.index.to_series().between(start_graph, end_graph)]
 
-    print(pandas_df)
-    print(own_df)
+    # print(pandas_df)
+    print(original_df)
 
     make_simple_graph(trivial_df, title='Trivial interpolation.')
     make_simple_graph(pandas_df, title='Pandas interpolation.')
     make_simple_graph(own_df, title='Own interpolation.')
+    make_simple_graph(original_df, title='Original data')
