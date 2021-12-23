@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     # Second method
     res_df['solar_farms_m2'] = res_df['solar_mw'] * 1000 / res_df['radiation']
-    # Third method
+    # Third method and Fifth method
     res_df['cloud_coverage'] = res_df['solar_mw'] / res_df['solar_mw'].max()
     # Fourth method
     res_df['cloud_coverage_rolling'] = res_df['solar_mw'] / res_df['solar_mw'].rolling(180).max()
