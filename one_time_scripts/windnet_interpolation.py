@@ -48,7 +48,6 @@ def csv_maker():
     print(trivial_df)
     print(pandas_df)
 
-    trivial_df.to_csv('../data/windnet/trivial_cleaned_windnet_data_sep_2020_sep_2021.csv')
     trivial_df.to_csv('../data/windnet/trivial_interpolation_windnet.csv')
     pandas_df.to_csv('../data/windnet/pandas_interpolation_windnet.csv')
 
