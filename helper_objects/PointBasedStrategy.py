@@ -1,14 +1,10 @@
+from helper_objects.Strategy import Strategy
 
-class PointBasedStrategy(object):
-    def __init__(self, name):
-        self.ready_to_use = False
+class PointBasedStrategy(Strategy):
+    def __init__(self, name, price_step_size=5):
+        super().__init__(name, price_step_size)
         self.charge_points = []
         self.discharge_points = []
-        self.strategy = None
-        self.name = name
-        self.max_price = -9999
-        self.min_price = 9999
-        self.price_step_size = 5
 
     def add_point(self, point):
         try:
@@ -30,35 +26,8 @@ class PointBasedStrategy(object):
             raise ValueError("The offered point should be tuple of (SoC%, Imb Price, ACTION)."
                              "First two integers respectively, other is a valid command, CHARGE, DISCHARGE.")
 
-    def price_index(self, price):
-        price = self.clean_price(price)
-        price = price - self.min_price
-        price_index = price / self.price_step_size
-        price_index = int(price_index)
-        return price_index
-
-    def clean_price(self, price, discharge_price=True):
-        if price % self.price_step_size == 0:
-            res = price
-        else:
-            if discharge_price:
-                res = price - price % self.price_step_size
-            else:
-                res = price + self.price_step_size - (price % self.price_step_size)
-
-        if price > self.max_price:
-            res = self.max_price
-        elif price < self.min_price:
-            res = self.min_price
-        return res
-
     def upload_strategy(self):
-        num_of_price_buckets = int((self.max_price - self.min_price) / self.price_step_size)
-        strategy_matrix = []
-        for i in range(100 + 1):
-            strategy_matrix.append([])
-            for _ in range(num_of_price_buckets + 1):
-                strategy_matrix[i].append('WAIT')
+        self.initialize_strategy_matrix()
 
         self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
         self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
@@ -67,6 +36,7 @@ class PointBasedStrategy(object):
 
         latest_charge = next(charge_iter)
         latest_discharge = next(discharge_iter)
+        strategy_matrix = self.strategy_matrix
 
         for current_soc in range(100 + 1):
             for current_price in range(self.min_price, self.max_price + self.price_step_size, self.price_step_size):

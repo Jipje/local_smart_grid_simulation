@@ -6,10 +6,9 @@ import os
 
 class TestPointBasedStrategy(unittest.TestCase):
 
-    def test_nice_initialization(self):
+    def test_normal_strategy_vs_point_based(self):
         strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-        rhino_strategy = StrategyBattery(strategy_csv=strategy_one_path)
-
+        rhino_strategy = StrategyBattery(name='CSV strategy', strategy_csv=strategy_one_path)
         self.assertEqual(rhino_strategy.max_price, 105)
         self.assertEqual(rhino_strategy.min_price, -5)
         self.assertEqual(rhino_strategy.price_step_size, 5)
@@ -24,7 +23,6 @@ class TestPointBasedStrategy(unittest.TestCase):
         point_based_strat.add_point((95, 65, 'DISCHARGE'))
 
         point_based_strat.upload_strategy()
-
         self.assertEqual(point_based_strat.max_price, 105)
         self.assertEqual(point_based_strat.min_price, -5)
         self.assertEqual(point_based_strat.price_step_size, 5)
