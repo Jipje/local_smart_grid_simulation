@@ -7,9 +7,9 @@ if __name__ == '__main__':
     strategy_one = StrategyBattery(strategy_csv=strategy_one_path)
     print(strategy_one)
     strategy_matrix = strategy_one.strategy_matrix
-    red = 1
-    blue = 0.5
-    white = 0
+    red = (239, 71, 111)
+    blue = (33, 137, 126)
+    white = (250, 250, 250)
 
     for row_index in range(len(strategy_matrix)):
         row = strategy_matrix[row_index]
