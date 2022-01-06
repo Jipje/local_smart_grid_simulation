@@ -39,8 +39,17 @@ class PointBasedStrategy(Strategy):
         strategy_matrix = self.strategy_matrix
 
         for current_soc in range(100 + 1):
+
+            try:
+                if current_soc == latest_charge[0]:
+                    latest_charge = next(charge_iter)
+                if current_soc == latest_discharge[0]:
+                    latest_discharge = next(discharge_iter)
+            except StopIteration:
+                pass
+
             for current_price in range(self.min_price, self.max_price + self.price_step_size, self.price_step_size):
-                if current_soc <= 5:
+                if current_soc < 5:
                     command = 'CHARGE'
                 elif current_soc >= 95:
                     command = 'DISCHARGE'
@@ -54,14 +63,6 @@ class PointBasedStrategy(Strategy):
                 current_soc_index = current_soc
                 current_price_index = self.price_index(current_price)
                 strategy_matrix[current_soc_index][current_price_index] = command
-
-            try:
-                if current_soc == latest_charge[0]:
-                    latest_charge = next(charge_iter)
-                if current_soc == latest_discharge[0]:
-                    latest_discharge = next(discharge_iter)
-            except StopIteration:
-                pass
 
         self.uploaded = True
         self.strategy_matrix = strategy_matrix
