@@ -27,4 +27,7 @@ class TestPointBasedStrategy(unittest.TestCase):
         self.assertEqual(point_based_strat.min_price, -5)
         self.assertEqual(point_based_strat.price_step_size, 5)
 
-        self.assertEqual(point_based_strat.strategy_matrix, point_based_strat.strategy_matrix)
+        for i in range(len(rhino_strategy.strategy_matrix)):
+            rhino_strategy_line = rhino_strategy.strategy_matrix[i]
+            point_based_line = point_based_strat.strategy_matrix[i]
+            self.assertListEqual(rhino_strategy_line, point_based_line)
