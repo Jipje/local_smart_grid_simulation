@@ -2,10 +2,10 @@ import pandas as pd
 
 
 class StrategyBattery(object):
-    def __init__(self, strategy_csv):
+    def __init__(self, strategy_csv, price_step_size=5):
         self.dayhead_tracker = False
         self.strategy_matrix = []
-        self.price_step_size = 5
+        self.price_step_size = price_step_size
         self.max_price = -9999
         self.min_price = 9999
 
