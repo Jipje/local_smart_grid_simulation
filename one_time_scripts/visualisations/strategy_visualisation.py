@@ -24,6 +24,8 @@ if __name__ == '__main__':
 
             strategy_matrix[row_index][column_index] = new_item
 
+    plt.xlabel('Imbalance price')
+    plt.ylabel('State of charge (SoC %)')
     plt.imshow(strategy_matrix, interpolation='none')
 
     plt.show()
