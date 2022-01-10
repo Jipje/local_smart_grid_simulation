@@ -10,7 +10,7 @@ class TestStrategyBattery(unittest.TestCase):
         strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
         pre_path = '..{0}'.format(os.path.sep)
         try:
-            StrategyBattery(strategy_csv=strategy_one_path)
+            StrategyBattery('Basic Rhino strategy', strategy_csv=strategy_one_path)
         except FileNotFoundError:
             strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
             pre_path = ''
@@ -18,27 +18,27 @@ class TestStrategyBattery(unittest.TestCase):
         cls.pre_path = pre_path
 
     def test_nice_initialization(self):
-        rhino_strategy = StrategyBattery(strategy_csv=self.strategy_one_path)
+        rhino_strategy = StrategyBattery('Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         self.assertEqual(rhino_strategy.max_price, 105)
         self.assertEqual(rhino_strategy.min_price, -5)
         self.assertEqual(rhino_strategy.price_step_size, 5)
 
     def test_wrong_file_initialization(self):
-        self.assertRaises(FileNotFoundError, StrategyBattery, strategy_csv='bla_bla_simplified_passive_imbalance_1.csv')
+        self.assertRaises(FileNotFoundError, StrategyBattery, name='Basic Rhino strategy', strategy_csv='bla_bla_simplified_passive_imbalance_1.csv')
 
     def test_weird_strategy_files(self):
-        self.assertRaises(AssertionError, StrategyBattery, strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_0.csv'.format(os.path.sep))
-        self.assertRaises(AssertionError, StrategyBattery, strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_100.csv'.format(os.path.sep))
-        self.assertRaises(ValueError, StrategyBattery, strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_step_5.csv'.format(os.path.sep))
-        self.assertRaises(ValueError, StrategyBattery, strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_unknown_action.csv'.format(os.path.sep))
+        self.assertRaises(AssertionError, StrategyBattery, name='Basic Rhino strategy', strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_0.csv'.format(os.path.sep))
+        self.assertRaises(AssertionError, StrategyBattery, name='Basic Rhino strategy', strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_100.csv'.format(os.path.sep))
+        self.assertRaises(ValueError, StrategyBattery, name='Basic Rhino strategy', strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_not_step_5.csv'.format(os.path.sep))
+        self.assertRaises(ValueError, StrategyBattery, name='Basic Rhino strategy', strategy_csv=self.pre_path + 'data{0}strategies{0}weird_strategies{0}strategy_unknown_action.csv'.format(os.path.sep))
 
     def test_faulty_soc_make_decision(self):
-        rhino_strategy = StrategyBattery(strategy_csv=self.strategy_one_path)
+        rhino_strategy = StrategyBattery(name='Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         self.assertRaises(ValueError, rhino_strategy.make_decision, 20, 20, -1)
         self.assertRaises(ValueError, rhino_strategy.make_decision, 20, 20, 101)
 
     def test_nice_charge_buckets(self):
-        rhino_strategy = StrategyBattery(strategy_csv=self.strategy_one_path)
+        rhino_strategy = StrategyBattery(name='Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         # Second bucket
         self.assertEqual(rhino_strategy.make_decision(-50, -50, 5), 'CHARGE')
         self.assertEqual(rhino_strategy.make_decision(0, 0, 6), 'CHARGE')
@@ -56,7 +56,7 @@ class TestStrategyBattery(unittest.TestCase):
         self.assertEqual(rhino_strategy.make_decision(-1, -1, 94), 'CHARGE')
 
     def test_nice_waiting_charge_buckets(self):
-        rhino_strategy = StrategyBattery(strategy_csv=self.strategy_one_path)
+        rhino_strategy = StrategyBattery(name='Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         # Second bucket
         self.assertEqual(rhino_strategy.make_decision(51, 51, 5), 'WAIT')
         self.assertEqual(rhino_strategy.make_decision(98, 98, 6), 'WAIT')
@@ -74,13 +74,13 @@ class TestStrategyBattery(unittest.TestCase):
         self.assertEqual(rhino_strategy.make_decision(64, 64, 94), 'WAIT')
 
     def test_extreme_buckets(self):
-        rhino_strategy = StrategyBattery(strategy_csv=self.strategy_one_path)
+        rhino_strategy = StrategyBattery(name='Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         # First bucket
-        self.assertEqual(rhino_strategy.make_decision(100, 100, 0), 'CHARGE')
-        self.assertEqual(rhino_strategy.make_decision(1000, 1000, 1), 'CHARGE')
-        self.assertEqual(rhino_strategy.make_decision(500, 500, 2), 'CHARGE')
-        self.assertEqual(rhino_strategy.make_decision(50, 50, 3), 'CHARGE')
-        self.assertEqual(rhino_strategy.make_decision(-50, -50, 4), 'CHARGE')
+        self.assertEqual('CHARGE', rhino_strategy.make_decision(100, 100, 0))
+        self.assertEqual('CHARGE', rhino_strategy.make_decision(1000, 1000, 1))
+        self.assertEqual('CHARGE', rhino_strategy.make_decision(500, 500, 2))
+        self.assertEqual('CHARGE', rhino_strategy.make_decision(50, 50, 3))
+        self.assertEqual('CHARGE', rhino_strategy.make_decision(-50, -50, 4))
         # Last bucket
         self.assertEqual(rhino_strategy.make_decision(-9996, -9996, 95), 'DISCHARGE')
         self.assertEqual(rhino_strategy.make_decision(-9996, -9996, 99), 'DISCHARGE')

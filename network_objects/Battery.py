@@ -32,7 +32,7 @@ class Battery(NetworkObject):
         else:
             self.cycle_counter = cycle_counter
 
-        self.strategy = StrategyBattery(strategy_csv=battery_strategy_csv)
+        self.strategy = StrategyBattery(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
 
         self.earnings = 0
         self.old_earnings = self.earnings
