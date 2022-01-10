@@ -87,9 +87,10 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
                 # Update steps taken
                 steps_taken = steps_taken + 1
-                # Print information at the end of the simulation.
-                if steps_taken == number_of_steps and verbose_lvl >= 0:
-                    print('End of simulation, final PTU: {}'.format(time_step_string))
+
+        # Print information at the end of the simulation.
+        if verbose_lvl >= 0:
+            print('End of simulation, final PTU: {}'.format(time_step_string))
 
     num_of_days = int(steps_taken / 60 / 24)
     print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}'.format(steps_taken, steps_taken / 15, num_of_days))
