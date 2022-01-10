@@ -1,10 +1,10 @@
 import os
 
-from helper_objects.PointBasedStrategy import PointBasedStrategy
-from helper_objects.StrategyBattery import StrategyBattery
+from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
+from helper_objects.strategies.CsvStrategy import CsvStrategy
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
-from helper_objects.Strategy import Strategy
+from helper_objects.strategies.Strategy import Strategy
 
 
 def visualize_strategy(strategy: Strategy):
@@ -41,7 +41,7 @@ def visualize_strategy(strategy: Strategy):
 
 if __name__ == '__main__':
     csv_strategy_path = '..{0}..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-    csv_strategy = StrategyBattery(name='CSV Strategy', strategy_csv=csv_strategy_path, price_step_size=1)
+    csv_strategy = CsvStrategy(name='CSV Strategy', strategy_csv=csv_strategy_path, price_step_size=1)
     visualize_strategy(csv_strategy)
 
     point_based_strat = PointBasedStrategy('Point Based Strategy', price_step_size=1)

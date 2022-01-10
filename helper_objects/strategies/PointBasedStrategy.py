@@ -1,4 +1,4 @@
-from helper_objects.Strategy import Strategy
+from helper_objects.strategies.Strategy import Strategy
 
 class PointBasedStrategy(Strategy):
     def __init__(self, name, price_step_size=5):

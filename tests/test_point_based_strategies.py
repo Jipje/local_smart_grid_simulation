@@ -1,5 +1,5 @@
-from helper_objects.StrategyBattery import StrategyBattery
-from helper_objects.PointBasedStrategy import PointBasedStrategy
+from helper_objects.strategies.CsvStrategy import CsvStrategy
+from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 import unittest
 import os
 
@@ -10,10 +10,10 @@ class TestPointBasedStrategy(unittest.TestCase):
         rhino_strategy = None
         try:
             strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-            rhino_strategy = StrategyBattery(strategy_one_path, strategy_csv=strategy_one_path)
+            rhino_strategy = CsvStrategy(strategy_one_path, strategy_csv=strategy_one_path)
         except FileNotFoundError:
             strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-            rhino_strategy = StrategyBattery(name=strategy_one_path, strategy_csv=strategy_one_path)
+            rhino_strategy = CsvStrategy(name=strategy_one_path, strategy_csv=strategy_one_path)
         self.assertEqual(rhino_strategy.max_price, 105)
         self.assertEqual(rhino_strategy.min_price, -5)
         self.assertEqual(rhino_strategy.price_step_size, 5)
