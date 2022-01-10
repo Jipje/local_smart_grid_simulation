@@ -7,13 +7,18 @@ import os
 class TestPointBasedStrategy(unittest.TestCase):
 
     def test_normal_strategy_vs_point_based(self):
-        strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-        rhino_strategy = StrategyBattery(name='CSV strategy', strategy_csv=strategy_one_path)
+        rhino_strategy = None
+        try:
+            strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+            rhino_strategy = StrategyBattery(strategy_one_path, strategy_csv=strategy_one_path)
+        except FileNotFoundError:
+            strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+            rhino_strategy = StrategyBattery(name=strategy_one_path, strategy_csv=strategy_one_path)
         self.assertEqual(rhino_strategy.max_price, 105)
         self.assertEqual(rhino_strategy.min_price, -5)
         self.assertEqual(rhino_strategy.price_step_size, 5)
 
-        point_based_strat = PointBasedStrategy('TESTING')
+        point_based_strat = PointBasedStrategy('PointBasedBasicStrategy')
         point_based_strat.add_point((50, 50, 'CHARGE'))
         point_based_strat.add_point((70, 30, 'CHARGE'))
         point_based_strat.add_point((95, 0, 'CHARGE'))
