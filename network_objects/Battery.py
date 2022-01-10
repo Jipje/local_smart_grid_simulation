@@ -40,6 +40,7 @@ class Battery(NetworkObject):
         self.average_soc = 0
         self.last_action = 'WAIT'
         self.change_of_direction_tracker = 0
+        self.old_changes_of_direction = self.change_of_direction_tracker
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
@@ -172,13 +173,15 @@ class Battery(NetworkObject):
 
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
+        changes_of_direction_in_mean_time = round(self.change_of_direction_tracker - self.old_changes_of_direction, 2)
+        self.old_changes_of_direction = self.change_of_direction_tracker
         self.old_earnings = self.earnings
         msg = "{} battery - " \
               "Current SoC: {}kWh - " \
               "Average SoC: {}kWh - " \
               "{} - " \
               "Number of changes of direction: {} - " \
-              "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), self.change_of_direction_tracker, earnings_in_mean_time)
+              "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), changes_of_direction_in_mean_time, earnings_in_mean_time)
         return msg
 
     def __str__(self):
