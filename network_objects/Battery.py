@@ -180,7 +180,7 @@ class Battery(NetworkObject):
               "Current SoC: {}kWh - " \
               "Average SoC: {}kWh - " \
               "{} - " \
-              "Number of changes of direction: {} - " \
+              "Changes of direction in mean time: {} - " \
               "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), changes_of_direction_in_mean_time, earnings_in_mean_time)
         return msg
 
