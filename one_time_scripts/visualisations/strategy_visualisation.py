@@ -35,7 +35,7 @@ def visualize_strategy(strategy: Strategy):
                        Patch(facecolor=white, edgecolor='black', label='WAIT'),
                        Patch(facecolor=blue, edgecolor='black', label='DISCHARGE')]
     plt.legend(handles=legend_elements, loc='lower left')
-    plt.imshow(strategy_matrix, interpolation='none', origin='lower')
+    plt.imshow(strategy_matrix, extent=[0, 100, strategy.min_price, strategy.max_price], interpolation='none', origin='lower')
 
     plt.show()
 
