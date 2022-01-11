@@ -1,8 +1,7 @@
 import unittest
 import os
 
-from environment.NetworkEnvironment import NetworkEnvironment
-from environment.decorators.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
+from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from network_objects.Battery import Battery
 
 
