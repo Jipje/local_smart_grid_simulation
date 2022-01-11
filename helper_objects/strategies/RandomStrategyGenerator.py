@@ -65,13 +65,12 @@ def generate_random_discharge_relative_strategy(seed=None, name=None):
             discharge_price = random.randrange(charge_price, discharge_price - 1, 5)
         point_based_strat.add_point((discharge_soc, discharge_price, 'DISCHARGE'))
 
-    state_of_charge_perc = 95
-    imbalance_price = random.randrange(-100, charge_price - 1, 5)
-    point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'CHARGE'))
-
-    state_of_charge_perc = 95
-    imbalance_price = random.randrange(imbalance_price, discharge_price - 1, 5)
-    point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
+    charge_soc = 95
+    charge_price = random.randrange(-100, charge_price - 1, 5)
+    point_based_strat.add_point((charge_soc, charge_price, 'CHARGE'))
+    discharge_soc = 95
+    discharge_price = random.randrange(charge_price, discharge_price - 1, 5)
+    point_based_strat.add_point((discharge_soc, discharge_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
     return point_based_strat
