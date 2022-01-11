@@ -9,11 +9,13 @@ class NetworkEnvironment(object):
         self.network_objects.append(network_object)
         self.network_object_parameters.append(action_parameters)
 
-    def take_step(self, environment_step):
+    def take_step(self, environment_step) -> int:
+        total_network_step = 0
         for object_index in range(len(self.network_objects)):
             network_object = self.network_objects[object_index]
             action_parameters = self.network_object_parameters[object_index]
-            network_object.take_step(environment_step, action_parameters)
+            total_network_step += network_object.take_step(environment_step, action_parameters)
+        return total_network_step
 
     def done_in_mean_time(self):
         res_msg = ''

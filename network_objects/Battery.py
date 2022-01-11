@@ -77,6 +77,7 @@ class Battery(NetworkObject):
         self.update_state_of_charge(charged_kwh)
         if self.verbose_lvl > 2:
             print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        return charged_kwh / self.time_step
 
     def discharge(self, discharge_kw):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
@@ -89,6 +90,7 @@ class Battery(NetworkObject):
         self.update_state_of_charge(discharged_kwh)
         if self.verbose_lvl > 2:
             print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+        return discharged_kwh / self.time_step
 
     def ptu_reset(self):
         if self.ptu_total_action > 0:
@@ -106,7 +108,7 @@ class Battery(NetworkObject):
         self.ptu_total_action = 0
 
     def wait(self):
-        pass
+        return 0
 
     def check_action(self, action_kwh):
         largest_kwh_action_battery = self.max_kw * self.time_step
@@ -131,7 +133,7 @@ class Battery(NetworkObject):
 
         return adjusted_action
 
-    def take_step(self, environment_step, action_parameters):
+    def take_step(self, environment_step, action_parameters) -> int:
         charge_price = environment_step[action_parameters[0]]
         discharge_price = environment_step[action_parameters[1]]
 
@@ -139,7 +141,7 @@ class Battery(NetworkObject):
         self.average_soc_tracker = self.average_soc_tracker + self.state_of_charge_kwh
         self.average_soc = int(self.average_soc_tracker / self.number_of_steps)
 
-        self.take_imbalance_action(charge_price, discharge_price)
+        return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
@@ -165,11 +167,12 @@ class Battery(NetworkObject):
             chosen_action = 2
 
         if chosen_action == 0:
-            self.charge(self.max_kw)
+            action_kw = self.charge(self.max_kw)
         elif chosen_action == 1:
-            self.discharge(self.max_kw)
+            action_kw = self.discharge(self.max_kw)
         else:
-            self.wait()
+            action_kw = self.wait()
+        return action_kw
 
     def done_in_mean_time(self):
         earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
