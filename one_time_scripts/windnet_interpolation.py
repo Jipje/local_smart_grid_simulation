@@ -81,3 +81,5 @@ if __name__ == '__main__':
     make_simple_graph(original_df, title='Original data')
     make_simple_graph(trivial_df, title='Trivial interpolation.')
     make_simple_graph(pandas_df, title='Pandas interpolation.')
+
+    # csv_maker()

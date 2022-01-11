@@ -1,5 +1,4 @@
 import pandas as pd
-from csv import writer
 
 if __name__ == '__main__':
     tennet_delta_df = pd.read_csv('../data/tennet_balans_delta/tennet_balans_delta_okt_2020_nov_2021.csv')
