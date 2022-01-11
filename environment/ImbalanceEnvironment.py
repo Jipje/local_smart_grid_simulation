@@ -25,5 +25,3 @@ class ImbalanceEnvironment(NetworkEnvironment):
         environment_step[self.max_price_index] = self.imbalance_msg_interpreter.get_charge_price()
         environment_step[self.min_price_index] = self.imbalance_msg_interpreter.get_discharge_price()
         super().take_step(environment_step)
-
-
