@@ -61,10 +61,10 @@ def generate_fixed_step_strategy(seed=None, name=None):
 
         if discharge_soc is None and discharge_price is None:
             state_of_charge_perc = random.randint(6, 6 + soc_step_size)
-            imbalance_price = random.randrange(int(200 - price_step_size), 200, 5)
+            imbalance_price = random.randrange(max(int(200 - price_step_size), charge_price), 200, 5)
         else:
             state_of_charge_perc = random.randint(discharge_soc + 1, i * soc_step_size)
-            imbalance_price = random.randrange(200 - i * price_step_size, discharge_price - 1, 5)
+            imbalance_price = random.randrange(max(int(200 - i * price_step_size), charge_price), discharge_price - 1, 5)
         discharge_soc = state_of_charge_perc
         discharge_price = imbalance_price
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
@@ -74,7 +74,7 @@ def generate_fixed_step_strategy(seed=None, name=None):
     point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'CHARGE'))
 
     state_of_charge_perc = 95
-    imbalance_price = random.randrange(-200, discharge_price - 1, 5)
+    imbalance_price = random.randrange(imbalance_price, discharge_price - 1, 5)
     point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
