@@ -1,6 +1,7 @@
 import unittest
 import os
 
+from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from network_objects.Battery import Battery
 
@@ -17,8 +18,9 @@ class TestNetworkEnvironment(unittest.TestCase):
         cls.strategy_one_path = strategy_one_path
 
     def test_simple_congestion(self):
-        network_capacity_environment = TotalNetworkCapacityTracker(3, 10000)
+        network = NetworkEnvironment(verbose_lvl=3)
+        TotalNetworkCapacityTracker(network, 10000)
         rhino = Battery('rhinoNetworkEnvironmentTest', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=3750)
-        network_capacity_environment.add_object(rhino, [0, 1])
-        network_capacity_environment.take_step([200, 200])
-        self.assertEqual(1, network_capacity_environment.number_of_congestion_time_steps)
+        network.add_object(rhino, [0, 1])
+        network.take_step([200, 200])
+        print(network.done_in_mean_time())
