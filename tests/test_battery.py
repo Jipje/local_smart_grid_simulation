@@ -58,7 +58,7 @@ class TestBattery(unittest.TestCase):
         # Charge 1 MWh for 50 €/MWh
         rhino_battery.update_earnings(1000, 50)
         self.assertEqual(rhino_battery.earnings, -50)
-        base_msg = 'TEST battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Number of changes of direction: 0 - Earnings since last time: €'
+        base_msg = 'TEST battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Changes of direction in mean time: 0 - Earnings since last time: €'
         self.assertEqual(base_msg + '-50.0', rhino_battery.done_in_mean_time())
         # Discharge 2 MWh for 50 €/MWh
         rhino_battery.update_earnings(-2000, 50)
