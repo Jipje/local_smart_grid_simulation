@@ -1,8 +1,8 @@
 import pandas as pd
-from helper_objects.Strategy import Strategy
+from helper_objects.strategies.Strategy import Strategy
 
 
-class StrategyBattery(Strategy):
+class CsvStrategy(Strategy):
     def __init__(self, name, strategy_csv, price_step_size=5):
         super().__init__(name, price_step_size)
         self.upload_strategy(strategy_csv)

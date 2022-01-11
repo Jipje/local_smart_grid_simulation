@@ -1,4 +1,4 @@
-from helper_objects.StrategyBattery import StrategyBattery
+from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.cycle_counters.NaiveCycleCounter import NaiveCycleCounter
 from network_objects.NetworkObject import NetworkObject
 
@@ -32,7 +32,7 @@ class Battery(NetworkObject):
         else:
             self.cycle_counter = cycle_counter
 
-        self.strategy = StrategyBattery(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
+        self.strategy = CsvStrategy(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
 
         self.earnings = 0
         self.old_earnings = self.earnings

@@ -47,7 +47,7 @@ class Strategy(object):
         pass
 
     def make_decision(self, charge_price, discharge_price, state_of_charge_perc: int):
-        if not(self.uploaded):
+        if not self.uploaded:
             raise ValueError('Strategy has not yet been uploaded')
 
         charge_price = self.clean_price(charge_price, discharge_price=False)
