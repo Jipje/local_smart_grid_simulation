@@ -1,4 +1,5 @@
 from helper_objects.strategies.Strategy import Strategy
+import random
 
 class PointBasedStrategy(Strategy):
     def __init__(self, name, price_step_size=5):
@@ -82,5 +83,3 @@ if __name__ == '__main__':
     print(point_based_strat)
 
     point_based_strat.upload_strategy()
-
-
