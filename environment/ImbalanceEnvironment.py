@@ -1,8 +1,8 @@
-from environment.Environment import Environment
+from environment.NetworkEnvironment import NetworkEnvironment
 from helper_objects.ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
-class ImbalanceEnvironment(Environment):
+class ImbalanceEnvironment(NetworkEnvironment):
     def __init__(self, verbose_lvl, mid_price_index, max_price_index, min_price_index):
         super().__init__(verbose_lvl=verbose_lvl)
         self.imbalance_msg_interpreter = ImbalanceMessageInterpreter()

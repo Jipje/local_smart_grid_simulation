@@ -1,5 +1,5 @@
 
-class Environment(object):
+class NetworkEnvironment(object):
     def __init__(self, verbose_lvl=2):
         self.network_objects = []
         self.verbose_lvl = verbose_lvl
