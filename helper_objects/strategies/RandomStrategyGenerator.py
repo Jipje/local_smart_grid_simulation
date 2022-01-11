@@ -8,7 +8,6 @@ from one_time_scripts.visualisations.strategy_visualisation import visualize_str
 def generate_fully_random_strategy(seed=None, name=None):
     if seed is None:
         seed = random.randrange(sys.maxsize)
-
     random.seed(seed)
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
@@ -30,10 +29,9 @@ def generate_fully_random_strategy(seed=None, name=None):
     return point_based_strat
 
 
-def generate_fixed_step_strategy(seed=None, name=None):
+def generate_random_discharge_relative_strategy(seed=None, name=None):
     if seed is None:
         seed = random.randrange(sys.maxsize)
-
     random.seed(seed)
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
@@ -60,10 +58,10 @@ def generate_fixed_step_strategy(seed=None, name=None):
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'CHARGE'))
 
         if discharge_soc is None and discharge_price is None:
-            state_of_charge_perc = random.randint(6, 6 + soc_step_size)
+            state_of_charge_perc = charge_soc + random.randint(5, soc_step_size)
             imbalance_price = random.randrange(max(int(200 - price_step_size), charge_price), 200, 5)
         else:
-            state_of_charge_perc = random.randint(discharge_soc + 1, i * soc_step_size)
+            state_of_charge_perc = charge_soc + random.randint(5, soc_step_size)
             imbalance_price = random.randrange(max(int(200 - i * price_step_size), charge_price), discharge_price - 1, 5)
         discharge_soc = state_of_charge_perc
         discharge_price = imbalance_price
@@ -82,5 +80,5 @@ def generate_fixed_step_strategy(seed=None, name=None):
 
 
 if __name__ == '__main__':
-    random_strategy = generate_fixed_step_strategy(seed=3331977661887185251)
+    random_strategy = generate_random_discharge_relative_strategy(seed=3331977661887185251)
     visualize_strategy(random_strategy)
