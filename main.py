@@ -99,7 +99,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         print(simulation_environment.end_of_environment_message(environment_additions=[]))
 
 
-def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
+def network_capacity_windnet_simulation(network_capacity=27000, verbose_lvl=1):
     # Setup environment
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -155,6 +155,22 @@ def windnet_with_ppa(verbose_lvl=1):
                       simulation_environment=imbalance_environment, verbose_lvl=1)
 
 
+def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
+    # Rhino and Neushoorntocht with networkcapacity
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+    rhino = Battery('Rhino', 7500, 12000,
+                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    LimitedChargeOrDischargeCapacity(rhino, 5, -1)
+    imbalance_environment.add_object(rhino, [1, 3])
+    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 5])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
 if __name__ == '__main__':
     verbose_lvl = 1
 
@@ -162,22 +178,6 @@ if __name__ == '__main__':
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
+    # network_capacity_windnet_simulation(27000)
 
-    network_capacity_windnet_simulation(25000)
-
-    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
-    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-
-    TotalNetworkCapacityTracker(imbalance_environment, 25000)
-
-    rhino = Battery('Rhino', 7500, 12000,
-                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
-                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    LimitedChargeOrDischargeCapacity(rhino, 5, -1)
-    imbalance_environment.add_object(rhino, [1, 3])
-
-    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(windnet, [1, 3, 5])
-
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
-                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    full_rhino_site_capacity()
