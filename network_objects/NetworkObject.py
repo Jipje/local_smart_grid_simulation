@@ -2,8 +2,8 @@ class NetworkObject(object):
     def __init__(self, name):
         self.name = name
 
-    def take_step(self, environment_step, action_parameters):
-        pass
+    def take_step(self, environment_step, action_parameters) -> int:
+        return 0
 
     def wait(self):
         pass

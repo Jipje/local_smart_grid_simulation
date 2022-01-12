@@ -1,14 +1,19 @@
-from environment.Environment import Environment
+from environment.NetworkEnvironment import NetworkEnvironment
 from helper_objects.ImbalanceMessageInterpreter import ImbalanceMessageInterpreter
 
 
-class ImbalanceEnvironment(Environment):
-    def __init__(self, verbose_lvl, mid_price_index, max_price_index, min_price_index):
-        super().__init__(verbose_lvl=verbose_lvl)
+class ImbalanceEnvironment:
+    def __init__(self, network_environment: NetworkEnvironment, mid_price_index, max_price_index, min_price_index):
+        self.network_environment = network_environment
+
         self.imbalance_msg_interpreter = ImbalanceMessageInterpreter()
         self.mid_price_index = mid_price_index
         self.max_price_index = max_price_index
         self.min_price_index = min_price_index
+
+        # Assign the correct functions to each object
+        self.original_take_step = self.network_environment.take_step
+        self.network_environment.take_step = self.take_step
 
     def take_step(self, environment_step):
         mid_price_msg = environment_step[self.mid_price_index]
@@ -24,6 +29,4 @@ class ImbalanceEnvironment(Environment):
         environment_step[self.mid_price_index] = self.imbalance_msg_interpreter.mid_price
         environment_step[self.max_price_index] = self.imbalance_msg_interpreter.get_charge_price()
         environment_step[self.min_price_index] = self.imbalance_msg_interpreter.get_discharge_price()
-        super().take_step(environment_step)
-
-
+        return self.original_take_step(environment_step)

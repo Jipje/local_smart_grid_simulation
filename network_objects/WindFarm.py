@@ -28,7 +28,7 @@ class WindFarm(NetworkObject):
         available_kw = environment_step[action_parameters[2]]
 
         self.set_available_kw_this_action(-1 * available_kw)
-        self.take_imbalance_action(charge_price, discharge_price)
+        return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
         if self.ptu_tracker >= 15:
@@ -38,13 +38,14 @@ class WindFarm(NetworkObject):
         self.ptu_charge_price = charge_price
         self.ptu_discharge_price = discharge_price
 
-        self.generate_electricity()
+        return self.generate_electricity()
 
     def generate_electricity(self):
         generated_kwh = self.available_kw * self.time_step
         self.ptu_total_action = self.ptu_total_action + generated_kwh
         if self.verbose_lvl > 2:
             print('{} is generating {} kW'.format(self.name, self.available_kw))
+        return generated_kwh / self.time_step
 
     def ptu_reset(self):
         if self.ptu_total_action > 0:
