@@ -42,4 +42,7 @@ class NetworkEnvironment(object):
             .format(self.number_of_steps, num_of_ptus, num_of_days)
         for msg in environment_additions:
             res_msg = res_msg + '\n\t' + msg
+
+        for network_object in self.network_objects:
+            res_msg = res_msg + network_object.end_of_environment_message(num_of_days)
         return res_msg
