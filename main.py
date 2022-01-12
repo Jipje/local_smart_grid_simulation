@@ -1,4 +1,6 @@
 from csv import reader
+
+from environment.NetworkEnvironment import NetworkEnvironment
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
@@ -30,7 +32,8 @@ def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environm
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, simulation_environment=None):
     if simulation_environment is None:
-        simulation_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+        simulation_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+        ImbalanceEnvironment(simulation_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
         rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
         simulation_environment.add_object(rhino, [1, 3])
 
@@ -109,26 +112,30 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 if __name__ == '__main__':
     verbose_lvl = 1
     # Baseline Rhino simulation
-    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino, [1, 3])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
 
     # Rhino with limited charging simulation
-    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
     imbalance_environment.add_object(rhino, [1, 3])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
     # Baseline Windnet simulation
-    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 7])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
     # Windnet with a PPA simulation
-    imbalance_environment = ImbalanceEnvironment(verbose_lvl=verbose_lvl, mid_price_index=2, max_price_index=1, min_price_index=3)
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl, ppa=40)
     imbalance_environment.add_object(windnet, [1, 3, 7])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
