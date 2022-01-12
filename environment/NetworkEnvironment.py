@@ -25,8 +25,9 @@ class NetworkEnvironment(object):
     def done_in_mean_time(self, curr_msg=None):
         res_msg = ''
         for network_object in self.network_objects:
-            res_msg = res_msg + network_object.done_in_mean_time() + '\n'
-        res_msg = res_msg[:-1]
+            res_msg = res_msg + network_object.done_in_mean_time() + '\n\t'
+        res_msg = res_msg[:-2]
+
         if curr_msg is not None:
             res_msg = curr_msg + res_msg
         return res_msg

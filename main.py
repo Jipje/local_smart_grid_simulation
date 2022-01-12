@@ -1,6 +1,7 @@
 from csv import reader
 
 from environment.NetworkEnvironment import NetworkEnvironment
+from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
@@ -63,7 +64,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 curr_month = time_step_dt.month
                 curr_day = time_step_dt.day
                 if curr_day != old_day and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
-                    msg = time_step_string[6:-4] + ' - ' + imbalance_environment.done_in_mean_time()
+                    msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
                     print(msg)
                     old_day = curr_day
                     old_month = curr_month
@@ -97,7 +98,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
     num_of_days = int(steps_taken / 60 / 24)
     print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}'.format(steps_taken, steps_taken / 15, num_of_days))
-    for network_object in imbalance_environment.network_objects:
+    for network_object in simulation_environment.network_objects:
         print(network_object)
         if num_of_days != 0:
             earnings_per_day = round(network_object.earnings / num_of_days, 2)

@@ -25,5 +25,5 @@ class TotalNetworkCapacityTracker:
     def done_in_mean_time(self):
         congestion_time_steps_since = self.number_of_congestion_time_steps - self.old_number_of_congestion_time_steps
         self.old_number_of_congestion_time_steps = self.number_of_congestion_time_steps
-        msg = 'Timesteps with congestion since last time: {}m\n'.format(congestion_time_steps_since)
+        msg = 'Network capacity tracker - Timesteps with congestion since last time: {}m\n\t'.format(congestion_time_steps_since)
         return self.original_done_in_mean_time(curr_msg=msg)
