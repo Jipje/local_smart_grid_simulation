@@ -97,18 +97,6 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
             print('End of simulation, final PTU: {}'.format(time_step_string))
 
     print(simulation_environment.end_of_environment_message(environment_additions=[]))
-    # num_of_days = int(steps_taken / 60 / 24)
-    # print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}'.format(steps_taken, steps_taken / 15, num_of_days))
-    # for network_object in simulation_environment.network_objects:
-    #     print(network_object)
-    #     if num_of_days != 0:
-    #         earnings_per_day = round(network_object.earnings / num_of_days, 2)
-    #         print('Average earnings per day: {}'.format(earnings_per_day))
-    #         try:
-    #             cycles_per_day = round(network_object.cycle_counter.cycle_count / num_of_days, 2)
-    #             print('Average cycles per day: {}'.format(cycles_per_day))
-    #         except:
-    #             pass
 
 
 def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
@@ -170,7 +158,7 @@ def windnet_with_ppa(verbose_lvl=1):
 if __name__ == '__main__':
     verbose_lvl = 1
 
-    # baseline_rhino_simulation(verbose_lvl)
+    baseline_rhino_simulation(verbose_lvl)
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
