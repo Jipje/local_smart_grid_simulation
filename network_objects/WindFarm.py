@@ -79,5 +79,13 @@ class WindFarm(NetworkObject):
             print('STOP')
         return msg
 
+    def end_of_environment_message(self, num_of_days=None):
+        res_msg = "\n{} windfarm:\n\t" \
+            "Total earnings: {}".format(self.name, '{:,.2f}'.format(self.earnings))
+        if num_of_days is not None:
+            avg_earnings_str = '{:,.2f}'.format(self.earnings / num_of_days)
+            res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: {}".format(avg_earnings_str)
+        return res_msg
+
     def __str__(self):
         return "{} wind farm:\nTotal Earnings: €{}".format(self.name, round(self.earnings, 2))

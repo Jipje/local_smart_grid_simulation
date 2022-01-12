@@ -12,8 +12,10 @@ class TotalNetworkCapacityTracker:
         # Assign the correct functions to each object
         self.original_check_action = self.network_environment.check_action
         self.original_done_in_mean_time = self.network_environment.done_in_mean_time
+        self.original_end_of_environment_message = self.network_environment.end_of_environment_message
         self.network_environment.check_action = self.check_action
         self.network_environment.done_in_mean_time = self.done_in_mean_time
+        self.network_environment.end_of_environment_message = self.end_of_environment_message
 
     def check_action(self, action_kw):
         if abs(action_kw) > self.maximum_kw:
@@ -27,3 +29,16 @@ class TotalNetworkCapacityTracker:
         self.old_number_of_congestion_time_steps = self.number_of_congestion_time_steps
         msg = 'Network capacity tracker - Timesteps with congestion since last time: {}m\n\t'.format(congestion_time_steps_since)
         return self.original_done_in_mean_time(curr_msg=msg)
+
+    def end_of_environment_message(self, environment_additions=None):
+        if environment_additions is None:
+            environment_additions = []
+
+        total_msg = 'Number of timesteps with congestion: {}'.format(self.number_of_congestion_time_steps)
+
+        perc_congestion = round(self.number_of_congestion_time_steps / self.network_environment.number_of_steps * 100, 2)
+        avg_msg = 'Percentage of congestion issues: {}%'.format(perc_congestion)
+
+        environment_additions.append(total_msg)
+        environment_additions.append(avg_msg)
+        return self.original_end_of_environment_message(environment_additions)

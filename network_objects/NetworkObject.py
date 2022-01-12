@@ -13,3 +13,6 @@ class NetworkObject(object):
 
     def check_action(self, action_kwh):
         return action_kwh
+
+    def end_of_environment_message(self, num_of_days=None):
+        return ''

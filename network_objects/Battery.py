@@ -187,5 +187,26 @@ class Battery(NetworkObject):
               "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), changes_of_direction_in_mean_time, earnings_in_mean_time)
         return msg
 
+    def end_of_environment_message(self, num_of_days=None):
+        if num_of_days is None:
+            num_of_days = self.number_of_steps / self.time_step / 60 / 24
+        earnings_str = '{:,.2f}'.format(self.earnings)
+        average_num_changes_of_direction = round(self.change_of_direction_tracker / num_of_days, 2)
+        average_num_of_cycles = round(self.cycle_counter.cycle_count / num_of_days, 2)
+        average_earnings_str = '{:,.2f}'.format(self.earnings / num_of_days)
+        res_msg = "\n{} battery:\n\t" \
+            "Total changes of direction: {}\n\t" \
+            "Total number of cycles: {}\n\t" \
+            "Total earnings: {}\n\t" \
+            "--------------------\n\t" \
+            "Average SoC: {}kWh\n\t" \
+            "Average changes of direction: {}\n\t" \
+            "Average number of cycles: {}\n\t" \
+            "Average earnings: {}".format(self.name,
+                                          self.change_of_direction_tracker, self.cycle_counter.cycle_count,
+                                          earnings_str, self.average_soc, average_num_changes_of_direction,
+                                          average_num_of_cycles, average_earnings_str)
+        return res_msg
+
     def __str__(self):
         return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: {}\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.change_of_direction_tracker, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
