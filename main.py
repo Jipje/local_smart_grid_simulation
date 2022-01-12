@@ -96,7 +96,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         if verbose_lvl >= 0:
             print('End of simulation, final PTU: {}'.format(time_step_string))
 
-    print(simulation_environment.end_of_environment_message())
+    print(simulation_environment.end_of_environment_message(environment_additions=[]))
     # num_of_days = int(steps_taken / 60 / 24)
     # print('Number of 1m timesteps: {}\nNumber of PTUs: {}\nNumber of days: {}'.format(steps_taken, steps_taken / 15, num_of_days))
     # for network_object in simulation_environment.network_objects:
