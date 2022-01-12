@@ -84,7 +84,7 @@ class WindFarm(NetworkObject):
             "Total earnings: {}".format(self.name, '{:,.2f}'.format(self.earnings))
         if num_of_days is not None:
             avg_earnings_str = '{:,.2f}'.format(self.earnings / num_of_days)
-            res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: {}".format(avg_earnings_str)
+            res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: €{}".format(avg_earnings_str)
         return res_msg
 
     def __str__(self):

@@ -92,11 +92,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 # Update steps taken
                 steps_taken = steps_taken + 1
 
-        # Print information at the end of the simulation.
-        if verbose_lvl >= 0:
-            print('End of simulation, final PTU: {}'.format(time_step_string))
-
-    print(simulation_environment.end_of_environment_message(environment_additions=[]))
+    # Print information at the end of the simulation.
+    if verbose_lvl >= 0:
+        print('----------------------------------------')
+        print('End of simulation, final PTU: {}'.format(time_step_string))
+        print(simulation_environment.end_of_environment_message(environment_additions=[]))
 
 
 def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
@@ -105,8 +105,8 @@ def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(windnet, [1, 3, 7])
+    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -162,7 +162,8 @@ if __name__ == '__main__':
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
-    # network_capacity_windnet_simulation(25000)
+
+    network_capacity_windnet_simulation(25000)
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -175,7 +176,7 @@ if __name__ == '__main__':
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
     imbalance_environment.add_object(rhino, [1, 3])
 
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
 
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
