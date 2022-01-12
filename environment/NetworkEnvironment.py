@@ -5,11 +5,14 @@ class NetworkEnvironment(object):
         self.verbose_lvl = verbose_lvl
         self.network_object_parameters = []
 
+        self.number_of_steps = 0
+
     def add_object(self, network_object, action_parameters):
         self.network_objects.append(network_object)
         self.network_object_parameters.append(action_parameters)
 
     def take_step(self, environment_step) -> int:
+        self.number_of_steps += 1
         total_network_step = 0
         for object_index in range(len(self.network_objects)):
             network_object = self.network_objects[object_index]
@@ -30,4 +33,11 @@ class NetworkEnvironment(object):
 
         if curr_msg is not None:
             res_msg = curr_msg + res_msg
+        return res_msg
+
+    def end_of_environment_message(self):
+        num_of_ptus = self.number_of_steps / 15
+        num_of_days = num_of_ptus / 96
+        res_msg = 'Environment: \n\tNumber of 1m timesteps: {}\n\tNumber of PTUs: {}\n\tNumber of days: {}'\
+            .format(self.number_of_steps, num_of_ptus, num_of_days)
         return res_msg
