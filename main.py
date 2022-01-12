@@ -109,6 +109,17 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 pass
 
 
+def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
+    # Setup environment
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+
+    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 7])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
 if __name__ == '__main__':
     verbose_lvl = 1
     # Baseline Rhino simulation
