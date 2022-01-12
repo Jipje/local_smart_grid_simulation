@@ -43,7 +43,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         csv_reader = reader(read_obj)
 
         steps_taken = 0
-        old_day = 0
+        old_week = 0
         old_month = 0
 
         # Open the scenario
@@ -62,11 +62,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
                 # Give an update of how it is going in the mean_time
                 curr_month = time_step_dt.month
-                curr_day = time_step_dt.day
-                if curr_day != old_day and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
+                curr_week = time_step_dt.isocalendar()[1]
+                if curr_week != old_week and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
                     msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
                     print(msg)
-                    old_day = curr_day
+                    old_week = curr_week
                     old_month = curr_month
 
                 # End simulation here if number of steps have been taken.
