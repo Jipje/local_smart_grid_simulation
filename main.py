@@ -121,33 +121,55 @@ def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
-if __name__ == '__main__':
-    verbose_lvl = 1
+def baseline_rhino_simulation(verbose_lvl=1):
     # Baseline Rhino simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    rhino = Battery('Rhino', 7500, 12000,
+                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino, [1, 3])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=1)
 
+
+def rhino_with_limited_charging(verbose_lvl=1):
     # Rhino with limited charging simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    rhino = Battery('Rhino', 7500, 12000, battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    rhino = Battery('Rhino', 7500, 12000,
+                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
     imbalance_environment.add_object(rhino, [1, 3])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
+
+def baseline_windnet(verbose_lvl=1):
     # Baseline Windnet simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 7])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
+
+def windnet_with_ppa(verbose_lvl=1):
     # Windnet with a PPA simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl, ppa=40)
     imbalance_environment.add_object(windnet, [1, 3, 7])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=1)
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=1)
+
+
+if __name__ == '__main__':
+    verbose_lvl = 1
+
+    baseline_rhino_simulation(verbose_lvl)
+    rhino_with_limited_charging(verbose_lvl)
+    baseline_windnet(verbose_lvl)
+    windnet_with_ppa(verbose_lvl)
