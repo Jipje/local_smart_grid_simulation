@@ -23,4 +23,4 @@ class TestNetworkEnvironment(unittest.TestCase):
         rhino = Battery('rhinoNetworkEnvironmentTest', 7500, 12000, battery_strategy_csv=self.strategy_one_path, starting_soc_kwh=3750)
         network.add_object(rhino, [0, 1])
         network.take_step([200, 200])
-        print(network.done_in_mean_time())
+        self.assertIn('Timesteps with congestion since last time: 1m', network.done_in_mean_time())
