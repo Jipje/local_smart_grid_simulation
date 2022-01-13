@@ -3,6 +3,7 @@ from csv import reader
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from helper_objects.strategies.CsvStrategy import CsvStrategy
+from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
@@ -174,11 +175,20 @@ def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
 
 
 def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
+    # Initialise environment
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    rhino = Battery('Rhino', 7500, 12000, strategy=random_point_based_strategy,
+    # Initialise random strategy
+    random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
+    random_step_battery = Battery('Random step battery', 7500, 12000, strategy=random_point_based_strategy,
+                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(random_step_battery, [1, 3])
+
+    csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+    rhino = Battery('Rhino', 7500, 12000, strategy=csv_strategy,
                     battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino, [1, 3])
+
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=1)
 
@@ -190,11 +200,10 @@ if __name__ == '__main__':
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
-    network_capacity_windnet_simulation(network_capacity=27000)
+    # network_capacity_windnet_simulation(network_capacity=27000)
+    #
+    # full_rhino_site_capacity(network_capacity=27000)
+    #
+    # full_rhino_site_capacity(network_capacity=15000)
 
-    full_rhino_site_capacity(network_capacity=27000)
-
-    full_rhino_site_capacity(network_capacity=15000)
-
-    random_battery(verbose_lvl=verbose_lvl, seed=4899458002697043430)
-    random_strategy = generate_random_discharge_relative_strategy()
+    random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
