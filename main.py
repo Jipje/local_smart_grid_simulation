@@ -178,6 +178,8 @@ if __name__ == '__main__':
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
-    # network_capacity_windnet_simulation(27000)
+    network_capacity_windnet_simulation(network_capacity=27000)
 
-    full_rhino_site_capacity()
+    full_rhino_site_capacity(network_capacity=27000)
+
+    full_rhino_site_capacity(network_capacity=15000)
