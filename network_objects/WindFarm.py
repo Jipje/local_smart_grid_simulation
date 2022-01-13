@@ -56,7 +56,7 @@ class WindFarm(NetworkObject):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        if self.verbose_lvl > 2 or self.verbose_lvl > 1 and abs(ptu_profits) > 100:
+        if self.verbose_lvl > 2:
             print('PTU reset. Action this PTU was: {}kWh. Prices were {} charge, {} discharge. Earned €{}'.format(self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
 
         self.ptu_tracker = 0
@@ -81,10 +81,10 @@ class WindFarm(NetworkObject):
 
     def end_of_environment_message(self, num_of_days=None):
         res_msg = "\n{} windfarm:\n\t" \
-            "Total earnings: {}".format(self.name, '{:,.2f}'.format(self.earnings))
+            "Total earnings: €{}".format(self.name, '{:,.2f}'.format(self.earnings))
         if num_of_days is not None:
             avg_earnings_str = '{:,.2f}'.format(self.earnings / num_of_days)
-            res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: {}".format(avg_earnings_str)
+            res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: €{}".format(avg_earnings_str)
         return res_msg
 
     def __str__(self):

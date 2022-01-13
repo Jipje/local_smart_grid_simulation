@@ -101,8 +101,8 @@ class Battery(NetworkObject):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        if self.verbose_lvl > 2 or self.verbose_lvl > 1 and abs(ptu_profits) > 100:
-            print('PTU reset. Action this PTU was: {}kWh. Prices were {} charge, {} discharge. Earned €{}'.format(self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
+        if self.verbose_lvl > 2:
+            print('PTU reset. Action this PTU was: {}kWh. Prices were €{} charge, €{} discharge. Earned €{}'.format(self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
@@ -197,12 +197,12 @@ class Battery(NetworkObject):
         res_msg = "\n{} battery:\n\t" \
             "Total changes of direction: {}\n\t" \
             "Total number of cycles: {}\n\t" \
-            "Total earnings: {}\n\t" \
+            "Total earnings: €{}\n\t" \
             "--------------------\n\t" \
             "Average SoC: {}kWh\n\t" \
             "Average changes of direction: {}\n\t" \
             "Average number of cycles: {}\n\t" \
-            "Average earnings: {}".format(self.name,
+            "Average earnings: €{}".format(self.name,
                                           self.change_of_direction_tracker, self.cycle_counter.cycle_count,
                                           earnings_str, self.average_soc, average_num_changes_of_direction,
                                           average_num_of_cycles, average_earnings_str)

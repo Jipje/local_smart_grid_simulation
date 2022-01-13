@@ -43,7 +43,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         csv_reader = reader(read_obj)
 
         steps_taken = 0
-        old_day = 0
+        old_week = 0
         old_month = 0
 
         # Open the scenario
@@ -62,11 +62,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
                 # Give an update of how it is going in the mean_time
                 curr_month = time_step_dt.month
-                curr_day = time_step_dt.day
-                if curr_day != old_day and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
+                curr_week = time_step_dt.isocalendar()[1]
+                if curr_week != old_week and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
                     msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
                     print(msg)
-                    old_day = curr_day
+                    old_week = curr_week
                     old_month = curr_month
 
                 # End simulation here if number of steps have been taken.
@@ -92,21 +92,21 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 # Update steps taken
                 steps_taken = steps_taken + 1
 
-        # Print information at the end of the simulation.
-        if verbose_lvl >= 0:
-            print('End of simulation, final PTU: {}'.format(time_step_string))
+    # Print information at the end of the simulation.
+    if verbose_lvl >= 0:
+        print('----------------------------------------')
+        print('End of simulation, final PTU: {}'.format(time_step_string))
+        print(simulation_environment.end_of_environment_message(environment_additions=[]))
 
-    print(simulation_environment.end_of_environment_message(environment_additions=[]))
 
-
-def network_capacity_windnet_simulation(network_capacity=25000, verbose_lvl=1):
+def network_capacity_windnet_simulation(network_capacity=27000, verbose_lvl=1):
     # Setup environment
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(windnet, [1, 3, 7])
+    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -140,7 +140,7 @@ def baseline_windnet(verbose_lvl=1):
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(windnet, [1, 3, 7])
+    imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
@@ -150,17 +150,36 @@ def windnet_with_ppa(verbose_lvl=1):
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl, ppa=40)
-    imbalance_environment.add_object(windnet, [1, 3, 7])
+    imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=1)
+
+
+def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
+    # Rhino and Neushoorntocht with networkcapacity
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+    rhino = Battery('Rhino', 7500, 12000,
+                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
+    LimitedChargeOrDischargeCapacity(rhino, 5, -1)
+    imbalance_environment.add_object(rhino, [1, 3])
+    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(windnet, [1, 3, 5])
+    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
 if __name__ == '__main__':
     verbose_lvl = 1
 
-    baseline_rhino_simulation(verbose_lvl)
+    # baseline_rhino_simulation(verbose_lvl)
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
+    network_capacity_windnet_simulation(network_capacity=27000)
 
-    network_capacity_windnet_simulation(20000)
+    full_rhino_site_capacity(network_capacity=27000)
+
+    full_rhino_site_capacity(network_capacity=15000)
