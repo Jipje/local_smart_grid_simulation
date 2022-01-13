@@ -4,7 +4,7 @@ from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
-    def __init__(self, name, max_kwh, max_kw, battery_strategy_csv, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
+    def __init__(self, name, max_kwh, max_kw, strategy=None, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
         super().__init__(name)
 
         if max_kwh <= 0:
@@ -32,7 +32,7 @@ class Battery(NetworkObject):
         else:
             self.cycle_counter = cycle_counter
 
-        self.strategy = CsvStrategy(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
+        self.strategy = strategy
 
         self.earnings = 0
         self.old_earnings = self.earnings
@@ -153,6 +153,8 @@ class Battery(NetworkObject):
 
         if action is None:
             soc_perc = int(self.state_of_charge_kwh / self.max_kwh * 100)
+            if self.strategy is None:
+                raise NotImplementedError('You did not specify a strategy for the {} battery.'.format(self.name))
             action = self.strategy.make_decision(charge_price, discharge_price, soc_perc)
 
         if action != 'WAIT' and action != self.last_action:
