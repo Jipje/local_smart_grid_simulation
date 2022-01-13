@@ -70,7 +70,7 @@ def generate_random_discharge_relative_strategy(seed=None, name=None):
 
 
 if __name__ == '__main__':
-    # fully_random = generate_fully_random_strategy()
-    # visualize_strategy(fully_random)
+    fully_random = generate_fully_random_strategy()
+    visualize_strategy(fully_random)
     random_strategy = generate_random_discharge_relative_strategy()
     visualize_strategy(random_strategy)
