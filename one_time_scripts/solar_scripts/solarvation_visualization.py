@@ -81,6 +81,23 @@ def do_monthly_analysis(solarvation_df):
     plt.show()
 
 
+def do_range_investigation(solarvation_df):
+    solarvation_df['within_range'] = (solarvation_df['upper_range'] >= solarvation_df['power']) & (solarvation_df['power'] >= solarvation_df['lower_range'])
+    within_range_values = solarvation_df['within_range'].value_counts()
+    correct = within_range_values[True]
+    try:
+        incorrect = within_range_values[False]
+    except KeyError:
+        incorrect = 0
+    total_number_of_points = correct + incorrect
+    perc_correct = round(correct / total_number_of_points * 100, 2)
+    msg = '{} data points analyzed.\n' \
+          'The range estimation was correct {} of times.\n' \
+          'The range estimation was incorrect {} number of times.\n' \
+          'The range was correct {}% of the time.'.format(total_number_of_points, correct, incorrect, perc_correct)
+    print(msg)
+
+
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
@@ -93,4 +110,4 @@ if __name__ == '__main__':
 
     # do_monthly_analysis(solarvation_df)
 
-    do_monthly_analysis(solarvation_df)
+    do_range_investigation(solarvation_df)
