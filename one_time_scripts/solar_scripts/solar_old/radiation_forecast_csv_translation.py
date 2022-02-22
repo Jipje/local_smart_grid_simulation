@@ -6,10 +6,10 @@ ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
 if __name__ == '__main__':
-    with open('../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', 'w+', newline='') as new_file:
+    with open('../../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', 'w+', newline='') as new_file:
         csv_writer = writer(new_file)
         csv_writer.writerow(['time', 'radiation', 'radiation_d_1', 'radiation_d_3', 'radiation_d_5'])
-        with open('../../data/solar_data/radiation_with_forecast/radiation_forecast_and_values.csv', 'r') as read_obj:
+        with open('../../../data/solar_data/radiation_with_forecast/radiation_forecast_and_values.csv', 'r') as read_obj:
             csv_reader = reader(read_obj)
             header = False
             for radiation_data in csv_reader:

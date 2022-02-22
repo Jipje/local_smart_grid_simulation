@@ -26,7 +26,8 @@ if __name__ == '__main__':
     # solar_forecast_df.columns = ['solar_mw_forecast']
     # print(solar_forecast_df)
 
-    radiation_df = pd.read_csv('../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', parse_dates=[0], date_parser=date_parser)
+    radiation_df = pd.read_csv(
+        '../../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', parse_dates=[0], date_parser=date_parser)
     radiation_df.index = pd.to_datetime(radiation_df['time'], errors='coerce', utc=True)
     radiation_df = radiation_df.drop('time', axis=1)
     # print(radiation_df)

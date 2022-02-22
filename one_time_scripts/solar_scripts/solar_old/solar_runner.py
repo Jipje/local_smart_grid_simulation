@@ -14,12 +14,13 @@ def date_parser(string):
 
 
 if __name__ == '__main__':
-    solar_power_mw_df = pd.read_csv('../../data/solar_data/solar_power/cleaned_solar_production.csv', parse_dates=[0], date_parser=date_parser)
+    solar_power_mw_df = pd.read_csv('../../../data/solar_data/solar_power/cleaned_solar_production.csv', parse_dates=[0], date_parser=date_parser)
     solar_power_mw_df.index = pd.to_datetime(solar_power_mw_df['time'], errors='coerce', utc=True)
     solar_power_mw_df = solar_power_mw_df.drop('time', axis=1)
     # print(solar_power_mw_df)
 
-    radiation_df = pd.read_csv('../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', parse_dates=[0], date_parser=date_parser)
+    radiation_df = pd.read_csv(
+        '../../../data/solar_data/radiation_with_forecast/cleaned_radiation_forecast_and_values.csv', parse_dates=[0], date_parser=date_parser)
     radiation_df.index = pd.to_datetime(radiation_df['time'], errors='coerce', utc=True)
     radiation_df = radiation_df.drop('time', axis=1)
     # print(radiation_df)
