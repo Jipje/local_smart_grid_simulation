@@ -82,8 +82,64 @@ def do_monthly_analysis(solarvation_df):
 
 
 def do_range_investigation(solarvation_df):
+    print('Is the measured power between the expected range?')
     solarvation_df['within_range'] = (solarvation_df['upper_range'] >= solarvation_df['power']) & (solarvation_df['power'] >= solarvation_df['lower_range'])
     within_range_values = solarvation_df['within_range'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('Add 20 percent safety margin to the expected range, how does that improve it?')
+    solarvation_df['20_perc_upper_range'] = solarvation_df['upper_range'] * 1.2
+    solarvation_df['20_perc_lower_range'] = solarvation_df['lower_range'] * 0.8
+    solarvation_df['20_perc_within_range'] = (solarvation_df['20_perc_upper_range'] >= solarvation_df['power']) & (solarvation_df['power'] >= solarvation_df['20_perc_lower_range'])
+    within_range_values = solarvation_df['20_perc_within_range'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('Is the measured power lower than the upper range?')
+    solarvation_df['upper_range_correct'] = solarvation_df['upper_range'] >= solarvation_df['power']
+    within_range_values = solarvation_df['upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('If we take an upper range with 20% safety margin?')
+    solarvation_df['20_perc_upper_range_correct'] = solarvation_df['20_perc_upper_range'] >= solarvation_df['power']
+    within_range_values = solarvation_df['20_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('If we take an upper range with 50% safety margin?')
+    solarvation_df['50_perc_upper_range'] = solarvation_df['upper_range'] * 1.5
+    solarvation_df['50_perc_upper_range_correct'] = solarvation_df['50_perc_upper_range'] >= solarvation_df['power']
+    within_range_values = solarvation_df['50_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('If we take an upper range with 75% safety margin?')
+    solarvation_df['75_perc_upper_range'] = solarvation_df['upper_range'] * 1.75
+    solarvation_df['75_perc_upper_range_correct'] = solarvation_df['75_perc_upper_range'] >= solarvation_df['power']
+    within_range_values = solarvation_df['75_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('If we take an upper range with 100% safety margin?')
+    solarvation_df['100_perc_upper_range'] = solarvation_df['upper_range'] * 2
+    solarvation_df['100_perc_upper_range_correct'] = solarvation_df['100_perc_upper_range'] >= solarvation_df['power']
+    within_range_values = solarvation_df['100_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('\nAha, issue is a prediction of 0 and small measured values.')
+    print('Lets filter out issues where measured power is below 1000 kW\n')
+
+    filtered_df = solarvation_df[solarvation_df['power'] > 1000]
+
+    print('Filtered DataFrame with 100% safety margin')
+    within_range_values = filtered_df['100_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    print('Filtered DataFrame with 20% safety margin')
+    within_range_values = filtered_df['20_perc_upper_range_correct'].value_counts()
+    range_value_counts_msg(within_range_values)
+
+    faulty_df = filtered_df[~filtered_df['20_perc_upper_range_correct']]
+    print(faulty_df[['power', 'upper_range', '20_perc_upper_range']])
+
+
+def range_value_counts_msg(within_range_values):
     correct = within_range_values[True]
     try:
         incorrect = within_range_values[False]
@@ -91,10 +147,10 @@ def do_range_investigation(solarvation_df):
         incorrect = 0
     total_number_of_points = correct + incorrect
     perc_correct = round(correct / total_number_of_points * 100, 2)
-    msg = '{} data points analyzed.\n' \
-          'The range estimation was correct {} of times.\n' \
-          'The range estimation was incorrect {} number of times.\n' \
-          'The range was correct {}% of the time.'.format(total_number_of_points, correct, incorrect, perc_correct)
+    msg = '\t{} data points analyzed.\n' \
+          '\tThe range estimation was correct {} of times.\n' \
+          '\tThe range estimation was incorrect {} number of times.\n' \
+          '\tThe range was correct {}% of the time.'.format(total_number_of_points, correct, incorrect, perc_correct)
     print(msg)
 
 
