@@ -110,12 +110,6 @@ def do_range_investigation(solarvation_df):
     within_range_values = solarvation_df['50_perc_upper_range_correct'].value_counts()
     range_value_counts_msg(within_range_values)
 
-    print('If we take an upper range with 75% safety margin?')
-    solarvation_df['75_perc_upper_range'] = solarvation_df['upper_range'] * 1.75
-    solarvation_df['75_perc_upper_range_correct'] = solarvation_df['75_perc_upper_range'] >= solarvation_df['power']
-    within_range_values = solarvation_df['75_perc_upper_range_correct'].value_counts()
-    range_value_counts_msg(within_range_values)
-
     print('If we take an upper range with 100% safety margin?')
     solarvation_df['100_perc_upper_range'] = solarvation_df['upper_range'] * 2
     solarvation_df['100_perc_upper_range_correct'] = solarvation_df['100_perc_upper_range'] >= solarvation_df['power']
