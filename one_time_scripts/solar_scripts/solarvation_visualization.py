@@ -72,9 +72,9 @@ def do_monthly_analysis(solarvation_df):
 
         month_df = solarvation_df[start_of_month:end_of_month]
         axs[axes_x, axes_y].scatter(month_df['hour_of_production'], month_df['power'])
-        fig.suptitle('Scatterplot of generated power per month')
         axs[axes_x, axes_y].set_title('{}'.format(start_of_month.strftime('%B')))
         axs[axes_x, axes_y].set_ylim((0, 20000))
+    fig.suptitle('Scatterplot of generated power per month')
     for ax in axs.flat:
         ax.set(xlabel='Hour (UTC)', ylabel='Generated power (kW)')
         ax.label_outer()
@@ -156,8 +156,8 @@ if __name__ == '__main__':
     # end_filter = dt.datetime(2021, 3, 3, 17, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
-    # do_basic_analysis(solarvation_df)
+    do_basic_analysis(solarvation_df)
 
-    # do_monthly_analysis(solarvation_df)
+    do_monthly_analysis(solarvation_df)
 
     do_range_investigation(solarvation_df)
