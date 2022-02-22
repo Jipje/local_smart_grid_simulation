@@ -9,5 +9,5 @@ if __name__ == '__main__':
     solar_df['time_utc'] = pd.to_datetime(solar_df['time_ams'], utc=True, errors='coerce')
     solar_df.index = solar_df['time_utc']
     solar_df = solar_df.drop(['time_ams', 'time_utc'], axis=1)
-    solar_df = solar_df.resample('1T').interpolate()
+    solar_df = solar_df.resample('1T').interpolate(method='linear', limit=4)
     print(solar_df)
