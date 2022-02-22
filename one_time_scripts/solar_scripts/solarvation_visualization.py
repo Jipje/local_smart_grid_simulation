@@ -85,6 +85,12 @@ if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    do_basic_analysis(solarvation_df)
+    # start_filter = dt.datetime(2021, 3, 3, 7, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 3, 3, 17, 0, 0, tzinfo=utc)
+    # solarvation_df = solarvation_df[start_filter:end_filter]
+
+    # do_basic_analysis(solarvation_df)
+
+    # do_monthly_analysis(solarvation_df)
 
     do_monthly_analysis(solarvation_df)
