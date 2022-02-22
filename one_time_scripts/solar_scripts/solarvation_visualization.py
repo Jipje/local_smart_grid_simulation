@@ -148,16 +148,28 @@ def range_value_counts_msg(within_range_values):
     print(msg)
 
 
+def identify_congestion(solarvation_df, congestion_kw):
+    congestion_margin = 0.8
+    congestion_margin_kw = congestion_margin * congestion_kw
+    solarvation_df['cable_usage'] = solarvation_df['power'] / congestion_margin_kw
+    solarvation_df['congestion_probability'] = solarvation_df['cable_usage'].rolling(60, min_periods=0, center=True).mean()
+    solarvation_df['congestion'] = solarvation_df[['cable_usage', 'congestion_probability']].max(axis=1)
+    solarvation_df['congestion'] = solarvation_df['congestion'] > 1
+    return solarvation_df['congestion']
+
+
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    # start_filter = dt.datetime(2021, 3, 3, 7, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 3, 3, 17, 0, 0, tzinfo=utc)
+    # start_filter = dt.datetime(2021, 6, 3, 8, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 6, 3, 12, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
-    do_basic_analysis(solarvation_df)
+    # do_basic_analysis(solarvation_df)
 
-    do_monthly_analysis(solarvation_df)
+    # do_monthly_analysis(solarvation_df)
 
-    do_range_investigation(solarvation_df)
+    # do_range_investigation(solarvation_df)
+
+    solarvation_df['congestion'] = identify_congestion(solarvation_df, 17000)
