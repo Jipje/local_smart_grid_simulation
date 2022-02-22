@@ -11,11 +11,14 @@ def date_parser(string):
     return dt.datetime.strptime(string, '%Y-%m-%d %H:%M:%S%z').replace(tzinfo=utc)
 
 
-def load_solarvation_data():
-    solarvation_filename = '../../data/environments/lelystad_1_2021.csv'
+def load_solarvation_data(solarvation_filename='../../data/environments/lelystad_1_2021.csv'):
     solarvation_df = pd.read_csv(solarvation_filename, parse_dates=[0], date_parser=date_parser)
-    solarvation_df.index = pd.to_datetime(solarvation_df['time_utc'], errors='coerce', utc=True)
-    solarvation_df = solarvation_df.drop('time_utc', axis=1)
+    try:
+        solarvation_df.index = pd.to_datetime(solarvation_df['time_utc'], errors='coerce', utc=True)
+        solarvation_df = solarvation_df.drop('time_utc', axis=1)
+    except KeyError:
+        solarvation_df.index = pd.to_datetime(solarvation_df['time_ams'], errors='coerce', utc=True)
+        solarvation_df = solarvation_df.drop('time_ams', axis=1)
 
     solarvation_df['hour_of_production'] = solarvation_df.index.hour
 
@@ -79,6 +82,7 @@ def do_monthly_analysis(solarvation_df):
 
 
 if __name__ == '__main__':
+    # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
     do_basic_analysis(solarvation_df)
