@@ -89,4 +89,11 @@ if __name__ == '__main__':
                 'losses': losses
             }
             month_array.append(row_dict)
+    # Append the final month
+    month_df = pd.DataFrame(month_array)
+    month_df.index = month_df['time_ams']
+    month_df = month_df.drop('time_ams', axis=1)
+    res_df = res_df.append(month_df)
+
+    print(res_df)
     res_df.to_csv('../data/solar_data/solarvation/solarvation_lelystad_1.csv')
