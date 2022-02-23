@@ -180,19 +180,23 @@ def time_congestion_events(solarvation_df):
     max_end = solarvation_df['congestion_end'].max().strftime('%X')
     mean_start = solarvation_df['congestion_start'].mean().strftime('%X')
     mean_end = solarvation_df['congestion_end'].mean().strftime('%X')
+    median_start = solarvation_df['congestion_start'].median().strftime('%X')
+    median_end = solarvation_df['congestion_end'].median().strftime('%X')
 
     mean_length = solarvation_df['congestion_length'].mean()
     max_length = solarvation_df['congestion_length'].max()
     min_length = solarvation_df[solarvation_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
 
-    msg = "Earliest starting time of congestion is {}\n" \
-          "Latest ending time of congestion is {}\n" \
-          "Mean start time of congestion is {}\n" \
-          "Mean end time of congestion is {}\n" \
+    msg = f"Earliest starting time of congestion is {min_start}\n" \
+          f"Latest ending time of congestion is {max_end}\n" \
+          f"Mean start time of congestion is {mean_start}\n" \
+          f"Mean end time of congestion is {mean_end}\n" \
+          f"Median start time of congestion is {median_start}\n" \
+          f"Median end time of congestion is {median_end}\n" \
           "-----------------------------------\n" \
-          "Mean congestion length is {}\n" \
-          "Max congestion length is {}\n" \
-          "Min congestion length is {}".format(min_start, max_end, mean_start, mean_end, mean_length, max_length, min_length)
+          f"Mean congestion length is {mean_length}\n" \
+          f"Max congestion length is {max_length}\n" \
+          f"Min congestion length is {min_length}"
     print(msg)
 
 
