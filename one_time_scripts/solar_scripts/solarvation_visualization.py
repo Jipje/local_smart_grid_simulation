@@ -169,14 +169,30 @@ def time_congestion_events(solarvation_df):
     solarvation_df['time'] = solarvation_df['time_utc'].apply(lambda x: x.replace(year=1970, month=1, day=1))
 
     temp_df = pd.DataFrame()
-    temp_df['congestion_time'] = solarvation_df[solarvation_df['congestion']]['time']
+    temp_df['congestion_start'] = solarvation_df[solarvation_df['congestion']]['time']
+    temp_df['congestion_end'] = temp_df['congestion_start']
+    temp_df = temp_df.resample('1D').agg({'congestion_start': min, 'congestion_end': max})
+    temp_df['congestion_length'] = temp_df['congestion_end'] - temp_df['congestion_start']
 
     solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
 
-    min_start = solarvation_df['congestion_time'].min().strftime('%X')
-    max_end = solarvation_df['congestion_time'].max().strftime('%X')
+    min_start = solarvation_df['congestion_start'].min().strftime('%X')
+    max_end = solarvation_df['congestion_end'].max().strftime('%X')
+    mean_start = solarvation_df['congestion_start'].mean().strftime('%X')
+    mean_end = solarvation_df['congestion_end'].mean().strftime('%X')
+
+    mean_length = solarvation_df['congestion_length'].mean()
+    max_length = solarvation_df['congestion_length'].max()
+    min_length = solarvation_df[solarvation_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
+
     msg = "Earliest starting time of congestion is {}\n" \
-          "Latest ending time of congestion is {}".format(min_start, max_end)
+          "Latest ending time of congestion is {}\n" \
+          "Mean start time of congestion is {}\n" \
+          "Mean end time of congestion is {}\n" \
+          "-----------------------------------\n" \
+          "Mean congestion length is {}\n" \
+          "Max congestion length is {}\n" \
+          "Min congestion length is {}".format(min_start, max_end, mean_start, mean_end, mean_length, max_length, min_length)
     print(msg)
 
 
@@ -185,7 +201,7 @@ if __name__ == '__main__':
     solarvation_df = load_solarvation_data()
 
     # start_filter = dt.datetime(2021, 4, 30, 0, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 9, 1, 0, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 6, 1, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # do_basic_analysis(solarvation_df)
