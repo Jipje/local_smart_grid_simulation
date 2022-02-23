@@ -16,10 +16,10 @@ def load_solarvation_data(solarvation_filename='../../data/environments/lelystad
     solarvation_df = pd.read_csv(solarvation_filename, parse_dates=[0], date_parser=date_parser)
     try:
         solarvation_df.index = pd.to_datetime(solarvation_df['time_utc'], errors='coerce', utc=True)
-        solarvation_df = solarvation_df.drop('time_utc', axis=1)
     except KeyError:
         solarvation_df.index = pd.to_datetime(solarvation_df['time_ams'], errors='coerce', utc=True)
         solarvation_df = solarvation_df.drop('time_ams', axis=1)
+        solarvation_df['time_utc'] = solarvation_df.index
 
     solarvation_df['hour_of_production'] = solarvation_df.index.hour
 
@@ -75,6 +75,7 @@ def do_monthly_analysis(solarvation_df):
         axs[axes_x, axes_y].scatter(month_df['hour_of_production'], month_df['power'])
         axs[axes_x, axes_y].set_title('{}'.format(start_of_month.strftime('%B')))
         axs[axes_x, axes_y].set_ylim((0, 20000))
+        axs[axes_x, axes_y].set_xlim((0, 23))
     fig.suptitle('Scatterplot of generated power per month')
     for ax in axs.flat:
         ax.set(xlabel='Hour (UTC)', ylabel='Generated power (kW)')
@@ -165,21 +166,17 @@ def time_congestion_events(solarvation_df):
     except AssertionError:
         raise KeyError('Please offer an index DataFrame with a boolean column called congestion')
 
-    solarvation_df['timestamp'] = solarvation_df.index
+    solarvation_df['time'] = solarvation_df['time_utc'].apply(lambda x: x.replace(year=1970, month=1, day=1))
 
     temp_df = pd.DataFrame()
-    temp_df['congestion_timer'] = solarvation_df[solarvation_df['congestion']]['timestamp']
-    temp_df['congestion_timer'] = temp_df['congestion_timer'].apply(lambda x: float(x.strftime('%H%M')))
+    temp_df['congestion_time'] = solarvation_df[solarvation_df['congestion']]['time']
 
     solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
 
-    # try:
-    min_start = dt.datetime.strptime(str(solarvation_df['congestion_timer'].min()), '%H%M.0').strftime('%X')
-    # except ValueError:
-    #     min_start = dt.datetime.strptime('0' + str(solarvation_df['congestion_timer'].min()), '%H%M.0')
-    max_end = dt.datetime.strptime(str(solarvation_df['congestion_timer'].max()), '%H%M.0').strftime('%X')
-    msg = "Earliest starting time is {}\n" \
-          "Latest ending time is {}".format(min_start, max_end)
+    min_start = solarvation_df['congestion_time'].min().strftime('%X')
+    max_end = solarvation_df['congestion_time'].max().strftime('%X')
+    msg = "Earliest starting time of congestion is {}\n" \
+          "Latest ending time of congestion is {}".format(min_start, max_end)
     print(msg)
 
 
