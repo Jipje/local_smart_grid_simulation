@@ -57,7 +57,7 @@ def do_monthly_analysis(solarvation_df):
         month = i
         start_of_month = dt.datetime(2021, month, 1, tzinfo=utc)
         temp_day = start_of_month.replace(day=28) + dt.timedelta(days=4)
-        end_of_month = temp_day - dt.timedelta(days=temp_day.day)
+        end_of_month = temp_day.replace(day=1) - dt.timedelta(minutes=1)
 
         if month in [1, 4, 7, 10]:
             axes_y = 0
@@ -73,10 +73,15 @@ def do_monthly_analysis(solarvation_df):
                 break
 
         month_df = solarvation_df[start_of_month:end_of_month]
+        month_df.index = pd.to_datetime(month_df['time_utc'], errors='coerce', utc=True)
         axs[axes_x, axes_y].scatter(month_df['hour_of_production'], month_df['power'])
         axs[axes_x, axes_y].set_title('{}'.format(start_of_month.strftime('%B')))
         axs[axes_x, axes_y].set_ylim((0, 20000))
         axs[axes_x, axes_y].set_xlim((0, 23))
+
+        print("CONGESTION TIME INVESTIGATION OF {}".format(start_of_month.strftime('%B')))
+        time_congestion_events(month_df)
+
     fig.suptitle('Scatterplot of generated power per month')
     for ax in axs.flat:
         ax.set(xlabel='Hour (UTC)', ylabel='Generated power (kW)')
@@ -170,24 +175,27 @@ def time_congestion_events(solarvation_df):
     temp_df = pd.DataFrame()
     temp_df['congestion_start'] = solarvation_df[solarvation_df['congestion']]['time']
     temp_df['congestion_end'] = temp_df['congestion_start']
+    if len(temp_df) == 0:
+        print('No congestion events found.')
+        return 0
     temp_df = temp_df.resample('1D').agg({'congestion_start': min, 'congestion_end': max})
     temp_df['congestion_length'] = temp_df['congestion_end'] - temp_df['congestion_start']
 
-    solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
+    time_congestion_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
 
-    min_start = solarvation_df['congestion_start'].min().strftime('%X')
-    max_end = solarvation_df['congestion_end'].max().strftime('%X')
-    mean_start = solarvation_df['congestion_start'].mean().strftime('%X')
-    mean_end = solarvation_df['congestion_end'].mean().strftime('%X')
-    median_start = solarvation_df['congestion_start'].median().strftime('%X')
-    median_end = solarvation_df['congestion_end'].median().strftime('%X')
+    min_start = time_congestion_df['congestion_start'].min().strftime('%X')
+    max_end = time_congestion_df['congestion_end'].max().strftime('%X')
+    mean_start = time_congestion_df['congestion_start'].mean().strftime('%X')
+    mean_end = time_congestion_df['congestion_end'].mean().strftime('%X')
+    median_start = time_congestion_df['congestion_start'].median().strftime('%X')
+    median_end = time_congestion_df['congestion_end'].median().strftime('%X')
 
-    mean_length = solarvation_df['congestion_length'].mean()
-    median_length = solarvation_df['congestion_length'].median()
-    max_length = solarvation_df['congestion_length'].max()
-    min_length = solarvation_df[solarvation_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
+    mean_length = time_congestion_df['congestion_length'].mean()
+    median_length = time_congestion_df['congestion_length'].median()
+    max_length = time_congestion_df['congestion_length'].max()
+    min_length = time_congestion_df[time_congestion_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
 
-    # print(solarvation_df[solarvation_df['congestion_length'] == max_length])
+    # print(solarvation_df[solarvation_df['congestion_length'] == min_length])
 
     msg = f"Earliest starting time of congestion is {min_start}\n" \
           f"Latest ending time of congestion is {max_end}\n" \
@@ -241,15 +249,15 @@ if __name__ == '__main__':
 
     # do_basic_analysis(solarvation_df)
 
-    # do_monthly_analysis(solarvation_df)
-
     # do_range_investigation(solarvation_df)
 
     solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
+
+    do_monthly_analysis(solarvation_df)
 
     # temp_solarvation_df = solarvation_df[solarvation_df['congestion']]
     # do_monthly_analysis(temp_solarvation_df)
 
     # time_congestion_events(solarvation_df)
 
-    daily_vis(solarvation_df, dt.datetime(2021, 6, 13, tzinfo=utc))
+    # daily_vis(solarvation_df, dt.datetime(2021, 2, 24, tzinfo=utc))
