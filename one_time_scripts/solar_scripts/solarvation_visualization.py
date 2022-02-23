@@ -1,4 +1,4 @@
-import matplotlib
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
@@ -22,6 +22,7 @@ def load_solarvation_data(solarvation_filename='../../data/environments/lelystad
         solarvation_df['time_utc'] = solarvation_df.index
 
     solarvation_df['hour_of_production'] = solarvation_df.index.hour
+    solarvation_df['time'] = solarvation_df['time_utc'].apply(lambda x: x.replace(year=1970, month=1, day=1))
 
     return solarvation_df
 
@@ -166,8 +167,6 @@ def time_congestion_events(solarvation_df):
     except AssertionError:
         raise KeyError('Please offer an index DataFrame with a boolean column called congestion')
 
-    solarvation_df['time'] = solarvation_df['time_utc'].apply(lambda x: x.replace(year=1970, month=1, day=1))
-
     temp_df = pd.DataFrame()
     temp_df['congestion_start'] = solarvation_df[solarvation_df['congestion']]['time']
     temp_df['congestion_end'] = temp_df['congestion_start']
@@ -188,6 +187,8 @@ def time_congestion_events(solarvation_df):
     max_length = solarvation_df['congestion_length'].max()
     min_length = solarvation_df[solarvation_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
 
+    # print(solarvation_df[solarvation_df['congestion_length'] == max_length])
+
     msg = f"Earliest starting time of congestion is {min_start}\n" \
           f"Latest ending time of congestion is {max_end}\n" \
           f"Mean start time of congestion is {mean_start}\n" \
@@ -202,12 +203,40 @@ def time_congestion_events(solarvation_df):
     print(msg)
 
 
+def daily_vis(solarvation_df, day_dt=None):
+    counter = 0
+    if day_dt is not None:
+        end_of_day = day_dt + dt.timedelta(days=1) - dt.timedelta(minutes=1)
+        solarvation_df = solarvation_df[day_dt:end_of_day]
+
+    start_day = solarvation_df.iloc[0].time_utc.to_pydatetime().replace(hour=0)
+
+    for day_index in range(int(len(solarvation_df) / 1440)):
+        current_day_start = (start_day + dt.timedelta(days=day_index)).replace(hour=0, minute=0)
+        current_day_end = current_day_start + dt.timedelta(days=1) - dt.timedelta(minutes=1)
+
+        current_day_str = current_day_start.strftime('%b %d')
+        current_day_df = solarvation_df[current_day_start:current_day_end]
+        counter += 1
+
+        plt.plot(current_day_df['time'], current_day_df['power'], label=current_day_str)
+        if counter == 4:
+            break
+    plt.legend()
+    plt.ylabel('Generated power 1m (kW)')
+    plt.xlabel('Time (UTC)')
+    plt.ylim(0, 20000)
+    plt.title('Solar generation profile for multiple days.')
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    plt.show()
+
+
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    # start_filter = dt.datetime(2021, 4, 30, 0, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 6, 1, 0, 0, 0, tzinfo=utc)
+    # start_filter = dt.datetime(2021, 6, 16, 0, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 6, 22, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # do_basic_analysis(solarvation_df)
@@ -221,27 +250,6 @@ if __name__ == '__main__':
     # temp_solarvation_df = solarvation_df[solarvation_df['congestion']]
     # do_monthly_analysis(temp_solarvation_df)
 
-    time_congestion_events(solarvation_df)
+    # time_congestion_events(solarvation_df)
 
-
-def weird_vis():
-    solarvation_df['time'] = solarvation_df['timestamp'].apply(lambda x: x.replace(year=2021, month=1, day=1))
-    counter = 0
-    start_day = solarvation_df.iloc[0].timestamp.to_pydatetime().replace(hour=0)
-
-    solarvation_df = solarvation_df.resample('1H').max()
-    print(solarvation_df)
-    for day_index in range(int(len(solarvation_df) / 1440)):
-        current_day_start = (start_day + dt.timedelta(days=day_index)).replace(hour=0, minute=0)
-        current_day_end = current_day_start + dt.timedelta(days=1) - dt.timedelta(minutes=1)
-
-        current_day_str = current_day_start.strftime('%b %d')
-        current_day_df = solarvation_df[current_day_start:current_day_end]
-        congestion_current_day = current_day_df[current_day_df['congestion']]
-        counter += 1
-
-        plt.scatter(congestion_current_day['time'], congestion_current_day['power'], label=current_day_str)
-        if counter == 7:
-            break
-    # plt.legend()
-    plt.show()
+    daily_vis(solarvation_df, dt.datetime(2021, 6, 13, tzinfo=utc))
