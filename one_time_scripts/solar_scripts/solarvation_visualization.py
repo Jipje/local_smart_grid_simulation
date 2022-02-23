@@ -149,7 +149,7 @@ def range_value_counts_msg(within_range_values):
 
 
 def identify_congestion(solarvation_df, congestion_kw):
-    congestion_margin = 0.8
+    congestion_margin = 0.95
     congestion_margin_kw = congestion_margin * congestion_kw
     solarvation_df['cable_usage'] = solarvation_df['power'] / congestion_margin_kw
     solarvation_df['congestion_probability'] = solarvation_df['cable_usage'].rolling(60, min_periods=0, center=True).mean()
@@ -158,12 +158,40 @@ def identify_congestion(solarvation_df, congestion_kw):
     return solarvation_df['congestion']
 
 
+def time_congestion_events(solarvation_df):
+    try:
+        assert 'congestion' in solarvation_df.columns
+    except AssertionError:
+        raise KeyError('Please offer an index DataFrame with a boolean column called congestion')
+
+    solarvation_df['timestamp'] = solarvation_df.index
+
+    temp_df = pd.DataFrame()
+    temp_df['congestion_timer'] = solarvation_df[solarvation_df['congestion']]['timestamp']
+    temp_df['congestion_timer'] = temp_df['congestion_timer'].apply(lambda x: x.strftime('%H%M'))
+
+    solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
+
+    solarvation_df['start_of_congestion'] = solarvation_df['congestion_timer'].rolling(480, center=True, min_periods=0).min()
+    solarvation_df['end_of_congestion'] = solarvation_df['congestion_timer'].rolling(480, center=True, min_periods=0).max()
+
+    min_start = solarvation_df['start_of_congestion'].min()
+    max_end = solarvation_df['end_of_congestion'].max()
+
+    # print(solarvation_df[solarvation_df['start_of_congestion'] == 645.0])
+
+    print(solarvation_df[['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']].to_string())
+
+    msg = "Earliest starting time is {}\n" \
+          "Latest ending time is {}".format(min_start, max_end)
+    print(msg)
+
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    # start_filter = dt.datetime(2021, 6, 3, 8, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 6, 3, 12, 0, 0, tzinfo=utc)
+    # start_filter = dt.datetime(2021, 5, 19, 6, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 5, 19, 12, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # do_basic_analysis(solarvation_df)
@@ -173,3 +201,5 @@ if __name__ == '__main__':
     # do_range_investigation(solarvation_df)
 
     solarvation_df['congestion'] = identify_congestion(solarvation_df, 17000)
+
+    time_congestion_events(solarvation_df)
