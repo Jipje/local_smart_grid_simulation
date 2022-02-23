@@ -168,30 +168,33 @@ def time_congestion_events(solarvation_df):
 
     temp_df = pd.DataFrame()
     temp_df['congestion_timer'] = solarvation_df[solarvation_df['congestion']]['timestamp']
-    temp_df['congestion_timer'] = temp_df['congestion_timer'].apply(lambda x: x.strftime('%H%M'))
+    temp_df['congestion_timer'] = temp_df['congestion_timer'].apply(lambda x: float(x.strftime('%H%M')))
 
     solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
 
-    solarvation_df['start_of_congestion'] = solarvation_df['congestion_timer'].rolling(480, center=True, min_periods=0).min()
-    solarvation_df['end_of_congestion'] = solarvation_df['congestion_timer'].rolling(480, center=True, min_periods=0).max()
+    min_start = solarvation_df['congestion_timer'].min()
+    max_end = solarvation_df['congestion_timer'].max()
 
-    min_start = solarvation_df['start_of_congestion'].min()
-    max_end = solarvation_df['end_of_congestion'].max()
+    # print(solarvation_df[solarvation_df['start_of_congestion'] == 700.0])
 
-    # print(solarvation_df[solarvation_df['start_of_congestion'] == 645.0])
-
-    print(solarvation_df[['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']].to_string())
+    # if len(solarvation_df > 3000):
+    #     print(solarvation_df[['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']])
+    # else:
+    #     print(solarvation_df[
+    #               ['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']].to_string())
 
     msg = "Earliest starting time is {}\n" \
           "Latest ending time is {}".format(min_start, max_end)
     print(msg)
+    plt.scatter(solarvation_df['congestion_timer'], solarvation_df['cable_usage'])
+    plt.show()
 
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    # start_filter = dt.datetime(2021, 5, 19, 6, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 5, 19, 12, 0, 0, tzinfo=utc)
+    # start_filter = dt.datetime(2021, 6, 23, 2, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 6, 23, 12, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # do_basic_analysis(solarvation_df)
@@ -200,6 +203,6 @@ if __name__ == '__main__':
 
     # do_range_investigation(solarvation_df)
 
-    solarvation_df['congestion'] = identify_congestion(solarvation_df, 17000)
+    solarvation_df['congestion'] = identify_congestion(solarvation_df, 16000)
 
     time_congestion_events(solarvation_df)
