@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import datetime as dt
@@ -172,29 +173,22 @@ def time_congestion_events(solarvation_df):
 
     solarvation_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
 
-    min_start = solarvation_df['congestion_timer'].min()
-    max_end = solarvation_df['congestion_timer'].max()
-
-    # print(solarvation_df[solarvation_df['start_of_congestion'] == 700.0])
-
-    # if len(solarvation_df > 3000):
-    #     print(solarvation_df[['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']])
-    # else:
-    #     print(solarvation_df[
-    #               ['power', 'congestion', 'congestion_timer', 'start_of_congestion', 'end_of_congestion']].to_string())
-
+    # try:
+    min_start = dt.datetime.strptime(str(solarvation_df['congestion_timer'].min()), '%H%M.0').strftime('%X')
+    # except ValueError:
+    #     min_start = dt.datetime.strptime('0' + str(solarvation_df['congestion_timer'].min()), '%H%M.0')
+    max_end = dt.datetime.strptime(str(solarvation_df['congestion_timer'].max()), '%H%M.0').strftime('%X')
     msg = "Earliest starting time is {}\n" \
           "Latest ending time is {}".format(min_start, max_end)
     print(msg)
-    plt.scatter(solarvation_df['congestion_timer'], solarvation_df['cable_usage'])
-    plt.show()
+
 
 if __name__ == '__main__':
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
-    # start_filter = dt.datetime(2021, 6, 23, 2, 0, 0, tzinfo=utc)
-    # end_filter = dt.datetime(2021, 6, 23, 12, 0, 0, tzinfo=utc)
+    # start_filter = dt.datetime(2021, 4, 30, 0, 0, 0, tzinfo=utc)
+    # end_filter = dt.datetime(2021, 9, 1, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # do_basic_analysis(solarvation_df)
@@ -203,6 +197,32 @@ if __name__ == '__main__':
 
     # do_range_investigation(solarvation_df)
 
-    solarvation_df['congestion'] = identify_congestion(solarvation_df, 16000)
+    solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
+
+    # temp_solarvation_df = solarvation_df[solarvation_df['congestion']]
+    # do_monthly_analysis(temp_solarvation_df)
 
     time_congestion_events(solarvation_df)
+
+
+def weird_vis():
+    solarvation_df['time'] = solarvation_df['timestamp'].apply(lambda x: x.replace(year=2021, month=1, day=1))
+    counter = 0
+    start_day = solarvation_df.iloc[0].timestamp.to_pydatetime().replace(hour=0)
+
+    solarvation_df = solarvation_df.resample('1H').max()
+    print(solarvation_df)
+    for day_index in range(int(len(solarvation_df) / 1440)):
+        current_day_start = (start_day + dt.timedelta(days=day_index)).replace(hour=0, minute=0)
+        current_day_end = current_day_start + dt.timedelta(days=1) - dt.timedelta(minutes=1)
+
+        current_day_str = current_day_start.strftime('%b %d')
+        current_day_df = solarvation_df[current_day_start:current_day_end]
+        congestion_current_day = current_day_df[current_day_df['congestion']]
+        counter += 1
+
+        plt.scatter(congestion_current_day['time'], congestion_current_day['power'], label=current_day_str)
+        if counter == 7:
+            break
+    # plt.legend()
+    plt.show()
