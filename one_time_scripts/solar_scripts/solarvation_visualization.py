@@ -184,6 +184,7 @@ def time_congestion_events(solarvation_df):
     median_end = solarvation_df['congestion_end'].median().strftime('%X')
 
     mean_length = solarvation_df['congestion_length'].mean()
+    median_length = solarvation_df['congestion_length'].median()
     max_length = solarvation_df['congestion_length'].max()
     min_length = solarvation_df[solarvation_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
 
@@ -195,6 +196,7 @@ def time_congestion_events(solarvation_df):
           f"Median end time of congestion is {median_end}\n" \
           "-----------------------------------\n" \
           f"Mean congestion length is {mean_length}\n" \
+          f"Median congestion length is {median_length}\n" \
           f"Max congestion length is {max_length}\n" \
           f"Min congestion length is {min_length}"
     print(msg)
