@@ -79,9 +79,6 @@ def do_monthly_analysis(solarvation_df):
         axs[axes_x, axes_y].set_ylim((0, 20000))
         axs[axes_x, axes_y].set_xlim((0, 23))
 
-        print("CONGESTION TIME INVESTIGATION OF {}".format(start_of_month.strftime('%B')))
-        time_congestion_events(month_df)
-
     fig.suptitle('Scatterplot of generated power per month')
     for ax in axs.flat:
         ax.set(xlabel='Hour (UTC)', ylabel='Generated power (kW)')
@@ -236,7 +233,30 @@ def daily_vis(solarvation_df, day_dt=None):
     plt.show()
 
 
-if __name__ == '__main__':
+def make_congestion_series(solarvation_df, start_date, end_date, start_hours, end_hours):
+    res_arr = []
+    columns = []
+    current_date = start_date.replace(hour=0, minute=0)
+
+    while current_date < end_date:
+        start_of_period = current_date.replace(hour=start_hours.hour, minute=start_hours.minute)
+        end_of_period = current_date.replace(hour=end_hours.hour, minute=end_hours.minute)
+
+        day_df = solarvation_df[start_of_period:end_of_period]
+        if day_df['congestion'].max():
+            day_df.index = day_df['time']
+            res_arr.append(day_df['power'])
+            day_str = current_date.strftime('%d-%m-%Y')
+            columns.append(day_str)
+
+        current_date = current_date + dt.timedelta(days=1)
+    res_df = pd.DataFrame(res_arr).transpose()
+    res_df.columns = columns
+    print(res_df)
+    return res_df
+
+
+def main():
     # solarvation_df = load_solarvation_data(solarvation_filename='../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
     solarvation_df = load_solarvation_data()
 
@@ -259,3 +279,47 @@ if __name__ == '__main__':
     time_congestion_events(solarvation_df)
 
     # daily_vis(solarvation_df, dt.datetime(2021, 2, 24, tzinfo=utc))
+
+
+def retrieve_quarters(year=2021):
+    starting_times = []
+    ending_times = []
+    for i in range(4):
+        start_month = i * 3 + 1
+        end_month = start_month + 3
+
+        if end_month == 13:
+            end_q = dt.datetime(year + 1, 1, 1, tzinfo=utc)
+        else:
+            end_q = dt.datetime(year, end_month, 1, tzinfo=utc)
+        start_q = dt.datetime(year, start_month, 1, tzinfo=utc)
+
+        starting_times.append(start_q)
+        ending_times.append(end_q)
+    return starting_times, ending_times
+
+
+def time_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
+    for i in range(len(starting_times)):
+        period_df = solarvation_df[starting_times[i]:ending_times[i]]
+
+        if labels is not None:
+            print(labels[i])
+        time_congestion_events(period_df)
+
+
+if __name__ == '__main__':
+    # main()
+    solarvation_df = load_solarvation_data()
+    solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
+
+    starting_times, ending_times = retrieve_quarters()
+    labels = ['Analyzing Q1', 'Analyzing Q2', 'Analyzing Q3', 'Analyzing Q4']
+    time_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
+
+    start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
+    end_date = dt.datetime(2021, 4, 1, tzinfo=utc)
+    start_hours = dt.time(10, 0, tzinfo=utc)
+    end_hours = dt.time(14, 0, tzinfo=utc)
+
+    make_congestion_series(solarvation_df, start_date, end_date, start_hours, end_hours)
