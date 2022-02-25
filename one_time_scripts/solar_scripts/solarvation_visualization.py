@@ -137,9 +137,6 @@ def do_range_investigation(solarvation_df):
     within_range_values = filtered_df['20_perc_upper_range_correct'].value_counts()
     range_value_counts_msg(within_range_values)
 
-    faulty_df = filtered_df[~filtered_df['20_perc_upper_range_correct']]
-    print(faulty_df[['power', 'upper_range', '20_perc_upper_range']])
-
 
 def range_value_counts_msg(within_range_values):
     correct = within_range_values[True]
@@ -176,7 +173,7 @@ def time_congestion_events(solarvation_df):
     temp_df['congestion_start'] = solarvation_df[solarvation_df['congestion']]['time']
     temp_df['congestion_end'] = temp_df['congestion_start']
     if len(temp_df) == 0:
-        print('No congestion events found.')
+        print('\tNo congestion events found.')
         return 0
     temp_df = temp_df.resample('1D').agg({'congestion_start': min, 'congestion_end': max})
     temp_df['congestion_length'] = temp_df['congestion_end'] - temp_df['congestion_start']
@@ -197,17 +194,17 @@ def time_congestion_events(solarvation_df):
 
     # print(solarvation_df[solarvation_df['congestion_length'] == min_length])
 
-    msg = f"Earliest starting time of congestion is {min_start}\n" \
-          f"Latest ending time of congestion is {max_end}\n" \
-          f"Mean start time of congestion is {mean_start}\n" \
-          f"Mean end time of congestion is {mean_end}\n" \
-          f"Median start time of congestion is {median_start}\n" \
-          f"Median end time of congestion is {median_end}\n" \
+    msg = f"\tEarliest starting time of congestion is {min_start}\n" \
+          f"\tLatest ending time of congestion is {max_end}\n" \
+          f"\tMean start time of congestion is {mean_start}\n" \
+          f"\tMean end time of congestion is {mean_end}\n" \
+          f"\tMedian start time of congestion is {median_start}\n" \
+          f"\tMedian end time of congestion is {median_end}\n" \
           "-----------------------------------\n" \
-          f"Mean congestion length is {mean_length}\n" \
-          f"Median congestion length is {median_length}\n" \
-          f"Max congestion length is {max_length}\n" \
-          f"Min congestion length is {min_length}"
+          f"\tMean congestion length is {mean_length}\n" \
+          f"\tMedian congestion length is {median_length}\n" \
+          f"\tMax congestion length is {max_length}\n" \
+          f"\tMin congestion length is {min_length}"
     print(msg)
 
 
@@ -247,17 +244,18 @@ if __name__ == '__main__':
     # end_filter = dt.datetime(2021, 6, 22, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
-    # do_basic_analysis(solarvation_df)
+    do_basic_analysis(solarvation_df)
 
-    # do_range_investigation(solarvation_df)
+    do_range_investigation(solarvation_df)
 
     solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
-
+    print()
     do_monthly_analysis(solarvation_df)
 
     # temp_solarvation_df = solarvation_df[solarvation_df['congestion']]
     # do_monthly_analysis(temp_solarvation_df)
 
-    # time_congestion_events(solarvation_df)
+    print("CONGESTION TIME INVESTIGATION OF 2021")
+    time_congestion_events(solarvation_df)
 
     # daily_vis(solarvation_df, dt.datetime(2021, 2, 24, tzinfo=utc))
