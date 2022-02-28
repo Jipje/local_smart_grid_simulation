@@ -355,6 +355,7 @@ if __name__ == '__main__':
 
     do_basic_analysis(solarvation_df)
     do_range_investigation(solarvation_df)
+    do_monthly_analysis(solarvation_df)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
