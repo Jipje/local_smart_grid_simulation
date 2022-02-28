@@ -339,7 +339,27 @@ def retrieve_quarters(year=2021):
     return starting_times, ending_times
 
 
-def time_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
+def retrieve_months(year=2021):
+    starting_times = []
+    ending_times = []
+    for i in range(12):
+        start_month = i + 1
+        end_month = start_month + 1
+
+        start_period = dt.datetime(year, start_month, 1)
+
+        if end_month > 12:
+            year = year + 1
+            end_month = 1
+
+        end_period = dt.datetime(year, end_month, 1)
+
+        starting_times.append(start_period)
+        ending_times.append(end_period)
+    return starting_times, ending_times
+
+
+def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
     for i in range(len(starting_times)):
         period_df = solarvation_df[starting_times[i]:ending_times[i]]
 
@@ -354,9 +374,10 @@ if __name__ == '__main__':
     solarvation_df = load_solarvation_data()
     solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 10000)
 
-    starting_times, ending_times = retrieve_quarters()
-    labels = ['Analyzing Q1', 'Analyzing Q2', 'Analyzing Q3', 'Analyzing Q4']
-    time_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
+    starting_times, ending_times = retrieve_months(2021)
+    labels = ['January', 'February', 'March', 'April', 'May', 'June',
+              'July', 'August', 'September', 'October', 'November', 'December']
+    time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
 
     # start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
     # end_date = dt.datetime(2022, 1, 1, tzinfo=utc)
