@@ -214,29 +214,28 @@ def size_congestion_events(solarvation_df):
         raise KeyError('Please offer an index DataFrame with a column called excess_power')
 
     time_congestion_df = pd.DataFrame()
-    time_congestion_df['excess_power'] = solarvation_df[solarvation_df['congestion']]['excess_power']
-    time_congestion_df['excess_capacity'] = time_congestion_df['excess_power'] * 1/60
+    time_congestion_df['max_power'] = solarvation_df[solarvation_df['congestion']]['excess_power']
+    time_congestion_df['min_power'] = time_congestion_df['max_power']
+
+    time_congestion_df['excess_capacity'] = time_congestion_df['max_power'] * 1/60
 
     if len(time_congestion_df) == 0:
         print('\tNo congestion events found.')
         return 0
 
-    time_congestion_df = time_congestion_df.resample('1D').agg({'excess_power': 'mean', 'excess_capacity': sum})
+    time_congestion_df = time_congestion_df.resample('1D').agg(
+        {'max_power': max, 'min_power': min,  'excess_capacity': sum})
 
-    max_power = time_congestion_df['excess_power'].max()
-    min_power = time_congestion_df['excess_power'].min()
-    median_power = time_congestion_df['excess_power'].median()
-    mean_power = time_congestion_df['excess_power'].mean()
+    max_power = round(time_congestion_df['max_power'].max(), 2)
+    min_power = round(time_congestion_df['min_power'].min(), 2)
 
-    max_capacity = time_congestion_df['excess_capacity'].max()
-    min_capacity = time_congestion_df['excess_capacity'].min()
-    median_capacity = time_congestion_df['excess_capacity'].median()
-    mean_capacity = time_congestion_df['excess_capacity'].mean()
+    max_capacity = round(time_congestion_df['excess_capacity'].max(), 2)
+    min_capacity = round(time_congestion_df['excess_capacity'].min(), 2)
+    median_capacity = round(time_congestion_df['excess_capacity'].median(), 2)
+    mean_capacity = round(time_congestion_df['excess_capacity'].mean(), 2)
 
     msg = f"\tMinimum measured power during congestion is {min_power} kW\n" \
           f"\tMaximum measured power during congestion is {max_power} kW\n" \
-          f"\tMean measured power during congestion is {mean_power} kW\n" \
-          f"\tMedian measured power during congestion is {median_power} kW\n" \
           "-----------------------------------\n" \
           f"\tMinimum capacity generated during congestion is {min_capacity} kWh\n" \
           f"\tMaximum capacity generated during congestion is {max_capacity} kWh\n" \
