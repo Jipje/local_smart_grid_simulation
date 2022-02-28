@@ -346,13 +346,13 @@ def retrieve_months(year=2021):
         start_month = i + 1
         end_month = start_month + 1
 
-        start_period = dt.datetime(year, start_month, 1)
+        start_period = dt.datetime(year, start_month, 1, tzinfo=utc)
 
         if end_month > 12:
             year = year + 1
             end_month = 1
 
-        end_period = dt.datetime(year, end_month, 1)
+        end_period = dt.datetime(year, end_month, 1, tzinfo=utc)
 
         starting_times.append(start_period)
         ending_times.append(end_period)
@@ -364,8 +364,10 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         period_df = solarvation_df[starting_times[i]:ending_times[i]]
 
         if labels is not None:
-            print(labels[i])
+            print(labels[i] + ' - Time investigation')
         time_congestion_events(period_df)
+        if labels is not None:
+            print(labels[i] + ' - Size investigation')
         size_congestion_events(period_df)
 
 
