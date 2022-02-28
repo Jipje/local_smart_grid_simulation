@@ -205,6 +205,48 @@ def time_congestion_events(solarvation_df):
     print(msg)
 
 
+def size_congestion_events(solarvation_df, congestion_size=10000):
+    try:
+        assert 'congestion' in solarvation_df.columns
+    except AssertionError:
+        raise KeyError('Please offer an index DataFrame with a boolean column called congestion')
+
+    temp_df = pd.DataFrame()
+    temp_df['excess_power'] = solarvation_df[solarvation_df['congestion']]['power'] - congestion_size
+    temp_df['congestion_day_counter'] = 1
+    temp_df['excess_capacity'] = temp_df['excess_power'] * 1/60
+    if len(temp_df) == 0:
+        print('\tNo congestion events found.')
+        return 0
+    temp_df = temp_df.resample('1D').agg({'excess_power': sum, 'congestion_day_counter': sum, 'excess_capacity': sum})
+    temp_df['excess_power'] = temp_df['excess_power'] / temp_df['congestion_day_counter']
+    temp_df = temp_df.drop('congestion_day_counter', axis=1)
+
+    print(temp_df)
+    time_congestion_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
+
+    min_power = time_congestion_df['excess_power'].min()
+    max_power = time_congestion_df['excess_power'].max()
+    mean_power = time_congestion_df['excess_power'].mean()
+    median_power = time_congestion_df['excess_power'].median()
+
+    min_capacity = time_congestion_df['excess_capacity'].min()
+    max_capacity = time_congestion_df['excess_capacity'].max()
+    mean_capacity = time_congestion_df['excess_capacity'].mean()
+    median_capacity = time_congestion_df['excess_capacity'].median()
+
+    msg = f"\tMinimum measured power during congestion is {min_power} kW\n" \
+          f"\tMaximum measured power during congestion is {max_power} kW\n" \
+          f"\tMean measured power during congestion is {mean_power} kW\n" \
+          f"\tMedian measured power during congestion is {median_power} kW\n" \
+          "-----------------------------------\n" \
+          f"\tMinimum capacity generated during congestion length is {min_capacity} kWh\n" \
+          f"\tMaximum capacity generated during congestion is {max_capacity} kWh\n" \
+          f"\tMean capacity generated during congestion is {mean_capacity} kWh\n" \
+          f"\tMedian capacity generated during congestion is {median_capacity} kWh"
+    print(msg)
+
+
 def daily_vis(solarvation_df, day_dt=None):
     counter = 0
     if day_dt is not None:
@@ -306,6 +348,7 @@ def time_multiple_congestion_events(solarvation_df, starting_times, ending_times
         if labels is not None:
             print(labels[i])
         time_congestion_events(period_df)
+        size_congestion_events(period_df)
 
 
 if __name__ == '__main__':
@@ -317,9 +360,11 @@ if __name__ == '__main__':
     labels = ['Analyzing Q1', 'Analyzing Q2', 'Analyzing Q3', 'Analyzing Q4']
     time_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
 
-    start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
-    end_date = dt.datetime(2021, 4, 1, tzinfo=utc)
-    start_hours = dt.time(10, 0, tzinfo=utc)
-    end_hours = dt.time(14, 0, tzinfo=utc)
+    # start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
+    # end_date = dt.datetime(2022, 1, 1, tzinfo=utc)
+    # start_hours = dt.time(6, 24, tzinfo=utc)
+    # end_hours = dt.time(17, 15, tzinfo=utc)
+    #
+    # make_congestion_series(solarvation_df, start_date, end_date, start_hours, end_hours)
 
-    make_congestion_series(solarvation_df, start_date, end_date, start_hours, end_hours)
+    # size_congestion_events(solarvation_df)
