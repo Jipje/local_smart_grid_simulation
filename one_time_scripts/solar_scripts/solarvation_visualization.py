@@ -157,7 +157,9 @@ def identify_congestion(solarvation_df, congestion_kw):
     solarvation_df['congestion_probability'] = solarvation_df['cable_usage'].rolling(60, min_periods=0, center=True).mean()
     solarvation_df['congestion'] = solarvation_df[['cable_usage', 'congestion_probability']].max(axis=1)
     solarvation_df['congestion'] = solarvation_df['congestion'] > 1
-    return solarvation_df['congestion']
+
+    solarvation_df['excess_power'] = solarvation_df['power'] - congestion_kw
+    return solarvation_df['congestion'], solarvation_df['excess_power']
 
 
 def time_congestion_events(solarvation_df):
@@ -205,42 +207,38 @@ def time_congestion_events(solarvation_df):
     print(msg)
 
 
-def size_congestion_events(solarvation_df, congestion_size=10000):
+def size_congestion_events(solarvation_df):
     try:
-        assert 'congestion' in solarvation_df.columns
+        assert 'excess_power' in solarvation_df.columns
     except AssertionError:
-        raise KeyError('Please offer an index DataFrame with a boolean column called congestion')
+        raise KeyError('Please offer an index DataFrame with a column called excess_power')
 
-    temp_df = pd.DataFrame()
-    temp_df['excess_power'] = solarvation_df[solarvation_df['congestion']]['power'] - congestion_size
-    temp_df['congestion_day_counter'] = 1
-    temp_df['excess_capacity'] = temp_df['excess_power'] * 1/60
-    if len(temp_df) == 0:
+    time_congestion_df = pd.DataFrame()
+    time_congestion_df['excess_power'] = solarvation_df[solarvation_df['congestion']]['excess_power']
+    time_congestion_df['excess_capacity'] = time_congestion_df['excess_power'] * 1/60
+
+    if len(time_congestion_df) == 0:
         print('\tNo congestion events found.')
         return 0
-    temp_df = temp_df.resample('1D').agg({'excess_power': sum, 'congestion_day_counter': sum, 'excess_capacity': sum})
-    temp_df['excess_power'] = temp_df['excess_power'] / temp_df['congestion_day_counter']
-    temp_df = temp_df.drop('congestion_day_counter', axis=1)
 
-    print(temp_df)
-    time_congestion_df = pd.merge(solarvation_df, temp_df, left_index=True, right_index=True, how='left')
+    time_congestion_df = time_congestion_df.resample('1D').agg({'excess_power': 'mean', 'excess_capacity': sum})
 
-    min_power = time_congestion_df['excess_power'].min()
     max_power = time_congestion_df['excess_power'].max()
-    mean_power = time_congestion_df['excess_power'].mean()
+    min_power = time_congestion_df['excess_power'].min()
     median_power = time_congestion_df['excess_power'].median()
+    mean_power = time_congestion_df['excess_power'].mean()
 
-    min_capacity = time_congestion_df['excess_capacity'].min()
     max_capacity = time_congestion_df['excess_capacity'].max()
-    mean_capacity = time_congestion_df['excess_capacity'].mean()
+    min_capacity = time_congestion_df['excess_capacity'].min()
     median_capacity = time_congestion_df['excess_capacity'].median()
+    mean_capacity = time_congestion_df['excess_capacity'].mean()
 
     msg = f"\tMinimum measured power during congestion is {min_power} kW\n" \
           f"\tMaximum measured power during congestion is {max_power} kW\n" \
           f"\tMean measured power during congestion is {mean_power} kW\n" \
           f"\tMedian measured power during congestion is {median_power} kW\n" \
           "-----------------------------------\n" \
-          f"\tMinimum capacity generated during congestion length is {min_capacity} kWh\n" \
+          f"\tMinimum capacity generated during congestion is {min_capacity} kWh\n" \
           f"\tMaximum capacity generated during congestion is {max_capacity} kWh\n" \
           f"\tMean capacity generated during congestion is {mean_capacity} kWh\n" \
           f"\tMedian capacity generated during congestion is {median_capacity} kWh"
@@ -310,7 +308,7 @@ def main():
 
     do_range_investigation(solarvation_df)
 
-    solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
+    solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 10000)
     print()
     do_monthly_analysis(solarvation_df)
 
@@ -354,7 +352,7 @@ def time_multiple_congestion_events(solarvation_df, starting_times, ending_times
 if __name__ == '__main__':
     # main()
     solarvation_df = load_solarvation_data()
-    solarvation_df['congestion'] = identify_congestion(solarvation_df, 10000)
+    solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 10000)
 
     starting_times, ending_times = retrieve_quarters()
     labels = ['Analyzing Q1', 'Analyzing Q2', 'Analyzing Q3', 'Analyzing Q4']
