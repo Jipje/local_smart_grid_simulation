@@ -4,6 +4,7 @@ from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
+from network_objects.decorators.CanSolveCongestion import CanSolveCongestion
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
 import os
@@ -16,7 +17,7 @@ base_scenario = 'data{0}tennet_and_windnet{0}tennet_balans_delta_and_trivial_win
 def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
-    number_of_steps = 30 * 24 * 60
+    number_of_steps = 1 * 24 * 60
     print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
@@ -192,10 +193,27 @@ def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
 
 
 if __name__ == '__main__':
-    verbose_lvl = 1
+    verbose_lvl = 3
 
-    baseline_rhino_simulation(verbose_lvl)
-    baseline_solarvation(verbose_lvl)
+    network_capacity = 14000
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+
+    battery = Battery('Wombat', 30000, 14000,
+                    battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                    battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
+    LimitedChargeOrDischargeCapacity(battery, 4, -1)
+    CanSolveCongestion(battery, network_capacity, 4)
+    imbalance_environment.add_object(battery, [1, 3])
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+
+    run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl,
+                           simulation_environment=imbalance_environment)
+
+    # baseline_rhino_simulation(verbose_lvl)
+    # baseline_solarvation(verbose_lvl)
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
