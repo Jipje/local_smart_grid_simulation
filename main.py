@@ -136,7 +136,7 @@ def baseline_rhino_simulation(verbose_lvl=1):
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
-def rhino_with_limited_charging(verbose_lvl=1):
+def rhino_windnet_limited_charging(verbose_lvl=1):
     # Rhino with limited charging simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -156,6 +156,15 @@ def baseline_windnet(verbose_lvl=1):
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
+def baseline_solarvation(verbose_lvl=1):
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    solarvation = WindFarm('Solarvation', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -189,6 +198,7 @@ if __name__ == '__main__':
     verbose_lvl = 1
 
     baseline_rhino_simulation(verbose_lvl)
+    baseline_solarvation(verbose_lvl)
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
