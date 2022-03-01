@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
 
 
-class TestWindFarm(unittest.TestCase):
+class TestRenewableEnergyGenerator(unittest.TestCase):
     def test_nice_initialization(self):
         wind_farm = RenewableEnergyGenerator('TEST', 10000)
         self.assertEqual(10000, wind_farm.max_kw)
