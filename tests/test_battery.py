@@ -139,8 +139,18 @@ class TestBattery(unittest.TestCase):
 
     def test_to_string(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
-        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: 0\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
+        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: 0\nTotal " \
+              "number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
         self.assertEqual(res, rhino_battery.__str__())
+
+    def test_done_in_mean_time(self):
+        rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path)
+        rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
+        rhino_battery.take_imbalance_action(-100, -100, 'DISCHARGE')
+        rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
+        self.assertEqual('TEST battery - Current SoC: 3910kWh - Average SoC: 0kWh - Cycles in mean time: 0.04 - '
+                         'Changes of direction in mean time: 3 - Earnings since last time: €0',
+                         rhino_battery.done_in_mean_time())
 
     def test_all_pos_ptu(self):
         rhino_battery = Battery('TEST', 7500, 12000, battery_strategy_csv=self.strategy_one_path, battery_efficiency=1)

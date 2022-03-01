@@ -147,10 +147,10 @@ class Battery(NetworkObject):
         return action_kw
 
     def done_in_mean_time(self):
-        earnings_in_mean_time = round(self.earnings - self.old_earnings, 2)
+        earnings_in_mean_time = round(self.earnings() - self.old_earnings, 2)
         changes_of_direction_in_mean_time = round(self.change_of_direction_tracker - self.old_changes_of_direction, 2)
         self.old_changes_of_direction = self.change_of_direction_tracker
-        self.old_earnings = self.earnings
+        self.old_earnings = self.earnings()
         msg = "{} battery - " \
               "Current SoC: {}kWh - " \
               "Average SoC: {}kWh - " \
@@ -162,10 +162,10 @@ class Battery(NetworkObject):
     def end_of_environment_message(self, num_of_days=None):
         if num_of_days is None:
             num_of_days = self.number_of_steps / self.time_step / 60 / 24
-        earnings_str = '{:,.2f}'.format(self.earnings)
+        earnings_str = '{:,.2f}'.format(self.earnings())
         average_num_changes_of_direction = round(self.change_of_direction_tracker / num_of_days, 2)
         average_num_of_cycles = round(self.cycle_counter.cycle_count / num_of_days, 2)
-        average_earnings_str = '{:,.2f}'.format(self.earnings / num_of_days)
+        average_earnings_str = '{:,.2f}'.format(self.earnings() / num_of_days)
         res_msg = "\n{} battery:\n\t" \
             "Total changes of direction: {}\n\t" \
             "Total number of cycles: {}\n\t" \
