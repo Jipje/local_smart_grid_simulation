@@ -34,8 +34,8 @@ class RenewableEnergyGenerator(NetworkObject):
 
     def generate_electricity(self):
         generated_kwh = self.available_kw * self.time_step
-        if self.verbose_lvl > 2:
-            print('{} is generating {} kW'.format(self.name, self.available_kw))
+        if self.verbose_lvl > 3:
+            print('\t{} is generating {} kW'.format(self.name, self.available_kw))
 
         self.innax_metre.measure_imbalance_action(generated_kwh)
         return generated_kwh / self.time_step
