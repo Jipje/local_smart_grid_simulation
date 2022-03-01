@@ -1,6 +1,4 @@
 import unittest
-import os
-from unittest.mock import MagicMock
 
 from environment.InnaxMetre import InnaxMetre
 
@@ -57,7 +55,7 @@ class TestInnaxMetre(unittest.TestCase):
         self.assertEqual(-100, innax_metre.ptu_discharge_price)
         self.assertEqual(0, innax_metre.earnings)
 
-    def test_full_quarter(self):
+    def test_full_quarter_charge(self):
         innax_metre = InnaxMetre()
         innax_metre.update_prices(50, 50)
         innax_metre.measure_imbalance_action(0)
@@ -111,3 +109,83 @@ class TestInnaxMetre(unittest.TestCase):
         self.assertEqual(50, innax_metre.ptu_charge_price)
         self.assertEqual(50, innax_metre.ptu_discharge_price)
         self.assertEqual(-160, innax_metre.earnings)
+
+    def test_full_quarter_discharge(self):
+        innax_metre = InnaxMetre()
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 3)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 200)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 450)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 200)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 100)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 12)
+        innax_metre.measure_imbalance_action(-150)
+        innax_metre.update_prices(50, 100)
+        innax_metre.measure_imbalance_action(-100)
+
+        self.assertEqual(14, innax_metre.ptu_tracker)
+        self.assertEqual(-1600, innax_metre.ptu_total_action)
+        self.assertEqual(50, innax_metre.ptu_charge_price)
+        self.assertEqual(100, innax_metre.ptu_discharge_price)
+        self.assertEqual(0, innax_metre.earnings)
+
+        innax_metre.update_prices(100, 50)
+        innax_metre.measure_imbalance_action(600)
+
+        self.assertEqual(15, innax_metre.ptu_tracker)
+        self.assertEqual(-1000, innax_metre.ptu_total_action)
+        self.assertEqual(100, innax_metre.ptu_charge_price)
+        self.assertEqual(50, innax_metre.ptu_discharge_price)
+        self.assertEqual(0, innax_metre.earnings)
+
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+
+        self.assertEqual(1, innax_metre.ptu_tracker)
+        self.assertEqual(0, innax_metre.ptu_total_action)
+        self.assertEqual(50, innax_metre.ptu_charge_price)
+        self.assertEqual(50, innax_metre.ptu_discharge_price)
+        self.assertEqual(50, innax_metre.earnings)
+
+    def test_neutral_ptu(self):
+        innax_metre = InnaxMetre()
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+
+        innax_metre.ptu_tracker = 14
+
+        innax_metre.update_prices(50, 50)
+        innax_metre.measure_imbalance_action(0)
+
+        self.assertEqual(15, innax_metre.ptu_tracker)
+        self.assertEqual(0, innax_metre.ptu_total_action)
+        self.assertEqual(50, innax_metre.ptu_charge_price)
+        self.assertEqual(50, innax_metre.ptu_discharge_price)
+        self.assertEqual(0, innax_metre.earnings)
+
+        innax_metre.update_prices(75, 75)
+        self.assertEqual(1, innax_metre.ptu_tracker)
+        self.assertEqual(0, innax_metre.ptu_total_action)
+        self.assertEqual(75, innax_metre.ptu_charge_price)
+        self.assertEqual(75, innax_metre.ptu_discharge_price)
+        self.assertEqual(0, innax_metre.earnings)
+        innax_metre.measure_imbalance_action(100)
+        self.assertEqual(100, innax_metre.ptu_total_action)
