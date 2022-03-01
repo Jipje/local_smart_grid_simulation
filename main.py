@@ -88,14 +88,11 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                             environment_data[2] = float(environment_data[2])
                             environment_data[3] = float(environment_data[3])
                             environment_data[4] = float(environment_data[4])
-                            if environment_data[5] == '':
-                                environment_data[5] = None
-                            else:
-                                environment_data[5] = float(environment_data[5])
-                            environment_data[6] = float(environment_data[6])
-                            environment_data[7] = float(environment_data[7])
-                            environment_data[8] = float(environment_data[8])
-                            environment_data[9] = float(environment_data[9])
+                            environment_data[5] = None if environment_data[5] == '' else float(environment_data[5])
+                            environment_data[6] = None if environment_data[6] == '' else float(environment_data[6])
+                            environment_data[7] = None if environment_data[7] == '' else float(environment_data[7])
+                            environment_data[8] = None if environment_data[8] == '' else float(environment_data[8])
+                            environment_data[9] = None if environment_data[9] == '' else float(environment_data[9])
                     except ValueError:
                         if verbose_lvl > 2:
                             print("Skipping timestep {} as data is missing".format(time_step_string))
@@ -162,7 +159,7 @@ def baseline_windnet(verbose_lvl=1):
 def baseline_solarvation(verbose_lvl=1):
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    solarvation = WindFarm('Solarvation', 19000, verbose_lvl=verbose_lvl)
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
