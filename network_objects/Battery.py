@@ -1,3 +1,4 @@
+from environment.InnaxMetre import InnaxMetre
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.cycle_counters.NaiveCycleCounter import NaiveCycleCounter
 from network_objects.NetworkObject import NetworkObject
@@ -33,30 +34,19 @@ class Battery(NetworkObject):
             self.cycle_counter = cycle_counter
 
         self.strategy = CsvStrategy(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
+        self.innax_metre = InnaxMetre()
 
-        self.earnings = 0
-        self.old_earnings = self.earnings
+        self.earnings = self.innax_metre.get_earnings
+        self.old_earnings = 0
         self.average_soc_tracker = 0
         self.average_soc = 0
         self.last_action = 'WAIT'
         self.change_of_direction_tracker = 0
         self.old_changes_of_direction = self.change_of_direction_tracker
 
-        self.ptu_tracker = 0
-        self.ptu_total_action = 0
-        self.ptu_charge_price = 9999
-        self.ptu_discharge_price = -9999
-
         self.number_of_steps = 0
         self.time_step = 1/60
         self.verbose_lvl = verbose_lvl
-
-    def update_earnings(self, action_kwh, cost):
-        # Discharge is a negative action. However that pays us money so we invert the action * cost
-        #     Same holds vice versa for charge. A positive action however it costs us money.
-        cost_of_action = -1 * (action_kwh / 1000) * cost
-        self.earnings = self.earnings + cost_of_action
-        return cost_of_action
 
     def update_state_of_charge(self, action_kwh):
         physical_action = action_kwh
@@ -69,7 +59,6 @@ class Battery(NetworkObject):
     def charge(self, charge_kw):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
-        self.ptu_total_action = self.ptu_total_action + charged_kwh
 
         if potential_charged_kwh != charged_kwh and self.verbose_lvl > 2:
             print('Charge action adjusted due to constraints')
@@ -82,7 +71,6 @@ class Battery(NetworkObject):
     def discharge(self, discharge_kw):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
-        self.ptu_total_action = self.ptu_total_action + discharged_kwh
 
         if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 2:
             print('Discharge action adjusted due to constraints')
@@ -91,21 +79,6 @@ class Battery(NetworkObject):
         if self.verbose_lvl > 2:
             print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
         return discharged_kwh / self.time_step
-
-    def ptu_reset(self):
-        if self.ptu_total_action > 0:
-            price_to_use = self.ptu_charge_price
-        elif self.ptu_total_action < 0:
-            price_to_use = self.ptu_discharge_price
-        else:
-            price_to_use = 0
-
-        ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        if self.verbose_lvl > 2:
-            print('PTU reset. Action this PTU was: {}kWh. Prices were €{} charge, €{} discharge. Earned €{}'.format(self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
-
-        self.ptu_tracker = 0
-        self.ptu_total_action = 0
 
     def wait(self):
         return 0
@@ -144,12 +117,7 @@ class Battery(NetworkObject):
         return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
-        if self.ptu_tracker >= 15:
-            self.ptu_reset()
-        self.ptu_tracker += 1
-
-        self.ptu_charge_price = charge_price
-        self.ptu_discharge_price = discharge_price
+        self.innax_metre.update_prices(charge_price, discharge_price)
 
         if action is None:
             soc_perc = int(self.state_of_charge_kwh / self.max_kwh * 100)
@@ -172,6 +140,10 @@ class Battery(NetworkObject):
             action_kw = self.discharge(self.max_kw)
         else:
             action_kw = self.wait()
+
+        action_kwh = action_kw * self.time_step
+        self.innax_metre.measure_imbalance_action(action_kwh)
+
         return action_kw
 
     def done_in_mean_time(self):
@@ -209,4 +181,4 @@ class Battery(NetworkObject):
         return res_msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: {}\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.change_of_direction_tracker, round(self.cycle_counter.cycle_count, 2), round(self.earnings, 2))
+        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: {}\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.change_of_direction_tracker, round(self.cycle_counter.cycle_count, 2), round(self.earnings(), 2))

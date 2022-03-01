@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 
 from environment.InnaxMetre import InnaxMetre
 
@@ -189,3 +190,57 @@ class TestInnaxMetre(unittest.TestCase):
         self.assertEqual(0, innax_metre.earnings)
         innax_metre.measure_imbalance_action(100)
         self.assertEqual(100, innax_metre.ptu_total_action)
+
+    def test_nice_update_earnings(self):
+        innax_metre = InnaxMetre()
+        # Charge 1 MWh for 50 €/MWh
+        innax_metre.update_earnings(1000, 50)
+        self.assertEqual(innax_metre.earnings, -50)
+        # Discharge 2 MWh for 50 €/MWh
+        innax_metre.update_earnings(-2000, 50)
+        self.assertEqual(innax_metre.earnings, 50)
+        # Charge 1 MWh for -50 €/MWh
+        innax_metre.update_earnings(1000, -50)
+        self.assertEqual(innax_metre.earnings, 100)
+        # Discharge 1 MWh for -50 €/MWh
+        innax_metre.update_earnings(-1000, -50)
+        self.assertEqual(innax_metre.earnings, 50)
+
+    def test_ptu_reset(self):
+        innax_metre = InnaxMetre()
+        innax_metre.update_earnings = MagicMock(name='update_earnings', return_value=1500)
+        innax_metre.ptu_total_action = -3000
+        innax_metre.ptu_charge_price = -20
+        innax_metre.ptu_discharge_price = 500
+        innax_metre.ptu_reset()
+        innax_metre.update_earnings.assert_called_with(-3000, 500)
+
+        innax_metre = InnaxMetre()
+        innax_metre.ptu_total_action = -3000
+        innax_metre.ptu_charge_price = -20
+        innax_metre.ptu_discharge_price = 500
+        innax_metre.ptu_reset()
+        self.assertEqual(1500, innax_metre.earnings)
+
+        innax_metre = InnaxMetre()
+        innax_metre.update_earnings = MagicMock(name='update_earnings', return_value=60)
+        innax_metre.ptu_total_action = 3000
+        innax_metre.ptu_charge_price = -20
+        innax_metre.ptu_discharge_price = 500
+        innax_metre.ptu_reset()
+        innax_metre.update_earnings.assert_called_with(3000, -20)
+
+        innax_metre = InnaxMetre()
+        innax_metre.ptu_total_action = 3000
+        innax_metre.ptu_charge_price = -20
+        innax_metre.ptu_discharge_price = 500
+        innax_metre.ptu_reset()
+        self.assertEqual(60, innax_metre.earnings)
+
+        innax_metre = InnaxMetre()
+        innax_metre.update_earnings = MagicMock(name='update_earnings', return_value=0)
+        innax_metre.ptu_total_action = 0
+        innax_metre.ptu_charge_price = -20
+        innax_metre.ptu_discharge_price = 500
+        innax_metre.ptu_reset()
+        innax_metre.update_earnings.assert_called_with(0, 0)

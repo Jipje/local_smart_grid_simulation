@@ -7,6 +7,9 @@ class InnaxMetre(object):
         self.ptu_charge_price = 9999
         self.ptu_discharge_price = -9999
 
+    def get_earnings(self):
+        return self.earnings
+
     def update_prices(self, charge_price, discharge_price):
         if self.ptu_tracker >= 15:
             self.ptu_reset()
