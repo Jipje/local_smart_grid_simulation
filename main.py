@@ -77,11 +77,25 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                     try:
                         if environment_data[1] == 'nan':
                             raise ValueError
-                        environment_data[2] = float(environment_data[2])
-                        environment_data[1] = float(environment_data[1])
-                        environment_data[3] = float(environment_data[3])
-                        environment_data[5] = float(environment_data[5])
-                        environment_data[7] = float(environment_data[7])
+                        if scenario.__contains__('windnet'):
+                            environment_data[2] = float(environment_data[2])
+                            environment_data[1] = float(environment_data[1])
+                            environment_data[3] = float(environment_data[3])
+                            environment_data[5] = float(environment_data[5])
+                            environment_data[7] = float(environment_data[7])
+                        elif scenario.__contains__('lelystad'):
+                            environment_data[1] = float(environment_data[1])
+                            environment_data[2] = float(environment_data[2])
+                            environment_data[3] = float(environment_data[3])
+                            environment_data[4] = float(environment_data[4])
+                            if environment_data[5] == '':
+                                environment_data[5] = None
+                            else:
+                                environment_data[5] = float(environment_data[5])
+                            environment_data[6] = float(environment_data[6])
+                            environment_data[7] = float(environment_data[7])
+                            environment_data[8] = float(environment_data[8])
+                            environment_data[9] = float(environment_data[9])
                     except ValueError:
                         if verbose_lvl > 2:
                             print("Skipping timestep {} as data is missing".format(time_step_string))
@@ -118,11 +132,11 @@ def baseline_rhino_simulation(verbose_lvl=1):
                     battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
                     battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino, [1, 3])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
-                      simulation_environment=imbalance_environment, verbose_lvl=1)
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
-def rhino_with_limited_charging(verbose_lvl=1):
+def rhino_windnet_limited_charging(verbose_lvl=1):
     # Rhino with limited charging simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -142,6 +156,15 @@ def baseline_windnet(verbose_lvl=1):
     windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
+def baseline_solarvation(verbose_lvl=1):
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    solarvation = WindFarm('Solarvation', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -174,12 +197,12 @@ def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
 if __name__ == '__main__':
     verbose_lvl = 1
 
-    # baseline_rhino_simulation(verbose_lvl)
+    baseline_rhino_simulation(verbose_lvl)
+    baseline_solarvation(verbose_lvl)
     # rhino_with_limited_charging(verbose_lvl)
     # baseline_windnet(verbose_lvl)
     # windnet_with_ppa(verbose_lvl)
-    network_capacity_windnet_simulation(network_capacity=27000)
 
-    full_rhino_site_capacity(network_capacity=27000)
-
-    full_rhino_site_capacity(network_capacity=15000)
+    # network_capacity_windnet_simulation(network_capacity=27000)
+    # full_rhino_site_capacity(network_capacity=27000)
+    # full_rhino_site_capacity(network_capacity=15000)
