@@ -61,7 +61,7 @@ class Battery(NetworkObject):
         charged_kwh = self.check_action(potential_charged_kwh)
 
         if potential_charged_kwh != charged_kwh and self.verbose_lvl > 3:
-            print('Charge action adjusted due to constraints')
+            print('\t\tCharge action adjusted due to constraints')
 
         self.update_state_of_charge(charged_kwh)
 
@@ -72,7 +72,7 @@ class Battery(NetworkObject):
         discharged_kwh = self.check_action(potential_discharged_kwh)
 
         if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 3:
-            print('Discharge action adjusted due to constraints')
+            print('\t\tDischarge action adjusted due to constraints')
 
         self.update_state_of_charge(discharged_kwh)
 
