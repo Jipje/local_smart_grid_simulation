@@ -1,5 +1,6 @@
 class InnaxMetre(object):
-    def __init__(self):
+    def __init__(self, verbose_lvl=3):
+        self.verbose_lvl = verbose_lvl
         self.earnings = 0
 
         self.ptu_tracker = 0

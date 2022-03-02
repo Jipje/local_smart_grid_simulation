@@ -9,7 +9,7 @@ class RenewableEnergyGenerator(NetworkObject):
         self.available_kw = 0
         self.ppa = ppa
 
-        self.innax_metre = InnaxMetre()
+        self.innax_metre = InnaxMetre(verbose_lvl=verbose_lvl)
 
         self.earnings = self.innax_metre.get_earnings
         self.old_earnings = self.earnings()

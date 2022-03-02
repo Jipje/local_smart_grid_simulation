@@ -34,7 +34,7 @@ class Battery(NetworkObject):
             self.cycle_counter = cycle_counter
 
         self.strategy = CsvStrategy(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
-        self.innax_metre = InnaxMetre()
+        self.innax_metre = InnaxMetre(verbose_lvl=verbose_lvl)
 
         self.earnings = self.innax_metre.get_earnings
         self.old_earnings = 0
