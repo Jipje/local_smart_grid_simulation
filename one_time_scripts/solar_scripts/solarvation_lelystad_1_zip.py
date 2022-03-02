@@ -4,10 +4,11 @@ import dateutil.tz
 utc = dateutil.tz.tzutc()
 
 if __name__ == '__main__':
-    solar_df = pd.read_csv('../../data/solar_data/solarvation/solarvation_lelystad_1.csv')
-    solar_df['time_utc'] = pd.to_datetime(solar_df['time_ams'], utc=True, errors='coerce')
-    solar_df.index = solar_df['time_utc']
-    solar_df = solar_df.drop(['time_ams', 'time_utc'], axis=1)
+    choose_a_number_1_or_2 = 2
+    solar_df = pd.read_csv(f'../../data/solar_data/solarvation/solarvation_lelystad_{choose_a_number_1_or_2}.csv')
+    solar_df.index = pd.to_datetime(solar_df['time_ams'], utc=True)
+    solar_df = solar_df.drop(['time_ams'], axis=1)
+
     solar_df = solar_df.resample('1T').interpolate(method='linear', limit=4)
     print(solar_df)
 
@@ -21,5 +22,5 @@ if __name__ == '__main__':
     res_df['irradiance'] = res_df['irradiance'].astype('float64')
     res_df['expected_power'] = res_df['expected_power'].astype('float64')
     res_df['losses'] = res_df['losses'].astype('float64')
-    # res_df.to_csv('../data/environments/lelystad_1_2021.csv')
+    res_df.to_csv(f'../../data/environments/lelystad_{choose_a_number_1_or_2}_2021.csv')
     print(res_df)
