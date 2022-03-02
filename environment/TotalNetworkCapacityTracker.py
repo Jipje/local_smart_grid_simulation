@@ -21,7 +21,7 @@ class TotalNetworkCapacityTracker:
         if abs(action_kw) > self.maximum_kw:
             self.number_of_congestion_time_steps += 1
             if self.network_environment.verbose_lvl > 2:
-                print('Network congestion measured')
+                print('\t\tNetwork congestion measured')
         return self.original_check_action
 
     def done_in_mean_time(self):

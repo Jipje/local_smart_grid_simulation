@@ -1,5 +1,6 @@
 class InnaxMetre(object):
-    def __init__(self):
+    def __init__(self, verbose_lvl=3):
+        self.verbose_lvl = verbose_lvl
         self.earnings = 0
 
         self.ptu_tracker = 0
@@ -30,9 +31,10 @@ class InnaxMetre(object):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        # if self.verbose_lvl > 2:
-        #     print('PTU reset. Action this PTU was: {}kWh. Prices were €{} charge, €{} discharge. Earned €{}'.format(
-        #         self.ptu_total_action, self.ptu_charge_price, self.ptu_discharge_price, ptu_profits))
+        if self.verbose_lvl > 3:
+            print(f'\t\tPTU reset. Action this PTU was: {self.ptu_total_action}kWh. '
+                  f'Prices were €{self.ptu_charge_price} charge, €{self.ptu_discharge_price} discharge. '
+                  f'Earned €{ptu_profits}')
 
         self.ptu_tracker = 0
         self.ptu_total_action = 0
