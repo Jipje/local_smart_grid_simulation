@@ -202,14 +202,14 @@ if __name__ == '__main__':
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
     battery = Battery('Wombat', 30000, 14000,
                       battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
                       battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
     LimitedChargeOrDischargeCapacity(battery, 4, -1)
     CanSolveCongestion(battery, network_capacity, 4)
     imbalance_environment.add_object(battery, [1, 3])
-    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
-    imbalance_environment.add_object(solarvation, [1, 3, 4])
 
     run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl,
                            simulation_environment=imbalance_environment)

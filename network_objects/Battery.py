@@ -61,7 +61,7 @@ class Battery(NetworkObject):
         charged_kwh = self.check_action(potential_charged_kwh)
 
         if potential_charged_kwh != charged_kwh and self.verbose_lvl > 3:
-            print('\t\tCharge action adjusted due to constraints')
+            print(f'\t\tCharge action adjusted from {charge_kw}kW to {charged_kwh / self.time_step}kW')
 
         self.update_state_of_charge(charged_kwh)
 
@@ -72,14 +72,23 @@ class Battery(NetworkObject):
         discharged_kwh = self.check_action(potential_discharged_kwh)
 
         if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 3:
-            print('\t\tDischarge action adjusted due to constraints')
+            print(f'\t\tDischarge action adjusted from {-1 * discharge_kw}kW to {discharged_kwh / self.time_step}kW')
 
         self.update_state_of_charge(discharged_kwh)
 
         return discharged_kwh / self.time_step
 
     def wait(self):
-        return 0
+        proposed_action_kwh = 0
+        action_kwh = self.check_action(proposed_action_kwh)
+
+        self.update_state_of_charge(action_kwh)
+
+        action_kw = action_kwh / self.time_step
+        if proposed_action_kwh != action_kwh and self.verbose_lvl > 3:
+            print(f'\t\tWait action adjusted to {action_kw}kW')
+
+        return action_kw
 
     def check_action(self, action_kwh):
         largest_kwh_action_battery = self.max_kw * self.time_step
@@ -146,7 +155,7 @@ class Battery(NetworkObject):
         self.innax_metre.measure_imbalance_action(action_kwh)
 
         if self.verbose_lvl > 3:
-            print('\t{} battery is doing {}. Current SoC: {}kWh'.format(self.name, action_kw, self.state_of_charge_kwh))
+            print('\t{} battery is doing {}kW. Current SoC: {}kWh'.format(self.name, action_kw, self.state_of_charge_kwh))
 
         return action_kw
 

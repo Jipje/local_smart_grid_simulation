@@ -28,7 +28,7 @@ class LimitedChargeOrDischargeCapacity:
             adjusted_action = self.maximum_discharge_kwh
 
         if adjusted_action != action_kwh and self.network_object.verbose_lvl > 2:
-            print('\t\tAction was limited due to not enough power generation')
+            print(f'\t\tAction was limited from {action_kwh}kWh to {adjusted_action}kWh based on generated power')
 
         return self.original_check(adjusted_action)
 
