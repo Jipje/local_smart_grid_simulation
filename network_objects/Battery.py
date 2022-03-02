@@ -38,6 +38,7 @@ class Battery(NetworkObject):
 
         self.earnings = self.innax_metre.get_earnings
         self.old_earnings = 0
+
         self.average_soc_tracker = 0
         self.average_soc = 0
         self.last_action = 'WAIT'
@@ -157,12 +158,12 @@ class Battery(NetworkObject):
         changes_of_direction_in_mean_time = round(self.change_of_direction_tracker - self.old_changes_of_direction, 2)
         self.old_changes_of_direction = self.change_of_direction_tracker
         self.old_earnings = self.earnings()
-        msg = "{} battery - " \
-              "Current SoC: {}kWh - " \
-              "Average SoC: {}kWh - " \
-              "{} - " \
-              "Changes of direction in mean time: {} - " \
-              "Earnings since last time: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.cycle_counter.done_in_mean_time(), changes_of_direction_in_mean_time, earnings_in_mean_time)
+        msg = f"{self.name} battery - " \
+              f"Current SoC: {self.state_of_charge_kwh}kWh - " \
+              f"Average SoC: {self.average_soc}kWh - " \
+              f"{self.cycle_counter.done_in_mean_time()} - " \
+              f"Changes of direction in mean time: {changes_of_direction_in_mean_time} - " \
+              f"Earnings since last time: €{earnings_in_mean_time}"
         return msg
 
     def end_of_environment_message(self, num_of_days=None):
@@ -172,19 +173,21 @@ class Battery(NetworkObject):
         average_num_changes_of_direction = round(self.change_of_direction_tracker / num_of_days, 2)
         average_num_of_cycles = round(self.cycle_counter.cycle_count / num_of_days, 2)
         average_earnings_str = '{:,.2f}'.format(self.earnings() / num_of_days)
-        res_msg = "\n{} battery:\n\t" \
-            "Total changes of direction: {}\n\t" \
-            "Total number of cycles: {}\n\t" \
-            "Total earnings: €{}\n\t" \
+        res_msg = f"\n{self.name} battery:\n\t" \
+            f"Total changes of direction: {self.change_of_direction_tracker}\n\t" \
+            f"Total number of cycles: {self.cycle_counter.cycle_count}\n\t" \
+            f"Total earnings: €{earnings_str}\n\t" \
             "--------------------\n\t" \
-            "Average SoC: {}kWh\n\t" \
-            "Average changes of direction: {}\n\t" \
-            "Average number of cycles: {}\n\t" \
-            "Average earnings: €{}".format(self.name,
-                                          self.change_of_direction_tracker, self.cycle_counter.cycle_count,
-                                          earnings_str, self.average_soc, average_num_changes_of_direction,
-                                          average_num_of_cycles, average_earnings_str)
+            f"Average SoC: {self.average_soc}kWh\n\t" \
+            f"Average changes of direction: {average_num_changes_of_direction}\n\t" \
+            f"Average number of cycles: {average_num_of_cycles}\n\t" \
+            f"Average earnings: €{average_earnings_str}"
         return res_msg
 
     def __str__(self):
-        return "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: {}\nTotal number of cycles: {}\nTotal Earnings: €{}".format(self.name, self.state_of_charge_kwh, self.average_soc, self.change_of_direction_tracker, round(self.cycle_counter.cycle_count, 2), round(self.earnings(), 2))
+        return f"{self.name} battery:\n" \
+               f"Current SoC: {self.state_of_charge_kwh}kWh\n" \
+               f"Average SoC: {self.average_soc}kWh\n" \
+               f"Total number of changes of direction: {self.change_of_direction_tracker}\n" \
+               f"Total number of cycles: {round(self.cycle_counter.cycle_count, 2)}\n" \
+               f"Total Earnings: €{round(self.earnings(), 2)}"
