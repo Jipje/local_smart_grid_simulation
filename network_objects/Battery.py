@@ -34,7 +34,7 @@ class Battery(NetworkObject):
             self.cycle_counter = cycle_counter
 
         self.strategy = CsvStrategy(name=battery_strategy_csv, strategy_csv=battery_strategy_csv)
-        self.innax_metre = InnaxMetre()
+        self.innax_metre = InnaxMetre(verbose_lvl=verbose_lvl)
 
         self.earnings = self.innax_metre.get_earnings
         self.old_earnings = 0
@@ -60,24 +60,22 @@ class Battery(NetworkObject):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
 
-        if potential_charged_kwh != charged_kwh and self.verbose_lvl > 2:
-            print('Charge action adjusted due to constraints')
+        if potential_charged_kwh != charged_kwh and self.verbose_lvl > 3:
+            print('\t\tCharge action adjusted due to constraints')
 
         self.update_state_of_charge(charged_kwh)
-        if self.verbose_lvl > 2:
-            print('Charging {} - Charged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+
         return charged_kwh / self.time_step
 
     def discharge(self, discharge_kw):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
 
-        if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 2:
-            print('Discharge action adjusted due to constraints')
+        if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 3:
+            print('\t\tDischarge action adjusted due to constraints')
 
         self.update_state_of_charge(discharged_kwh)
-        if self.verbose_lvl > 2:
-            print('Discharging {} - Discharged to {}kWh'.format(self.name, self.state_of_charge_kwh))
+
         return discharged_kwh / self.time_step
 
     def wait(self):
@@ -117,6 +115,9 @@ class Battery(NetworkObject):
         return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
+        if self.verbose_lvl > 3:
+            print('\t{} battery deciding what to do. Current SoC: {}kWh'.format(self.name, self.state_of_charge_kwh))
+
         self.innax_metre.update_prices(charge_price, discharge_price)
 
         if action is None:
@@ -143,6 +144,9 @@ class Battery(NetworkObject):
 
         action_kwh = action_kw * self.time_step
         self.innax_metre.measure_imbalance_action(action_kwh)
+
+        if self.verbose_lvl > 3:
+            print('\t{} battery is doing {}. Current SoC: {}kWh'.format(self.name, action_kw, self.state_of_charge_kwh))
 
         return action_kw
 

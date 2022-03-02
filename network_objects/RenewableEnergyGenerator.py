@@ -9,7 +9,7 @@ class RenewableEnergyGenerator(NetworkObject):
         self.available_kw = 0
         self.ppa = ppa
 
-        self.innax_metre = InnaxMetre()
+        self.innax_metre = InnaxMetre(verbose_lvl=verbose_lvl)
 
         self.earnings = self.innax_metre.get_earnings
         self.old_earnings = self.earnings()
@@ -29,13 +29,15 @@ class RenewableEnergyGenerator(NetworkObject):
         return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
+        if self.verbose_lvl > 3:
+            print('\t{} deciding what to do.'.format(self.name))
         self.innax_metre.update_prices(charge_price, discharge_price)
         return self.generate_electricity()
 
     def generate_electricity(self):
         generated_kwh = self.available_kw * self.time_step
-        if self.verbose_lvl > 2:
-            print('{} is generating {} kW'.format(self.name, self.available_kw))
+        if self.verbose_lvl > 3:
+            print('\t{} is generating {} kW'.format(self.name, self.available_kw))
 
         self.innax_metre.measure_imbalance_action(generated_kwh)
         return generated_kwh / self.time_step
