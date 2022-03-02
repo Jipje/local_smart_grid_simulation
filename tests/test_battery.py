@@ -26,21 +26,21 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.name, 'test_nice_initialization1')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 0)
-        self.assertEqual(rhino_battery.earnings, 0)
+        self.assertEqual(rhino_battery.earnings(), 0)
         # Less efficient battery
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_nice_initialization2', 7500, 12000, battery_efficiency=0.8)
         self.assertEqual(rhino_battery.name, 'test_nice_initialization2')
         self.assertEqual(rhino_battery.efficiency, 0.8)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
+        self.assertEqual(rhino_battery.earnings(), 0)
         # Different starting SoC
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_nice_initialization3', 7500, 12000, starting_soc_kwh=3000)
         self.assertEqual(rhino_battery.name, 'test_nice_initialization3')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3000)
-        self.assertEqual(rhino_battery.earnings, 0)
+        self.assertEqual(rhino_battery.earnings(), 0)
 
     def test_faulty_initialization(self):
         # Faulty max_kwh
@@ -56,24 +56,6 @@ class TestBattery(unittest.TestCase):
         # Faulty starting_soc_kwh
         self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, starting_soc_kwh=-100)
         self.assertRaises(ValueError, Battery, 'TEST', 7500, 12000, starting_soc_kwh=7501)
-
-    def test_nice_update_earnings(self):
-        rhino_battery = Battery('test_nice_update_earnings', 7500, 12000)
-        # Charge 1 MWh for 50 €/MWh
-        rhino_battery.update_earnings(1000, 50)
-        self.assertEqual(rhino_battery.earnings, -50)
-        base_msg = 'test_nice_update_earnings battery - Current SoC: 3750kWh - Average SoC: 0kWh - Cycles in mean time: 0 - Changes of direction in mean time: 0 - Earnings since last time: €'
-        self.assertEqual(base_msg + '-50.0', rhino_battery.done_in_mean_time())
-        # Discharge 2 MWh for 50 €/MWh
-        rhino_battery.update_earnings(-2000, 50)
-        self.assertEqual(rhino_battery.earnings, 50)
-        # Charge 1 MWh for -50 €/MWh
-        rhino_battery.update_earnings(1000, -50)
-        self.assertEqual(rhino_battery.earnings, 100)
-        # Discharge 1 MWh for -50 €/MWh
-        rhino_battery.update_earnings(-1000, -50)
-        self.assertEqual(rhino_battery.earnings, 50)
-        self.assertEqual(base_msg + '100.0', rhino_battery.done_in_mean_time())
 
     def test_nice_charge_and_discharge(self):
         rhino_battery = Battery('test_nice_charge_and_discharge', 7500, 12000)
@@ -154,56 +136,27 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(rhino_battery.name, 'test_wait')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
+        self.assertEqual(rhino_battery.earnings(), 0)
         rhino_battery.wait()
         self.assertEqual(rhino_battery.name, 'test_wait')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
-        self.assertEqual(rhino_battery.earnings, 0)
+        self.assertEqual(rhino_battery.earnings(), 0)
 
     def test_to_string(self):
         rhino_battery = Battery('TEST', 7500, 12000)
-        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: 0\nTotal number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
+        res = "{} battery:\nCurrent SoC: {}kWh\nAverage SoC: {}kWh\nTotal number of changes of direction: 0\nTotal " \
+              "number of cycles: 0\nTotal Earnings: €{}".format('TEST', 3750, 0, 0)
         self.assertEqual(res, rhino_battery.__str__())
 
-    def test_ptu_reset(self):
+    def test_done_in_mean_time(self):
         rhino_battery = Battery('TEST', 7500, 12000)
-        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=1500)
-        rhino_battery.ptu_total_action = -3000
-        rhino_battery.ptu_charge_price = -20
-        rhino_battery.ptu_discharge_price = 500
-        rhino_battery.ptu_reset()
-        rhino_battery.update_earnings.assert_called_with(-3000, 500)
-
-        rhino_battery = Battery('TEST', 7500, 12000)
-        rhino_battery.ptu_total_action = -3000
-        rhino_battery.ptu_charge_price = -20
-        rhino_battery.ptu_discharge_price = 500
-        rhino_battery.ptu_reset()
-        self.assertEqual(1500, rhino_battery.earnings)
-
-        rhino_battery = Battery('TEST', 7500, 12000)
-        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=60)
-        rhino_battery.ptu_total_action = 3000
-        rhino_battery.ptu_charge_price = -20
-        rhino_battery.ptu_discharge_price = 500
-        rhino_battery.ptu_reset()
-        rhino_battery.update_earnings.assert_called_with(3000, -20)
-
-        rhino_battery = Battery('TEST', 7500, 12000)
-        rhino_battery.ptu_total_action = 3000
-        rhino_battery.ptu_charge_price = -20
-        rhino_battery.ptu_discharge_price = 500
-        rhino_battery.ptu_reset()
-        self.assertEqual(60, rhino_battery.earnings)
-
-        rhino_battery = Battery('TEST', 7500, 12000)
-        rhino_battery.update_earnings = MagicMock(name='update_earnings', return_value=0)
-        rhino_battery.ptu_total_action = 0
-        rhino_battery.ptu_charge_price = -20
-        rhino_battery.ptu_discharge_price = 500
-        rhino_battery.ptu_reset()
-        rhino_battery.update_earnings.assert_called_with(0, 0)
+        rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
+        rhino_battery.take_imbalance_action(-100, -100, 'DISCHARGE')
+        rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
+        self.assertEqual('TEST battery - Current SoC: 3910kWh - Average SoC: 0kWh - Cycles in mean time: 0.04 - '
+                         'Changes of direction in mean time: 3 - Earnings since last time: €0',
+                         rhino_battery.done_in_mean_time())
 
     def test_all_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
@@ -223,47 +176,48 @@ class TestBattery(unittest.TestCase):
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
-        self.assertEqual(3000, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(3000, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(60, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(60, rhino_battery.innax_metre.earnings)
 
     def test_first_pos_then_neg_end_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_first_pos_then_net_end_pos_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
-        rhino_battery.ptu_tracker = 10
+        rhino_battery.innax_metre.ptu_tracker = 10
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(4, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(4, rhino_battery.earnings())
 
     def test_first_pos_end_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_first_pos_end_neg_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
-        rhino_battery.ptu_tracker = 10
+        rhino_battery.innax_metre.ptu_tracker = 10
+
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
-        self.assertEqual(-600, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(-600, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(300, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(300, rhino_battery.earnings())
 
     def test_all_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
@@ -283,47 +237,49 @@ class TestBattery(unittest.TestCase):
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
-        self.assertEqual(-3000, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(-3000, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(1500, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(1500, rhino_battery.earnings())
 
     def test_first_neg_then_pos_end_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_first_neg_then_pos_end_neg_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
-        rhino_battery.ptu_tracker = 10
+        rhino_battery.innax_metre.ptu_tracker = 10
+
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
-        self.assertEqual(-200, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(-200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(100, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(100, rhino_battery.earnings())
 
     def test_first_neg_end_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino_battery = Battery('test_first_neg_end_pos_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
-        rhino_battery.ptu_tracker = 10
+        rhino_battery.innax_metre.ptu_tracker = 10
+
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
-        self.assertEqual(600, rhino_battery.ptu_total_action)
-        self.assertEqual(15, rhino_battery.ptu_tracker)
-        self.assertEqual(0, rhino_battery.earnings)
+        self.assertEqual(600, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(15, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(0, rhino_battery.earnings())
         rhino_battery.take_imbalance_action(50, 50, 'CHARGE')
-        self.assertEqual(200, rhino_battery.ptu_total_action)
-        self.assertEqual(1, rhino_battery.ptu_tracker)
-        self.assertEqual(12, rhino_battery.earnings)
+        self.assertEqual(200, rhino_battery.innax_metre.ptu_total_action)
+        self.assertEqual(1, rhino_battery.innax_metre.ptu_tracker)
+        self.assertEqual(12, rhino_battery.earnings())
 
     def test_take_step(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)

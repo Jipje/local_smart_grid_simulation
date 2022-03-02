@@ -7,7 +7,7 @@ from helper_objects.strategies.RandomStrategyGenerator import generate_random_di
 from network_objects.Battery import Battery
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
-from network_objects.WindFarm import WindFarm
+from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
 import os
 import random
 import datetime as dt
@@ -18,7 +18,7 @@ base_scenario = 'data{0}tennet_and_windnet{0}tennet_balans_delta_and_trivial_win
 def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
     start_day = random.randint(0, 333)
     starting_timestep = start_day * 24 * 60
-    number_of_steps = 30 * 24 * 60
+    number_of_steps = 1 * 24 * 60
     print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
@@ -80,11 +80,24 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                     try:
                         if environment_data[1] == 'nan':
                             raise ValueError
-                        environment_data[2] = float(environment_data[2])
-                        environment_data[1] = float(environment_data[1])
-                        environment_data[3] = float(environment_data[3])
-                        environment_data[5] = float(environment_data[5])
-                        environment_data[7] = float(environment_data[7])
+                        if scenario.__contains__('windnet'):
+                            environment_data[2] = float(environment_data[2])
+                            environment_data[1] = float(environment_data[1])
+                            environment_data[3] = float(environment_data[3])
+                            environment_data[5] = float(environment_data[5])
+                            environment_data[7] = float(environment_data[7])
+                        elif scenario.__contains__('lelystad'):
+                            environment_data[1] = float(environment_data[1])
+                            environment_data[2] = float(environment_data[2])
+                            environment_data[3] = float(environment_data[3])
+                            environment_data[4] = float(environment_data[4])
+                            environment_data[5] = None if environment_data[5] == '' else float(environment_data[5])
+                            environment_data[6] = None if environment_data[6] == '' else float(environment_data[6])
+                            environment_data[7] = None if environment_data[7] == '' else float(environment_data[7])
+                            environment_data[8] = None if environment_data[8] == '' else float(environment_data[8])
+                            environment_data[9] = None if environment_data[9] == '' else float(environment_data[9])
+                            if verbose_lvl > 3:
+                                print(f'Running environment step {time_step_string}')
                     except ValueError:
                         if verbose_lvl > 2:
                             print("Skipping timestep {} as data is missing".format(time_step_string))
@@ -108,7 +121,7 @@ def network_capacity_windnet_simulation(network_capacity=27000, verbose_lvl=1):
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
-    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    windnet = RenewableEnergyGenerator('Neushoorntocht wind farm', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv', simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
@@ -121,11 +134,11 @@ def baseline_rhino_simulation(verbose_lvl=1):
     rhino = Battery('Rhino', 7500, 12000, strategy=csv_strategy,
                     battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(rhino, [1, 3])
-    run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
-                      simulation_environment=imbalance_environment, verbose_lvl=1)
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
-def rhino_with_limited_charging(verbose_lvl=1):
+def rhino_windnet_limited_charging(verbose_lvl=1):
     # Rhino with limited charging simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -142,9 +155,18 @@ def baseline_windnet(verbose_lvl=1):
     # Baseline Windnet simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl)
+    windnet = RenewableEnergyGenerator('Windnet wind farm', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
+                      simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
+def baseline_solarvation(verbose_lvl=1):
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -152,7 +174,7 @@ def windnet_with_ppa(verbose_lvl=1):
     # Windnet with a PPA simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    windnet = WindFarm('Windnet', 23000, verbose_lvl=verbose_lvl, ppa=40)
+    windnet = RenewableEnergyGenerator('Windnet wind farm', 23000, verbose_lvl=verbose_lvl, ppa=40)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=1)
@@ -168,7 +190,7 @@ def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
                     battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
     imbalance_environment.add_object(rhino, [1, 3])
-    windnet = WindFarm('Neushoorntocht', 23000, verbose_lvl=verbose_lvl)
+    windnet = RenewableEnergyGenerator('Neushoorntocht wind farm', 23000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(windnet, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
@@ -194,16 +216,21 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
 
 
 if __name__ == '__main__':
-    verbose_lvl = 1
+    verbose_lvl = 4
 
-    # baseline_rhino_simulation(verbose_lvl)
-    # rhino_with_limited_charging(verbose_lvl)
-    # baseline_windnet(verbose_lvl)
-    # windnet_with_ppa(verbose_lvl)
-    # network_capacity_windnet_simulation(network_capacity=27000)
-    #
-    # full_rhino_site_capacity(network_capacity=27000)
-    #
-    # full_rhino_site_capacity(network_capacity=15000)
+    network_capacity = 14000
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    battery = Battery('Wombat', 30000, 14000,
+                      battery_strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv',
+                      battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(battery, [1, 3])
+
+    run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl,
+                           simulation_environment=imbalance_environment)
 
     random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
