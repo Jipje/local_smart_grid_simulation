@@ -29,6 +29,8 @@ class RenewableEnergyGenerator(NetworkObject):
         return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
+        if self.verbose_lvl > 3:
+            print('\t{} deciding what to do.'.format(self.name))
         self.innax_metre.update_prices(charge_price, discharge_price)
         return self.generate_electricity()
 

@@ -115,6 +115,9 @@ class Battery(NetworkObject):
         return self.take_imbalance_action(charge_price, discharge_price)
 
     def take_imbalance_action(self, charge_price, discharge_price, action=None):
+        if self.verbose_lvl > 3:
+            print('\t{} battery deciding what to do. Current SoC: {}kWh'.format(self.name, self.state_of_charge_kwh))
+
         self.innax_metre.update_prices(charge_price, discharge_price)
 
         if action is None:

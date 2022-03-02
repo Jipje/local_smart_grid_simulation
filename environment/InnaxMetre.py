@@ -31,7 +31,7 @@ class InnaxMetre(object):
             price_to_use = 0
 
         ptu_profits = self.update_earnings(self.ptu_total_action, price_to_use)
-        if self.verbose_lvl > 4:
+        if self.verbose_lvl > 3:
             print(f'\t\tPTU reset. Action this PTU was: {self.ptu_total_action}kWh. '
                   f'Prices were €{self.ptu_charge_price} charge, €{self.ptu_discharge_price} discharge. '
                   f'Earned €{ptu_profits}')
