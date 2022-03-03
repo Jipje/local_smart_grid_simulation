@@ -180,3 +180,8 @@ class Battery(NetworkObject):
                f"Total number of changes of direction: {self.change_of_direction_tracker}\n" \
                f"Total number of cycles: {round(self.cycle_counter.cycle_count, 2)}\n" \
                f"Total Earnings: €{round(self.earnings(), 2)}"
+
+    def take_imbalance_action(self, charge_price, discharge_price, action):
+        self.take_step([charge_price, discharge_price], [0, 1])
+        action_kw = self.take_action(action)
+        return action_kw

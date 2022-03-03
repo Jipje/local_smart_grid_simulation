@@ -114,7 +114,7 @@ class TestBattery(unittest.TestCase):
 
     def test_take_action(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_take_action', 7500, 12000, strategy=csv_strategy)
+        rhino_battery = Battery('test_take_action', 7500, 12000)
         rhino_battery.charge = MagicMock(name='charge', return_value=0)
         rhino_battery.discharge = MagicMock(name='charge', return_value=1)
         rhino_battery.wait = MagicMock(name='charge', return_value=2)
@@ -127,12 +127,12 @@ class TestBattery(unittest.TestCase):
         rhino_battery.discharge.assert_called_with(12000)
         rhino_battery.wait.assert_called()
 
-        rhino_battery.take_imbalance_action(500, 500)
+        rhino_battery.take_imbalance_action(500, 500, action='CHARGE')
         rhino_battery.charge.assert_called_with(12000)
 
     def test_wait(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_wait', 7500, 12000, strategy=csv_strategy)
+        rhino_battery = Battery('test_wait', 7500, 12000)
         self.assertEqual(rhino_battery.name, 'test_wait')
         self.assertEqual(rhino_battery.efficiency, 0.9)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
@@ -154,13 +154,13 @@ class TestBattery(unittest.TestCase):
         rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
         rhino_battery.take_imbalance_action(-100, -100, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-100, -100, 'CHARGE')
-        self.assertEqual('TEST battery - Current SoC: 3910kWh - Average SoC: 0kWh - Cycles in mean time: 0.04 - '
+        self.assertEqual('TEST battery - Current SoC: 3910kWh - Average SoC: 3803kWh - Cycles in mean time: 0.04 - '
                          'Changes of direction in mean time: 3 - Earnings since last time: €0',
                          rhino_battery.done_in_mean_time())
 
     def test_all_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_all_pos_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_all_pos_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
@@ -186,7 +186,7 @@ class TestBattery(unittest.TestCase):
 
     def test_first_pos_then_neg_end_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_first_pos_then_net_end_pos_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_first_pos_then_net_end_pos_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.innax_metre.ptu_tracker = 10
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
@@ -203,7 +203,7 @@ class TestBattery(unittest.TestCase):
 
     def test_first_pos_end_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_first_pos_end_neg_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_first_pos_end_neg_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.innax_metre.ptu_tracker = 10
 
         rhino_battery.take_imbalance_action(-20, 500, 'CHARGE')
@@ -221,7 +221,7 @@ class TestBattery(unittest.TestCase):
 
     def test_all_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_all_neg_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_all_neg_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
@@ -247,7 +247,7 @@ class TestBattery(unittest.TestCase):
 
     def test_first_neg_then_pos_end_neg_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_first_neg_then_pos_end_neg_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_first_neg_then_pos_end_neg_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.innax_metre.ptu_tracker = 10
 
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
@@ -265,7 +265,7 @@ class TestBattery(unittest.TestCase):
 
     def test_first_neg_end_pos_ptu(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_first_neg_end_pos_ptu', 7500, 12000, strategy=csv_strategy, battery_efficiency=1)
+        rhino_battery = Battery('test_first_neg_end_pos_ptu', 7500, 12000, battery_efficiency=1)
         rhino_battery.innax_metre.ptu_tracker = 10
 
         rhino_battery.take_imbalance_action(-20, 500, 'DISCHARGE')
@@ -282,15 +282,14 @@ class TestBattery(unittest.TestCase):
         self.assertEqual(12, rhino_battery.earnings())
 
     def test_take_step(self):
-        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino_battery = Battery('test_first_neg_end_pos_ptu', 7500, 12000, strategy=csv_strategy)
-
-        rhino_battery.take_imbalance_action = MagicMock(name='take_imbalance_action', return_value=0)
+        rhino_battery = Battery('test_take_step', 7500, 12000)
         rhino_battery.take_step([0, 1, 2, 3, 4, 5, 6, 7], [2, 5])
-        rhino_battery.take_imbalance_action.assert_called_with(2, 5)
 
-        rhino_battery.take_step([0, 1, 2, 3, 4, 5, 6, 7], [2, 1])
-        rhino_battery.take_imbalance_action.assert_called_with(2, 1)
+        self.assertEqual(1, rhino_battery.number_of_steps)
+        self.assertEqual(3750, rhino_battery.average_soc_tracker)
+        self.assertEqual(3750, rhino_battery.average_soc)
+        self.assertEqual(2, rhino_battery.innax_metre.ptu_charge_price)
+        self.assertEqual(5, rhino_battery.innax_metre.ptu_discharge_price)
 
 
 if __name__ == '__main__':
