@@ -107,7 +107,10 @@ class Battery(NetworkObject):
     def take_step(self, environment_step, action_parameters) -> int:
         charge_price = environment_step[action_parameters[0]]
         discharge_price = environment_step[action_parameters[1]]
+        self.update_step(charge_price, discharge_price)
+        return 0
 
+    def update_step(self, charge_price, discharge_price):
         self.number_of_steps += 1
         self.average_soc_tracker = self.average_soc_tracker + self.state_of_charge_kwh
         self.average_soc = int(self.average_soc_tracker / self.number_of_steps)

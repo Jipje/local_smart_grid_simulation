@@ -5,7 +5,7 @@ from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
-from network_objects.control_strategies.BatteryControlStrategy import BatteryControlStrategy
+from network_objects.control_strategies.StrategyControlTower import StrategyControlTower
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
@@ -133,7 +133,7 @@ def baseline_rhino_simulation(verbose_lvl=1):
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = BatteryControlStrategy(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=verbose_lvl)
+    simple_strategy_controller = StrategyControlTower(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(simple_strategy_controller, [1, 3])
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
@@ -145,8 +145,8 @@ def rhino_windnet_limited_charging(verbose_lvl=1):
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = BatteryControlStrategy(name="Rhino Battery Controller", network_object=rhino,
-                                                        strategy=csv_strategy, verbose_lvl=verbose_lvl)
+    simple_strategy_controller = StrategyControlTower(name="Rhino Battery Controller", network_object=rhino,
+                                                      strategy=csv_strategy, verbose_lvl=verbose_lvl)
 
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
 
@@ -191,8 +191,8 @@ def full_rhino_site_capacity(network_capacity=27000, verbose_lvl=1):
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = BatteryControlStrategy(name="Rhino Battery Controller", network_object=rhino,
-                                                        strategy=csv_strategy, verbose_lvl=verbose_lvl)
+    simple_strategy_controller = StrategyControlTower(name="Rhino Battery Controller", network_object=rhino,
+                                                      strategy=csv_strategy, verbose_lvl=verbose_lvl)
 
     LimitedChargeOrDischargeCapacity(rhino, 5, -1)
 
@@ -211,13 +211,13 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
     # Initialise random strategy
     random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
     random_step_battery = Battery('Random Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = BatteryControlStrategy(name="Random strategy Battery Controller", network_object=random_step_battery,
-                                                        strategy=random_point_based_strategy, verbose_lvl=verbose_lvl)
+    simple_strategy_controller = StrategyControlTower(name="Random strategy Battery Controller", network_object=random_step_battery,
+                                                      strategy=random_point_based_strategy, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(simple_strategy_controller, [1, 3])
 
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = BatteryControlStrategy(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=verbose_lvl)
+    simple_strategy_controller = StrategyControlTower(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(simple_strategy_controller, [1, 3])
 
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
