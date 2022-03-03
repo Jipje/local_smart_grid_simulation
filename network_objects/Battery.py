@@ -5,7 +5,8 @@ from network_objects.NetworkObject import NetworkObject
 
 
 class Battery(NetworkObject):
-    def __init__(self, name, max_kwh, max_kw, strategy=None, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None, verbose_lvl=3):
+    def __init__(self, name, max_kwh, max_kw, cycle_counter=None, battery_efficiency=0.9, starting_soc_kwh=None,
+                 upper_safety_margin=0.95, lower_safety_margin=0.05, verbose_lvl=3):
         super().__init__(name)
 
         if max_kwh <= 0:
@@ -24,16 +25,22 @@ class Battery(NetworkObject):
                                  'negative.'.format(name))
             self.state_of_charge_kwh = starting_soc_kwh
 
+        if upper_safety_margin > 1 or upper_safety_margin < 0:
+            raise ValueError('upper_safety_margin must be between 0 and 1')
+        if lower_safety_margin > 1 or lower_safety_margin < 0 or lower_safety_margin > upper_safety_margin:
+            raise ValueError('lower_safety_margin must be between 0 and 1 and smaller than the upper safety margin')
+
         self.max_kwh = max_kwh
         self.max_kw = max_kw
         self.efficiency = battery_efficiency
+        self.upper_safety_margin = upper_safety_margin
+        self.lower_safety_margin = lower_safety_margin
 
         if cycle_counter is None:
             self.cycle_counter = NaiveCycleCounter(self.max_kwh)
         else:
             self.cycle_counter = cycle_counter
 
-        self.strategy = strategy
         self.innax_metre = InnaxMetre(verbose_lvl=verbose_lvl)
 
         self.earnings = self.innax_metre.get_earnings
@@ -60,10 +67,6 @@ class Battery(NetworkObject):
     def charge(self, charge_kw):
         potential_charged_kwh = int(charge_kw * self.time_step)
         charged_kwh = self.check_action(potential_charged_kwh)
-
-        if potential_charged_kwh != charged_kwh and self.verbose_lvl > 3:
-            print('\t\tCharge action adjusted due to constraints')
-
         self.update_state_of_charge(charged_kwh)
 
         return charged_kwh / self.time_step
@@ -71,10 +74,6 @@ class Battery(NetworkObject):
     def discharge(self, discharge_kw):
         potential_discharged_kwh = -1 * int(discharge_kw * self.time_step)
         discharged_kwh = self.check_action(potential_discharged_kwh)
-
-        if potential_discharged_kwh != discharged_kwh and self.verbose_lvl > 3:
-            print('\t\tDischarge action adjusted due to constraints')
-
         self.update_state_of_charge(discharged_kwh)
 
         return discharged_kwh / self.time_step
@@ -87,23 +86,23 @@ class Battery(NetworkObject):
         # The action can't be larger than the max_kw
         if abs(action_kwh) > largest_kwh_action_battery:
             if action_kwh > 0:
-                adjusted_action = largest_kwh_action_battery
+                adjusted_action_kwh = largest_kwh_action_battery
             elif action_kwh < 0:
-                adjusted_action = -1 * largest_kwh_action_battery
+                adjusted_action_kwh = -1 * largest_kwh_action_battery
         else:
-            adjusted_action = action_kwh
+            adjusted_action_kwh = action_kwh
 
         current_soc = self.state_of_charge_kwh
-        future_soc = current_soc + adjusted_action
-        adjusted_max = int(0.95 * self.max_kwh)
-        adjusted_min = int(0.05 * self.max_kwh)
+        future_soc = current_soc + adjusted_action_kwh
+        adjusted_max = int(self.upper_safety_margin * self.max_kwh)
+        adjusted_min = int(self.lower_safety_margin * self.max_kwh)
         # The SoC can't be higher than the max_kwh. Or lower than 0.
         if future_soc > adjusted_max:
-            adjusted_action = int((adjusted_max - current_soc) * 1 / self.efficiency)
+            adjusted_action_kwh = int((adjusted_max - current_soc) * 1 / self.efficiency)
         if future_soc < adjusted_min:
-            adjusted_action = adjusted_min - current_soc
+            adjusted_action_kwh = adjusted_min - current_soc
 
-        return adjusted_action
+        return adjusted_action_kwh
 
     def take_step(self, environment_step, action_parameters) -> int:
         charge_price = environment_step[action_parameters[0]]
@@ -112,36 +111,26 @@ class Battery(NetworkObject):
         self.number_of_steps += 1
         self.average_soc_tracker = self.average_soc_tracker + self.state_of_charge_kwh
         self.average_soc = int(self.average_soc_tracker / self.number_of_steps)
-
-        return self.take_imbalance_action(charge_price, discharge_price)
-
-    def take_imbalance_action(self, charge_price, discharge_price, action=None):
-        if self.verbose_lvl > 3:
-            print('\t{} battery deciding what to do. Current SoC: {}kWh'.format(self.name, self.state_of_charge_kwh))
-
         self.innax_metre.update_prices(charge_price, discharge_price)
+        return 0
 
-        if action is None:
-            soc_perc = int(self.state_of_charge_kwh / self.max_kwh * 100)
-            if self.strategy is None:
-                raise NotImplementedError('You did not specify a strategy for the {} battery.'.format(self.name))
-            action = self.strategy.make_decision(charge_price, discharge_price, soc_perc)
+    def take_action(self, action, action_kw=None):
+        if action not in ['CHARGE', 'DISCHARGE', 'WAIT']:
+            raise AttributeError('Please offer an actual action to the battery object')
+        if action_kw is None:
+            action_kw = self.max_kw
+        if action_kw > self.max_kw or action_kw < 0:
+            raise AttributeError(f'action_kw should not be larger than the max_kw: {self.max_kw}kW\n'
+                                 'action_kw should also be larger than 0. Discharge is handeled by the object.')
 
         if action != 'WAIT' and action != self.last_action:
             self.change_of_direction_tracker += 1
             self.last_action = action
 
         if action == 'CHARGE':
-            chosen_action = 0
+            action_kw = self.charge(action_kw)
         elif action == 'DISCHARGE':
-            chosen_action = 1
-        else:
-            chosen_action = 2
-
-        if chosen_action == 0:
-            action_kw = self.charge(self.max_kw)
-        elif chosen_action == 1:
-            action_kw = self.discharge(self.max_kw)
+            action_kw = self.discharge(action_kw)
         else:
             action_kw = self.wait()
 
