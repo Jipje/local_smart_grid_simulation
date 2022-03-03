@@ -7,6 +7,8 @@ from helper_objects.strategies.RandomStrategyGenerator import generate_random_di
 from network_objects.Battery import Battery
 from network_objects.control_strategies.StrategyControlTower import StrategyControlTower
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
+from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControlTower import \
+    StrategyWithLimitedChargeCapacityControlTower
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
 import os
@@ -145,12 +147,9 @@ def rhino_windnet_limited_charging(verbose_lvl=1):
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     rhino = Battery('Rhino', 7500, 12000, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-    simple_strategy_controller = StrategyControlTower(name="Rhino Battery Controller", network_object=rhino,
-                                                      strategy=csv_strategy, verbose_lvl=verbose_lvl)
+    strategy_limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=verbose_lvl)
 
-    LimitedChargeOrDischargeCapacity(rhino, 5, -1)
-
-    imbalance_environment.add_object(simple_strategy_controller, [1, 3])
+    imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
@@ -227,7 +226,10 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
 if __name__ == '__main__':
     verbose_lvl = 1
 
-    baseline_rhino_simulation(verbose_lvl)
+    # baseline_rhino_simulation(verbose_lvl)
+    # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
+
+    rhino_windnet_limited_charging(verbose_lvl)
 
     # network_capacity = 14000
     # imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
@@ -244,4 +246,3 @@ if __name__ == '__main__':
     # run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl,
     #                        simulation_environment=imbalance_environment)
     #
-    random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
