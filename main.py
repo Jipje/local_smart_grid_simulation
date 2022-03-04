@@ -38,11 +38,7 @@ def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environm
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, simulation_environment=None):
     if simulation_environment is None:
-        simulation_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
-        ImbalanceEnvironment(simulation_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
-        rhino = Battery('Rhino', 7500, 12000, strategy=csv_strategy, battery_efficiency=0.9, starting_soc_kwh=3750, verbose_lvl=verbose_lvl)
-        simulation_environment.add_object(rhino, [1, 3])
+        baseline_rhino_simulation(verbose_lvl=verbose_lvl)
 
     # open file in read mode
     with open(scenario, 'r') as read_obj:
