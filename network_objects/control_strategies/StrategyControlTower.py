@@ -7,14 +7,6 @@ class StrategyControlTower(NaiveControlTower):
         super().__init__(name, network_object, verbose_lvl)
         self.strategy = strategy
 
-    def take_step(self, environment_step, action_parameters) -> int:
-        self.progress_battery(environment_step, action_parameters)
-
-        action, action_kw = self.determine_step(environment_step, action_parameters)
-
-        action_kw = self.battery.take_action(action, action_kw)
-        return action_kw
-
     def determine_step(self, environment_step, action_parameters):
         charge_price = environment_step[action_parameters[0]]
         discharge_price = environment_step[action_parameters[1]]

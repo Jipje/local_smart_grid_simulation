@@ -11,7 +11,7 @@ class NaiveControlTower(NetworkObject):
     def take_step(self, environment_step, action_parameters) -> int:
         self.progress_battery(environment_step, action_parameters)
 
-        action, action_kw = self.determine_action(environment_step, action_parameters)
+        action, action_kw = self.determine_step(environment_step, action_parameters)
 
         action_kw = self.battery.take_action(action, action_kw)
         return action_kw
