@@ -102,7 +102,7 @@ class Battery(NetworkObject):
         if future_soc < adjusted_min:
             adjusted_action_kwh = adjusted_min - current_soc
 
-        if self.verbose_lvl == 3 and adjusted_action_kwh != action_kwh:
+        if self.verbose_lvl > 3 and adjusted_action_kwh != action_kwh:
             print(f'\t\tPhysical limitations of the {self.name} battery have limited its actions')
 
         return adjusted_action_kwh
