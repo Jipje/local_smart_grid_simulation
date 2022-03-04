@@ -235,6 +235,26 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
                       simulation_environment=imbalance_environment, verbose_lvl=1)
 
 
+def always_discharge_baseline(verbose_lvl=1):
+    network_capacity = 14000
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=25000, verbose_lvl=verbose_lvl)
+    csv_strategy = CsvStrategy('Dumb discharge', strategy_csv='data/strategies/always_discharge.csv')
+    congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller", network_object=battery,
+                                                        congestion_kw=network_capacity, congestion_safety_margin=0.99,
+                                                        strategy=csv_strategy, verbose_lvl=verbose_lvl)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(congestion_controller, [1, 3, 4])
+
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+
+
 if __name__ == '__main__':
     verbose_lvl = 1
 
@@ -242,7 +262,9 @@ if __name__ == '__main__':
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
+    always_discharge_baseline(verbose_lvl)
 
+    # Setup for a new experiment
     network_capacity = 14000
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -261,16 +283,6 @@ if __name__ == '__main__':
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(congestion_controller, [1, 3, 4])
 
-    verbose_lvl = 1
-    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
-    #
-    verbose_lvl = 2
-    run_single_month(month=6, scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
-    #
-    verbose_lvl = 3
-    starting_timestep = 236160
-    number_of_steps = 1440
-    run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
     # verbose_lvl = 4
     # imbalance_environment.verbose_lvl = verbose_lvl
