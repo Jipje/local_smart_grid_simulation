@@ -5,18 +5,17 @@ from helper_objects.strategies.CsvStrategy import CsvStrategy
 from network_objects.Battery import Battery
 from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControlTower import \
     StrategyWithLimitedChargeCapacityControlTower
-from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 
 
 class TestLimitedChargeOrDischargeCapacity(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+        strategy_one_path = '..{0}..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
         try:
             CsvStrategy('Rhino strategy 1', strategy_csv=strategy_one_path)
         except FileNotFoundError:
-            strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+            strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
         cls.strategy_one_path = strategy_one_path
 
     def test_initialisation(self):
@@ -37,4 +36,4 @@ class TestLimitedChargeOrDischargeCapacity(unittest.TestCase):
         self.assertEqual(7095, rhino.state_of_charge_kwh)
         # Original battery constraints
         simple_strategy_controller.take_step([-200, -200, 12000, -500], [0, 1, 2])
-        self.assertEqual(7124, rhino.state_of_charge_kwh)
+        self.assertEqual(7125, rhino.state_of_charge_kwh)

@@ -17,4 +17,7 @@ class StrategyControlTower(NaiveControlTower):
 
         action = self.strategy.make_decision(charge_price, discharge_price, soc_perc)
 
+        if self.verbose_lvl > 3:
+            print(f'\t\t{self.strategy.name} tells the battery to {action}')
+
         return action, self.battery.max_kw

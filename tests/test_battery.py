@@ -61,9 +61,9 @@ class TestBattery(unittest.TestCase):
         rhino_battery = Battery('test_nice_charge_and_discharge', 7500, 12000)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
         rhino_battery.charge(6760)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 3850)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3851)
         rhino_battery.discharge(6760)
-        self.assertEqual(rhino_battery.state_of_charge_kwh, 3738)
+        self.assertEqual(rhino_battery.state_of_charge_kwh, 3739)
 
         rhino_battery = Battery('test_nice_charge_and_discharge2', 7500, 12000, battery_efficiency=1)
         self.assertEqual(rhino_battery.state_of_charge_kwh, 3750)
@@ -77,7 +77,7 @@ class TestBattery(unittest.TestCase):
         rhino_battery = Battery('test_weird_charge', 7500, 12000, starting_soc_kwh=7025)
         self.assertEqual(7025, rhino_battery.state_of_charge_kwh)
         rhino_battery.charge(12000)
-        self.assertEqual(7124, rhino_battery.state_of_charge_kwh)
+        self.assertEqual(7125, rhino_battery.state_of_charge_kwh)
         # Asking too much power from battery
         rhino_battery = Battery('test_weird_charge2', 7500, 12000, starting_soc_kwh=6825)
         self.assertEqual(6825, rhino_battery.state_of_charge_kwh)

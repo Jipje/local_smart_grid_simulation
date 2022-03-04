@@ -9,6 +9,8 @@ class NaiveControlTower(NetworkObject):
         self.verbose_lvl = verbose_lvl
 
     def take_step(self, environment_step, action_parameters) -> int:
+        if self.verbose_lvl > 3:
+            print(f'\t{self.battery.name} battery is taking a step. Current SoC: {self.battery.state_of_charge_kwh}kWh')
         self.progress_battery(environment_step, action_parameters)
 
         action, action_kw = self.determine_step(environment_step, action_parameters)
