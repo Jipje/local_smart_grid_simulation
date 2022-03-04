@@ -32,16 +32,45 @@ class TestCongestionSolverControlTower(unittest.TestCase):
         simple_strategy_controller.take_step([-200, -200, 12000], [0, 1, 2])
         self.assertEqual(7005, rhino.state_of_charge_kwh)
 
+    def test_normal_discharge(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=7005)
+        simple_strategy_controller = SolveCongestionControlTower(name="Rhino Battery Controller", network_object=rhino,
+                                                                 congestion_kw=14000, congestion_safety_margin=1,
+                                                                 strategy=csv_strategy)
         # Normal discharging
         simple_strategy_controller.take_step([500, 500, 1000], [0, 1, 2])
         self.assertEqual(6805, rhino.state_of_charge_kwh)
+
+    def test_discharge_but_dont_cause_congestion(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6805)
+        simple_strategy_controller = SolveCongestionControlTower(name="Rhino Battery Controller",
+                                                                 network_object=rhino,
+                                                                 congestion_kw=14000, congestion_safety_margin=1,
+                                                                 strategy=csv_strategy)
         # Discharging but do not cause network congestion
         simple_strategy_controller.take_step([500, 500, 8000], [0, 1, 2])
         self.assertEqual(6705, rhino.state_of_charge_kwh)
 
+    def test_discharge_overwrite_due_to_congestion(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6705)
+        simple_strategy_controller = SolveCongestionControlTower(name="Rhino Battery Controller",
+                                                                 network_object=rhino,
+                                                                 congestion_kw=14000, congestion_safety_margin=1,
+                                                                 strategy=csv_strategy)
         # Discharging overwrite due to congestion
         simple_strategy_controller.take_step([500, 500, 20000], [0, 1, 2])
         self.assertEqual(6795, rhino.state_of_charge_kwh)
+
+    def test_wait_overwrite_due_to_congestion(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6795)
+        simple_strategy_controller = SolveCongestionControlTower(name="Rhino Battery Controller",
+                                                                 network_object=rhino,
+                                                                 congestion_kw=14000, congestion_safety_margin=1,
+                                                                 strategy=csv_strategy)
         # Wait overwrite due to congestion
         simple_strategy_controller.take_step([50, 50, 20000], [0, 1, 2])
         self.assertEqual(6885, rhino.state_of_charge_kwh)
