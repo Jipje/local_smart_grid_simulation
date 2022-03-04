@@ -37,4 +37,4 @@ class TestLimitedChargeOrDischargeCapacity(unittest.TestCase):
         self.assertEqual(7095, rhino.state_of_charge_kwh)
         # Original battery constraints
         simple_strategy_controller.take_step([-200, -200, 12000, -500], [0, 1, 2])
-        self.assertEqual(7124, rhino.state_of_charge_kwh)
+        self.assertEqual(7125, rhino.state_of_charge_kwh)
