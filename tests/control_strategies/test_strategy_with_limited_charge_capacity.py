@@ -5,18 +5,17 @@ from helper_objects.strategies.CsvStrategy import CsvStrategy
 from network_objects.Battery import Battery
 from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControlTower import \
     StrategyWithLimitedChargeCapacityControlTower
-from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 
 
 class TestLimitedChargeOrDischargeCapacity(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+        strategy_one_path = '..{0}..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
         try:
             CsvStrategy('Rhino strategy 1', strategy_csv=strategy_one_path)
         except FileNotFoundError:
-            strategy_one_path = 'data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+            strategy_one_path = '..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
         cls.strategy_one_path = strategy_one_path
 
     def test_initialisation(self):

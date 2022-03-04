@@ -27,7 +27,7 @@ class SolveCongestionControlTower(StrategyControlTower):
                 adjusted_action_kw = abs(excess_power)
                 msg = f'\t\tCongestion controller adjusts {strategy_action} to {adjusted_action} to solve congestion'
         # If there is no excess power and the battery wants to discharge, we need to make sure we don't cause congestion
-        elif adjusted_action == 'DISCHARGE':
+        elif adjusted_action == 'DISCHARGE' and adjusted_action_kw > abs(excess_power):
             adjusted_action_kw = abs(excess_power)
             msg = f'\t\tCongestion controller adjusts {adjusted_action} to not cause congestion'
 
