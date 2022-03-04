@@ -98,7 +98,7 @@ class Battery(NetworkObject):
         adjusted_min = int(self.lower_safety_margin * self.max_kwh)
         # The SoC can't be higher than the max_kwh. Or lower than 0.
         if future_soc > adjusted_max:
-            adjusted_action_kwh = int((adjusted_max - current_soc) * 1 / self.efficiency)
+            adjusted_action_kwh = int(round((adjusted_max - current_soc) * 1 / self.efficiency, 0))
         if future_soc < adjusted_min:
             adjusted_action_kwh = adjusted_min - current_soc
 
