@@ -3,6 +3,8 @@ import os
 
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from network_objects.Battery import Battery
+from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControlTower import \
+    StrategyWithLimitedChargeCapacityControlTower
 from network_objects.decorators.LimitedChargeOrDischargeCapacity import LimitedChargeOrDischargeCapacity
 
 
@@ -19,33 +21,20 @@ class TestLimitedChargeOrDischargeCapacity(unittest.TestCase):
 
     def test_initialisation(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino = Battery('test_simple_congestion', 7500, 12000, strategy=csv_strategy, starting_soc_kwh=0)
-        LimitedChargeOrDischargeCapacity(rhino, 5, 6)
+        rhino = Battery('test_simple_congestion', 7500, 12000, starting_soc_kwh=0)
+        limited_charge_control_tower = StrategyWithLimitedChargeCapacityControlTower(name="Rhino Battery Controller", network_object=rhino, strategy=csv_strategy, verbose_lvl=4)
 
     def test_max_charge(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino = Battery('test_max_charge', 7500, 12000, strategy=csv_strategy, starting_soc_kwh=6825)
-        LimitedChargeOrDischargeCapacity(rhino, 2, 3)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6825)
+        simple_strategy_controller = StrategyWithLimitedChargeCapacityControlTower(name="Rhino Battery Controller",                                                                         network_object=rhino,
+                                                                                   strategy=csv_strategy)
         # Normal charging
-        rhino.take_step([-200, -200, 500, -500], [0, 1])
+        simple_strategy_controller.take_step([-200, -200, 12000, -500], [0, 1, 2])
         self.assertEqual(7005, rhino.state_of_charge_kwh)
         # Limited charging constraints
-        rhino.take_step([-200, -200, 100, -500], [0, 1])
+        simple_strategy_controller.take_step([-200, -200, 6000, -500], [0, 1, 2])
         self.assertEqual(7095, rhino.state_of_charge_kwh)
         # Original battery constraints
-        rhino.take_step([-200, -200, 500, -500], [0, 1])
+        simple_strategy_controller.take_step([-200, -200, 12000, -500], [0, 1, 2])
         self.assertEqual(7124, rhino.state_of_charge_kwh)
-
-    def test_max_discharge(self):
-        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
-        rhino = Battery('test_max_discharge', 7500, 12000, strategy=csv_strategy, starting_soc_kwh=700)
-        LimitedChargeOrDischargeCapacity(rhino, 2, 3)
-        # Normal discharging
-        rhino.take_step([500, 500, 500, -500], [0, 1])
-        self.assertEqual(500, rhino.state_of_charge_kwh)
-        # Limited discharging constraints
-        rhino.take_step([500, 500, 500, -100], [0, 1])
-        self.assertEqual(400, rhino.state_of_charge_kwh)
-        # Original battery constraints
-        rhino.take_step([500, 500, 500, -500], [0, 1])
-        self.assertEqual(375, rhino.state_of_charge_kwh)
