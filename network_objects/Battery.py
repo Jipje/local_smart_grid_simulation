@@ -59,7 +59,7 @@ class Battery(NetworkObject):
     def update_state_of_charge(self, action_kwh):
         physical_action = action_kwh
         if action_kwh > 0:
-            physical_action = int(action_kwh * self.efficiency)
+            physical_action = int(round(action_kwh * self.efficiency, 0))
 
         self.cycle_counter.add_cycle(physical_action)
         self.state_of_charge_kwh = self.state_of_charge_kwh + physical_action
@@ -101,6 +101,9 @@ class Battery(NetworkObject):
             adjusted_action_kwh = int(round((adjusted_max - current_soc) * 1 / self.efficiency, 0))
         if future_soc < adjusted_min:
             adjusted_action_kwh = adjusted_min - current_soc
+
+        if self.verbose_lvl == 3 and adjusted_action_kwh != action_kwh:
+            print(f'\t\tPhysical limitations of the {self.name} battery have limited its actions')
 
         return adjusted_action_kwh
 

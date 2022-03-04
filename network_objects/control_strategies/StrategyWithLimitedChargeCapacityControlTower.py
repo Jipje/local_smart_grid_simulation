@@ -15,4 +15,7 @@ class StrategyWithLimitedChargeCapacityControlTower(StrategyControlTower):
             if strategy_action_kw > max_charge_kw:
                 adjusted_action_kw = max_charge_kw
 
+            if self.verbose_lvl > 3:
+                print(f'\t\tLimited charge controller limits {strategy_action} to {adjusted_action_kw}kW')
+
         return strategy_action, adjusted_action_kw

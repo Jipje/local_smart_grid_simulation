@@ -219,7 +219,7 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
 
 
 if __name__ == '__main__':
-    verbose_lvl = 4
+    verbose_lvl = 1
 
     # baseline_rhino_simulation(verbose_lvl)
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
@@ -244,6 +244,6 @@ if __name__ == '__main__':
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(congestion_controller, [1, 3, 4])
 
-    run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
-    # run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    # run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 

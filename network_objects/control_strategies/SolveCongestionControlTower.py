@@ -16,6 +16,7 @@ class SolveCongestionControlTower(StrategyControlTower):
 
         adjusted_action = strategy_action
         adjusted_action_kw = strategy_action_kw
+        msg = None
 
         # Check if there is congestion
         if excess_power < 0:
@@ -24,8 +25,13 @@ class SolveCongestionControlTower(StrategyControlTower):
                 # This control tower will solve that congestion by charging the excess power
                 adjusted_action = 'CHARGE'
                 adjusted_action_kw = abs(excess_power)
+                msg = f'\t\tCongestion controller adjusts {strategy_action} to {adjusted_action} to solve congestion'
         # If there is no excess power and the battery wants to discharge, we need to make sure we don't cause congestion
         elif adjusted_action == 'DISCHARGE':
             adjusted_action_kw = abs(excess_power)
+            msg = f'\t\tCongestion controller adjusts {adjusted_action} to not cause congestion'
+
+        if self.verbose_lvl > 3 and msg is not None:
+            print(msg)
 
         return adjusted_action, adjusted_action_kw
