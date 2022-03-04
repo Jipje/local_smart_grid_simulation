@@ -16,7 +16,7 @@ import os
 import random
 import datetime as dt
 
-base_scenario = 'data{0}tennet_and_windnet{0}tennet_balans_delta_and_trivial_windnet.csv'.format(os.path.sep)
+base_scenario = 'data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep)
 
 
 def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
@@ -26,6 +26,18 @@ def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_env
     print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
+
+
+def run_single_month(month, scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
+    starting_timesteps = [0, 61, 44702, 85022, 129602, 172802, 217442, 260477, 305117, 349757, 392957, 437597, 480797, 525376]
+    assert 13 > month > 0
+
+    starting_timestep = starting_timesteps[month]
+    number_of_steps = starting_timesteps[month + 1] - starting_timestep
+    print('Run single month - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
+    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl,
+                   simulation_environment=simulation_environment)
+    print('Just ran a month.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
 
 
 def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environment=None):
@@ -46,6 +58,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         csv_reader = reader(read_obj)
 
         steps_taken = 0
+        old_day = 0
         old_week = 0
         old_month = 0
 
@@ -66,9 +79,13 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 # Give an update of how it is going in the mean_time
                 curr_month = time_step_dt.month
                 curr_week = time_step_dt.isocalendar()[1]
-                if curr_week != old_week and verbose_lvl > 1 or curr_month != old_month and verbose_lvl > 0:
+                curr_day = time_step_dt.day
+                if curr_day != old_day and verbose_lvl > 2 or \
+                        curr_week != old_week and verbose_lvl > 1 or \
+                        curr_month != old_month and verbose_lvl > 0:
                     msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
                     print(msg)
+                    old_day = curr_day
                     old_week = curr_week
                     old_month = curr_month
 
@@ -219,7 +236,7 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
 
 
 if __name__ == '__main__':
-    verbose_lvl = 4
+    verbose_lvl = 1
 
     # baseline_rhino_simulation(verbose_lvl)
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
@@ -232,18 +249,38 @@ if __name__ == '__main__':
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
-    battery = Battery('Wombat', 30000, 14000,
-                      battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
-    csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=25000, verbose_lvl=verbose_lvl)
+    csv_strategy = CsvStrategy('Dumb discharge', strategy_csv='data/strategies/always_discharge.csv')
     congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller",
                                                                                network_object=battery,
                                                                                 congestion_kw=network_capacity,
+                                                        congestion_safety_margin=0.99,
                                                                                strategy=csv_strategy,
                                                                                verbose_lvl=verbose_lvl)
 
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(congestion_controller, [1, 3, 4])
 
-    run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
-    # run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    verbose_lvl = 1
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    #
+    verbose_lvl = 2
+    run_single_month(month=6, scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    #
+    verbose_lvl = 3
+    starting_timestep = 236160
+    number_of_steps = 1440
+    run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
+    # verbose_lvl = 4
+    # imbalance_environment.verbose_lvl = verbose_lvl
+    # imbalance_environment.network_objects[0].verbose_lvl = verbose_lvl
+    # imbalance_environment.network_objects[1].verbose_lvl = verbose_lvl
+    # imbalance_environment.network_objects[1].battery.verbose_lvl = verbose_lvl
+    #
+    # starting_timestep = 250600
+    # number_of_steps = 1440
+    # run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl,
+    #                simulation_environment=imbalance_environment)
+
+    # run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
