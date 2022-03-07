@@ -1,0 +1,5 @@
+time_from,time_until,state_from,state_until,price_from,price_until,command,action_perc
+0:00,24:00,0,5,-9999,9999,CHARGE,100
+0:00,24:00,5,95,-9999,-500,CHARGE,100
+0:00,24:00,5,95,60,9999,DISCHARGE,100
+0:00,24:00,95,100,-9999,9999,DISCHARGE,100
