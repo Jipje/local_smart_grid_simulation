@@ -83,14 +83,7 @@ class Battery(NetworkObject):
 
     def check_action(self, action_kwh):
         largest_kwh_action_battery = self.max_kw * self.time_step
-        # The action can't be larger than the max_kw
-        if abs(action_kwh) > largest_kwh_action_battery:
-            if action_kwh > 0:
-                adjusted_action_kwh = largest_kwh_action_battery
-            elif action_kwh < 0:
-                adjusted_action_kwh = -1 * largest_kwh_action_battery
-        else:
-            adjusted_action_kwh = action_kwh
+        adjusted_action_kwh = action_kwh
 
         current_soc = self.state_of_charge_kwh
         future_soc = current_soc + adjusted_action_kwh
@@ -101,6 +94,13 @@ class Battery(NetworkObject):
             adjusted_action_kwh = int(round((adjusted_max - current_soc) * 1 / self.efficiency, 0))
         if future_soc < adjusted_min:
             adjusted_action_kwh = adjusted_min - current_soc
+
+        # The action can't be larger than the max_kw
+        if abs(adjusted_action_kwh) > largest_kwh_action_battery:
+            if action_kwh > 0:
+                adjusted_action_kwh = largest_kwh_action_battery
+            elif action_kwh < 0:
+                adjusted_action_kwh = -1 * largest_kwh_action_battery
 
         if self.verbose_lvl > 3 and adjusted_action_kwh != action_kwh:
             print(f'\t\tPhysical limitations of the {self.name} battery have limited its actions')
