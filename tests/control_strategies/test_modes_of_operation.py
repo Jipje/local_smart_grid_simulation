@@ -180,3 +180,28 @@ class TestModesOfOperationController(unittest.TestCase):
         self.assertEqual(7100, rhino.state_of_charge_kwh)
         moo.take_step([500, 500, 26000, dt.datetime(2021, 5, 6, 6, 51, tzinfo=utc)], [0, 1, 2, 3])
         self.assertEqual(7125, rhino.state_of_charge_kwh)
+
+    def test_earning_money_in_the_afternoon(self):
+        moo, rhino = self.base_initialisation()
+
+        # Test normal charge
+        self.assertEqual(3000, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 12000, dt.datetime(2021, 5, 6, 17, 30, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(3180, rhino.state_of_charge_kwh)
+        # Test normal discharge
+        self.assertEqual(3180, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 8000, dt.datetime(2021, 5, 6, 17, 31, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2980, rhino.state_of_charge_kwh)
+        # Test limited charge
+        self.assertEqual(2980, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 6000, dt.datetime(2021, 5, 6, 17, 32, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(3070, rhino.state_of_charge_kwh)
+        # Test don't solve congestion
+        self.assertEqual(3070, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 24000, dt.datetime(2021, 5, 6, 17, 33, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2870, rhino.state_of_charge_kwh)
+        # Test physical limitations
+        rhino.state_of_charge_kwh = 7100
+        self.assertEqual(7100, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 12000, dt.datetime(2021, 5, 6, 17, 34, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(7125, rhino.state_of_charge_kwh)
