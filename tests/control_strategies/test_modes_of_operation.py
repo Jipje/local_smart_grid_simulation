@@ -32,7 +32,7 @@ class TestModesOfOperationController(unittest.TestCase):
         cls.greedy_discharge_path = greedy_discharge_path
         cls.always_discharge_path = always_discharge_path
 
-    def test_initialisation(self):
+    def base_initialisation(self):
         congestion_kw = 20000
         congestion_safety_margin = 1
         verbose_lvl = 4
@@ -69,3 +69,13 @@ class TestModesOfOperationController(unittest.TestCase):
         moo.add_mode_of_operation(dt.time(4, 45, tzinfo=utc), prepare_congestion_mod)
         moo.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), solve_congestion_mod)
         moo.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), earn_money_mod)
+        return moo, rhino
+
+    def test_initialisation(self):
+        moo, rhino = self.base_initialisation()
+
+        self.assertEqual(0, rhino.state_of_charge_kwh)
+
+        moo.take_step([500, 500, 12000, dt.datetime(2021, 5, 6, 1, 30, tzinfo=utc)], [0, 1, 2, 3])
+
+        self.assertEqual(180, rhino.state_of_charge_kwh)

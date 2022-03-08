@@ -32,12 +32,14 @@ class ModesOfOperationController(NaiveControlTower):
         self.timings.append(start_time)
 
     def determine_step(self, environment_step, action_parameters) -> (str, int):
-        current_time = environment_step[action_parameters[0]]
+        current_datetime = environment_step[action_parameters[3]]
+        current_time = dt.time(current_datetime.hour, current_datetime.minute, tzinfo=utc)
         chosen_controller = self.controllers[len(self.controllers) - 1]
 
         for i in range(len(self.timings)):
             timing_counter = self.timings[i]
             if current_time < timing_counter:
-                chosen_controller = self.controllers[timing_counter - 1]
+                chosen_controller = self.controllers[i - 1]
+                break
 
         return chosen_controller.determine_step(environment_step, action_parameters)
