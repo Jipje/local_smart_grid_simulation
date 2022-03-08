@@ -34,7 +34,7 @@ def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_env
 
 
 def run_single_month(month, scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
-    starting_timesteps = [0, 61, 44702, 85022, 129602, 172802, 217442, 260477, 305117, 349757, 392957, 437597, 480797, 525376]
+    starting_timesteps = [0, 61, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595, 480795, 525376]
     assert 13 > month > 0
 
     starting_timestep = starting_timesteps[month]
@@ -243,6 +243,8 @@ def random_rhino_strategy_simulation(verbose_lvl=1, seed=None):
 
 def super_naive_baseline(verbose_lvl=1):
     network_capacity = 14000
+    congestion_safety_margin = 0.99
+
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
@@ -251,7 +253,7 @@ def super_naive_baseline(verbose_lvl=1):
     battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
     csv_strategy = CsvStrategy('Discharge above 60', strategy_csv='data/strategies/greedy_discharge_60.csv')
     congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller", network_object=battery,
-                                                        congestion_kw=network_capacity, congestion_safety_margin=0.99,
+                                                        congestion_kw=network_capacity, congestion_safety_margin=congestion_safety_margin,
                                                         strategy=csv_strategy, verbose_lvl=verbose_lvl)
 
     imbalance_environment.add_object(solarvation, [1, 3, 4])
@@ -262,7 +264,7 @@ def super_naive_baseline(verbose_lvl=1):
 
 def baseline(verbose_lvl=1):
     congestion_kw = 14000
-    congestion_safety_margin = 0.95
+    congestion_safety_margin = 0.99
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -270,7 +272,7 @@ def baseline(verbose_lvl=1):
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
 
-    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
 
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
@@ -288,8 +290,10 @@ def baseline(verbose_lvl=1):
                                                                          congestion_safety_margin=congestion_safety_margin,
                                                                          strategy=always_discharge_strat,
                                                                          verbose_lvl=verbose_lvl)
-    earn_money_mod = StrategyWithLimitedChargeCapacityControlTower(name="Rhino strategy 1",
+    earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
                                                                    network_object=battery,
+                                                                   congestion_kw=congestion_kw,
+                                                                   congestion_safety_margin=congestion_safety_margin,
                                                                    strategy=csv_strategy,
                                                                    verbose_lvl=verbose_lvl)
 
@@ -304,6 +308,15 @@ def baseline(verbose_lvl=1):
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(moo, [1, 3, 4, 0])
 
+    # Run single day
+    # starting_timestep = 270555
+    # number_of_steps = 1440
+    # run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+    # Run single month
+    # run_single_month(7, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+    # Run full scenario
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
@@ -314,7 +327,7 @@ if __name__ == '__main__':
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
-    # super_naive_baseline(verbose_lvl)
+    super_naive_baseline(verbose_lvl)
     baseline(verbose_lvl)
 
     # Setup for a new experiment
