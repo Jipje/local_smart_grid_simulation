@@ -120,7 +120,7 @@ class TestModesOfOperationController(unittest.TestCase):
         self.assertEqual(2980, rhino.state_of_charge_kwh)
         moo.take_step([500, 500, 8000, dt.datetime(2021, 5, 6, 4, 46, tzinfo=utc)], [0, 1, 2, 3])
         self.assertEqual(2780, rhino.state_of_charge_kwh)
-        # Test limited charge -> Will only be discharging at this time
+        # Bad prices will still be discharging at this time
         self.assertEqual(2780, rhino.state_of_charge_kwh)
         moo.take_step([-200, -200, 6000, dt.datetime(2021, 5, 6, 4, 47, tzinfo=utc)], [0, 1, 2, 3])
         self.assertEqual(2580, rhino.state_of_charge_kwh)
@@ -139,3 +139,44 @@ class TestModesOfOperationController(unittest.TestCase):
         self.assertEqual(400, rhino.state_of_charge_kwh)
         moo.take_step([500, 500, 12000, dt.datetime(2021, 5, 6, 4, 50, tzinfo=utc)], [0, 1, 2, 3])
         self.assertEqual(375, rhino.state_of_charge_kwh)
+
+    def test_solving_congestion(self):
+        moo, rhino = self.base_initialisation()
+
+        # Test forced discharge at 6:44
+        self.assertEqual(3000, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 7500, dt.datetime(2021, 5, 6, 6, 44, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2800, rhino.state_of_charge_kwh)
+        # Same state at 6:45 will now be wait (waiting for congestion)
+        self.assertEqual(2800, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 12000, dt.datetime(2021, 5, 6, 6, 45, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2800, rhino.state_of_charge_kwh)
+
+        # Good prices and room on the line allow discharging
+        self.assertEqual(2800, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 8000, dt.datetime(2021, 5, 6, 6, 46, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2600, rhino.state_of_charge_kwh)
+        # Good charge prices however will be wait actions due to expected congestion
+        self.assertEqual(2600, rhino.state_of_charge_kwh)
+        moo.take_step([-200, -200, 12000, dt.datetime(2021, 5, 6, 6, 47, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2600, rhino.state_of_charge_kwh)
+
+        # Congestion should be solved
+        self.assertEqual(2600, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 26000, dt.datetime(2021, 5, 6, 6, 48, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2690, rhino.state_of_charge_kwh)
+        # And congestion shouldn't be caused by good prices
+        self.assertEqual(2690, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 14000, dt.datetime(2021, 5, 6, 6, 49, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(2590, rhino.state_of_charge_kwh)
+
+        # Test physical limitations
+        rhino.state_of_charge_kwh = 400
+        self.assertEqual(400, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 8000, dt.datetime(2021, 5, 6, 6, 50, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(375, rhino.state_of_charge_kwh)
+        # Phyiscal charge limitations
+        rhino.state_of_charge_kwh = 7100
+        self.assertEqual(7100, rhino.state_of_charge_kwh)
+        moo.take_step([500, 500, 26000, dt.datetime(2021, 5, 6, 6, 51, tzinfo=utc)], [0, 1, 2, 3])
+        self.assertEqual(7125, rhino.state_of_charge_kwh)
