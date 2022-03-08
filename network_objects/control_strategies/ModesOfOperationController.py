@@ -24,7 +24,7 @@ class ModesOfOperationController(NaiveControlTower):
             raise AttributeError('Start times of modes of operation should be add incrementally')
 
         try:
-            assert start_time < dt.time(23, 59, tzinfo=utc)
+            assert start_time <= dt.time(23, 59, tzinfo=utc)
         except AssertionError:
             raise AttributeError('This modes of operation controller only handles a single day')
 
