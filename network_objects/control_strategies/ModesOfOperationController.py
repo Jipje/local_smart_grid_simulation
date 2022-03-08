@@ -19,14 +19,14 @@ class ModesOfOperationController(NaiveControlTower):
 
     def add_mode_of_operation(self, start_time, control_strategy:NaiveControlTower):
         try:
+            assert start_time.tzinfo == utc
+        except AssertionError:
+            raise AttributeError('This modes of operation controller only handles a single day')
+
+        try:
             assert start_time > self.timings[len(self.timings) - 1]
         except AssertionError:
             raise AttributeError('Start times of modes of operation should be add incrementally')
-
-        try:
-            assert start_time <= dt.time(23, 59, tzinfo=utc)
-        except AssertionError:
-            raise AttributeError('This modes of operation controller only handles a single day')
 
         self.controllers.append(control_strategy)
         self.timings.append(start_time)

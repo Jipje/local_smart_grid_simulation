@@ -72,6 +72,44 @@ class TestModesOfOperationController(unittest.TestCase):
         moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
         return moo, rhino
 
+    def test_faulty_initialisation(self):
+        congestion_kw = 20000
+        congestion_safety_margin = 1
+        verbose_lvl = 4
+
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv=self.greedy_discharge_path)
+        always_discharge_strat = CsvStrategy('Always discharge', strategy_csv=self.always_discharge_path)
+
+        rhino = Battery('test_simple_congestion', 7500, 12000, starting_soc_kwh=3000, verbose_lvl=verbose_lvl)
+
+        solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
+                                                                           network_object=rhino,
+                                                                           congestion_kw=congestion_kw,
+                                                                           congestion_safety_margin=congestion_safety_margin,
+                                                                           strategy=greedy_discharge_strat,
+                                                                           verbose_lvl=verbose_lvl)
+
+        prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                             network_object=rhino,
+                                                                             congestion_kw=congestion_kw,
+                                                                             congestion_safety_margin=congestion_safety_margin,
+                                                                             strategy=always_discharge_strat,
+                                                                             verbose_lvl=verbose_lvl)
+
+        earn_money_mod = StrategyWithLimitedChargeCapacityControlTower(name="Rhino strategy 1",
+                                                                       network_object=rhino,
+                                                                       strategy=csv_strategy,
+                                                                       verbose_lvl=verbose_lvl)
+
+        moo = ModesOfOperationController(name='Rhino main controller',
+                                         network_object=rhino,
+                                         verbose_lvl=verbose_lvl)
+
+        moo.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
+        self.assertRaises(AttributeError, moo.add_mode_of_operation, dt.time(4, 45, tzinfo=utc), earn_money_mod)
+        self.assertRaises(AttributeError, moo.add_mode_of_operation, dt.time(8, 45, tzinfo=ams), solve_congestion_mod)
+
     def test_initialisation(self):
         moo, rhino = self.base_initialisation()
 
