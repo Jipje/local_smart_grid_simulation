@@ -349,6 +349,8 @@ if __name__ == '__main__':
     solarvation_df = load_solarvation_data()
     solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 10000)
 
+    # daily_vis(solarvation_df, dt.datetime(2021, 8, 7, tzinfo=utc))
+
     # start_filter = dt.datetime(2021, 6, 16, 0, 0, 0, tzinfo=utc)
     # end_filter = dt.datetime(2021, 6, 22, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
