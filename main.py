@@ -34,15 +34,18 @@ def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_env
 
 
 def run_single_month(month, scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
-    starting_timesteps = [0, 61, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595, 480795, 525376]
+    starting_timesteps = [0, 60, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595, 480795, 525376]
     assert 13 > month > 0
+
+    dt_month = dt.datetime(2021, month, 1)
+    month_str = dt_month.strftime('%B %Y')
 
     starting_timestep = starting_timesteps[month]
     number_of_steps = starting_timesteps[month + 1] - starting_timestep
-    print('Run single month - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
+    print('Run {} - Starting timestep: {} - Number of Steps: {}'.format(month_str, starting_timestep, number_of_steps))
     run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl,
                    simulation_environment=simulation_environment)
-    print('Just ran a month.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
+    print('Just ran {} - Starting timestep: {} - Number of Steps: {}'.format(month_str, starting_timestep, number_of_steps))
 
 
 def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environment=None):
@@ -172,6 +175,26 @@ def rhino_windnet_limited_charging(verbose_lvl=1):
     imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 5])
     run_full_scenario(scenario='data/tennet_and_windnet/tennet_balans_delta_and_pandas_windnet.csv',
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
+def wombat_solarvation_limited_charging(verbose_lvl=1):
+    # Wombat with limited charging simulation
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, 14000)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+
+    csv_strategy = CsvStrategy('Rhino strategy 1',
+                               strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+    wombat = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
+    strategy_limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(
+        name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 4])
+
+    run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
 def baseline_windnet(verbose_lvl=1):
@@ -320,6 +343,75 @@ def baseline(verbose_lvl=1):
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
+def month_baseline(verbose_lvl=2, month=1):
+    assert 13 > month > 0
+
+    congestion_kw = 14000
+    congestion_safety_margin = 0.99
+
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
+
+    csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+    greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
+    always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
+
+    solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
+                                                                       network_object=battery,
+                                                                       congestion_kw=congestion_kw,
+                                                                       congestion_safety_margin=congestion_safety_margin,
+                                                                       strategy=greedy_discharge_strat,
+                                                                       verbose_lvl=verbose_lvl)
+    prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                         network_object=battery,
+                                                                         congestion_kw=congestion_kw,
+                                                                         congestion_safety_margin=congestion_safety_margin,
+                                                                         strategy=always_discharge_strat,
+                                                                         verbose_lvl=verbose_lvl)
+    earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
+                                                                   network_object=battery,
+                                                                   congestion_kw=congestion_kw,
+                                                                   congestion_safety_margin=congestion_safety_margin,
+                                                                   strategy=csv_strategy,
+                                                                   verbose_lvl=verbose_lvl)
+
+    moo = ModesOfOperationController(name='Wombat main controller',
+                                     network_object=battery,
+                                     verbose_lvl=verbose_lvl)
+
+    earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(10, 14, tzinfo=utc), dt.time(7, 9, tzinfo=utc),
+                           dt.time(5, 50, tzinfo=utc), dt.time(4, 45, tzinfo=utc), dt.time(4, 56, tzinfo=utc),
+                           dt.time(5, 30, tzinfo=utc), dt.time(5, 50, tzinfo=utc), dt.time(7, 6, tzinfo=utc),
+                            dt.time(8, 25, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
+    preparing_for_congestion_until = [-1, -1, dt.time(12, 14, tzinfo=utc), dt.time(9, 9, tzinfo=utc),
+                           dt.time(7, 50, tzinfo=utc), dt.time(6, 45, tzinfo=utc), dt.time(6, 56, tzinfo=utc),
+                           dt.time(7, 30, tzinfo=utc), dt.time(7, 50, tzinfo=utc), dt.time(9, 6, tzinfo=utc),
+                           dt.time(10, 25, tzinfo=utc), -1, -1]
+    solving_congestion_until = [-1, -1, dt.time(12, 26, tzinfo=utc), dt.time(14, 20, tzinfo=utc),
+                           dt.time(15, 38, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(16, 29, tzinfo=utc),
+                           dt.time(16, 5, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
+                           dt.time(13, 5, tzinfo=utc), -1, -1]
+
+    if month in [1, 11, 12]:
+        moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
+    else:
+        moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
+        moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
+        moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
+        moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(moo, [1, 3, 4, 0])
+
+    # Run single month
+    run_single_month(month, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+
 if __name__ == '__main__':
     verbose_lvl = 1
 
@@ -327,8 +419,12 @@ if __name__ == '__main__':
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
-    super_naive_baseline(verbose_lvl)
-    baseline(verbose_lvl)
+
+    # super_naive_baseline(verbose_lvl)
+    # baseline(verbose_lvl)
+    for month_index in range(1, 13):
+        month_baseline(verbose_lvl, month_index)
+    wombat_solarvation_limited_charging()
 
     # Setup for a new experiment
     network_capacity = 14000
