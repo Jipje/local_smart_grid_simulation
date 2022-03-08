@@ -1,10 +1,17 @@
 from csv import reader
+import os
+import random
+import datetime as dt
+import dateutil.tz
 
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
+from network_objects.control_strategies.ModesOfOperationController import ModesOfOperationController
+from network_objects.control_strategies.SolveCongestionAndLimitedChargeControlTower import \
+    SolveCongestionAndLimitedChargeControlTower
 from network_objects.control_strategies.StrategyControlTower import StrategyControlTower
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControlTower import \
@@ -12,11 +19,9 @@ from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControl
 from network_objects.control_strategies.SolveCongestionControlTower import \
     SolveCongestionControlTower
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
-import os
-import random
-import datetime as dt
 
 base_scenario = 'data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+utc = dateutil.tz.tzutc()
 
 
 def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
@@ -70,6 +75,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
                 # Figure out date of the data
                 time_step_dt = dt.datetime.strptime(environment_data[0], '%Y-%m-%d %H:%M:%S%z')
                 time_step_dt = time_step_dt.astimezone(tz=dt.timezone.utc)
+                environment_data[0] = time_step_dt
                 time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
 
                 # Announce start of simulation
@@ -242,7 +248,7 @@ def super_naive_baseline(verbose_lvl=1):
     TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
-    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=25000, verbose_lvl=verbose_lvl)
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
     csv_strategy = CsvStrategy('Discharge above 60', strategy_csv='data/strategies/greedy_discharge_60.csv')
     congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller", network_object=battery,
                                                         congestion_kw=network_capacity, congestion_safety_margin=0.99,
@@ -254,6 +260,53 @@ def super_naive_baseline(verbose_lvl=1):
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
+def baseline(verbose_lvl=1):
+    congestion_kw = 14000
+    congestion_safety_margin = 0.95
+
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=15000, verbose_lvl=verbose_lvl)
+
+    csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+    greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
+    always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
+
+    solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
+                                                                       network_object=battery,
+                                                                       congestion_kw=congestion_kw,
+                                                                       congestion_safety_margin=congestion_safety_margin,
+                                                                       strategy=greedy_discharge_strat,
+                                                                       verbose_lvl=verbose_lvl)
+    prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                         network_object=battery,
+                                                                         congestion_kw=congestion_kw,
+                                                                         congestion_safety_margin=congestion_safety_margin,
+                                                                         strategy=always_discharge_strat,
+                                                                         verbose_lvl=verbose_lvl)
+    earn_money_mod = StrategyWithLimitedChargeCapacityControlTower(name="Rhino strategy 1",
+                                                                   network_object=battery,
+                                                                   strategy=csv_strategy,
+                                                                   verbose_lvl=verbose_lvl)
+
+    moo = ModesOfOperationController(name='Wombat main controller',
+                                     network_object=battery,
+                                     verbose_lvl=verbose_lvl)
+    moo.add_mode_of_operation(dt.time(4, 45, tzinfo=utc), earn_money_mod)
+    moo.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
+    moo.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), solve_congestion_mod)
+    moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(moo, [1, 3, 4, 0])
+
+    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+
 if __name__ == '__main__':
     verbose_lvl = 1
 
@@ -261,7 +314,8 @@ if __name__ == '__main__':
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
-    super_naive_baseline(verbose_lvl)
+    # super_naive_baseline(verbose_lvl)
+    baseline(verbose_lvl)
 
     # Setup for a new experiment
     network_capacity = 14000
