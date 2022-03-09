@@ -326,7 +326,7 @@ def baseline(verbose_lvl=1):
     moo = ModesOfOperationController(name='Wombat main controller',
                                      network_object=battery,
                                      verbose_lvl=verbose_lvl)
-    moo.add_mode_of_operation(dt.time(4, 45, tzinfo=utc), earn_money_mod)
+    moo.add_mode_of_operation(dt.time(4, 30, tzinfo=utc), earn_money_mod)
     moo.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
     moo.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), solve_congestion_mod)
     moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
@@ -346,12 +346,12 @@ def baseline(verbose_lvl=1):
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def month_baseline(verbose_lvl=2, month=1):
+def month_baseline(verbose_lvl=2, month=1, transportation_kw=0):
     assert 13 > month > 0
 
     congestion_kw = 14000
     congestion_safety_margin = 0.99
-    transportation_kw = 2000
+    transportation_kw = transportation_kw
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -389,18 +389,36 @@ def month_baseline(verbose_lvl=2, month=1):
                                      network_object=battery,
                                      verbose_lvl=verbose_lvl)
 
-    earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(10, 14, tzinfo=utc), dt.time(7, 9, tzinfo=utc),
-                           dt.time(5, 50, tzinfo=utc), dt.time(4, 45, tzinfo=utc), dt.time(4, 56, tzinfo=utc),
-                           dt.time(5, 30, tzinfo=utc), dt.time(5, 50, tzinfo=utc), dt.time(7, 6, tzinfo=utc),
-                            dt.time(8, 25, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
-    preparing_for_congestion_until = [-1, -1, dt.time(12, 14, tzinfo=utc), dt.time(9, 9, tzinfo=utc),
-                           dt.time(7, 50, tzinfo=utc), dt.time(6, 45, tzinfo=utc), dt.time(6, 56, tzinfo=utc),
-                           dt.time(7, 30, tzinfo=utc), dt.time(7, 50, tzinfo=utc), dt.time(9, 6, tzinfo=utc),
-                           dt.time(10, 25, tzinfo=utc), -1, -1]
-    solving_congestion_until = [-1, -1, dt.time(12, 26, tzinfo=utc), dt.time(14, 20, tzinfo=utc),
-                           dt.time(15, 38, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(16, 29, tzinfo=utc),
-                           dt.time(16, 5, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
-                           dt.time(13, 5, tzinfo=utc), -1, -1]
+    if transportation_kw == 2000:
+        earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(9, 30, tzinfo=utc), dt.time(6, 30, tzinfo=utc),
+                               dt.time(5, 15, tzinfo=utc), dt.time(4, 15, tzinfo=utc), dt.time(4, 15, tzinfo=utc),
+                               dt.time(5, 0, tzinfo=utc), dt.time(5, 15, tzinfo=utc), dt.time(6, 30, tzinfo=utc),
+                               dt.time(7, 45, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
+        preparing_for_congestion_until = [-1, -1, dt.time(12, 0, tzinfo=utc), dt.time(9, 0, tzinfo=utc),
+                                          dt.time(7, 45, tzinfo=utc), dt.time(6, 45, tzinfo=utc),
+                                          dt.time(6, 45, tzinfo=utc),
+                                          dt.time(7, 30, tzinfo=utc), dt.time(7, 45, tzinfo=utc),
+                                          dt.time(9, 0, tzinfo=utc),
+                                          dt.time(10, 15, tzinfo=utc), -1, -1]
+        solving_congestion_until = [-1, -1, dt.time(12, 30, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
+                                    dt.time(15, 45, tzinfo=utc), dt.time(16, 15, tzinfo=utc),
+                                    dt.time(16, 30, tzinfo=utc),
+                                    dt.time(16, 15, tzinfo=utc), dt.time(16, 15, tzinfo=utc),
+                                    dt.time(14, 30, tzinfo=utc),
+                                    dt.time(13, 15, tzinfo=utc), -1, -1]
+    else:
+        earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(10, 14, tzinfo=utc), dt.time(7, 9, tzinfo=utc),
+                               dt.time(5, 50, tzinfo=utc), dt.time(4, 45, tzinfo=utc), dt.time(4, 56, tzinfo=utc),
+                               dt.time(5, 30, tzinfo=utc), dt.time(5, 50, tzinfo=utc), dt.time(7, 6, tzinfo=utc),
+                                dt.time(8, 25, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
+        preparing_for_congestion_until = [-1, -1, dt.time(12, 14, tzinfo=utc), dt.time(9, 9, tzinfo=utc),
+                               dt.time(7, 50, tzinfo=utc), dt.time(6, 45, tzinfo=utc), dt.time(6, 56, tzinfo=utc),
+                               dt.time(7, 30, tzinfo=utc), dt.time(7, 50, tzinfo=utc), dt.time(9, 6, tzinfo=utc),
+                               dt.time(10, 25, tzinfo=utc), -1, -1]
+        solving_congestion_until = [-1, -1, dt.time(12, 26, tzinfo=utc), dt.time(14, 20, tzinfo=utc),
+                               dt.time(15, 38, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(16, 29, tzinfo=utc),
+                               dt.time(16, 5, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
+                               dt.time(13, 5, tzinfo=utc), -1, -1]
 
     if month in [1, 11, 12]:
         moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
