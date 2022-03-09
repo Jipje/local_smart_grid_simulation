@@ -189,7 +189,8 @@ def wombat_solarvation_limited_charging(verbose_lvl=1):
                                strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
     wombat = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
     strategy_limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(
-        name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl)
+        name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl,
+        transportation_kw=2000)
 
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 4])
@@ -288,6 +289,7 @@ def super_naive_baseline(verbose_lvl=1):
 def baseline(verbose_lvl=1):
     congestion_kw = 14000
     congestion_safety_margin = 0.99
+    transportation_kw = 2000
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -314,11 +316,12 @@ def baseline(verbose_lvl=1):
                                                                          strategy=always_discharge_strat,
                                                                          verbose_lvl=verbose_lvl)
     earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
-                                                                   network_object=battery,
-                                                                   congestion_kw=congestion_kw,
-                                                                   congestion_safety_margin=congestion_safety_margin,
-                                                                   strategy=csv_strategy,
-                                                                   verbose_lvl=verbose_lvl)
+                                                                 network_object=battery,
+                                                                 congestion_kw=congestion_kw,
+                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                                 strategy=csv_strategy,
+                                                                 verbose_lvl=verbose_lvl,
+                                                                 transportation_kw=transportation_kw)
 
     moo = ModesOfOperationController(name='Wombat main controller',
                                      network_object=battery,
@@ -348,6 +351,7 @@ def month_baseline(verbose_lvl=2, month=1):
 
     congestion_kw = 14000
     congestion_safety_margin = 0.99
+    transportation_kw = 2000
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -374,11 +378,12 @@ def month_baseline(verbose_lvl=2, month=1):
                                                                          strategy=always_discharge_strat,
                                                                          verbose_lvl=verbose_lvl)
     earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
-                                                                   network_object=battery,
-                                                                   congestion_kw=congestion_kw,
-                                                                   congestion_safety_margin=congestion_safety_margin,
-                                                                   strategy=csv_strategy,
-                                                                   verbose_lvl=verbose_lvl)
+                                                                 network_object=battery,
+                                                                 congestion_kw=congestion_kw,
+                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                                 strategy=csv_strategy,
+                                                                 verbose_lvl=verbose_lvl,
+                                                                 transportation_kw=transportation_kw)
 
     moo = ModesOfOperationController(name='Wombat main controller',
                                      network_object=battery,
@@ -438,7 +443,7 @@ if __name__ == '__main__':
     congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller",
                                                                                network_object=battery,
                                                                                 congestion_kw=network_capacity,
-                                                        congestion_safety_margin=0.99,
+                                                                                congestion_safety_margin=0.99,
                                                                                strategy=csv_strategy,
                                                                                verbose_lvl=verbose_lvl)
 
