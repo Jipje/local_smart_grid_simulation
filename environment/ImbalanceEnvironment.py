@@ -29,4 +29,7 @@ class ImbalanceEnvironment:
         environment_step[self.mid_price_index] = self.imbalance_msg_interpreter.mid_price
         environment_step[self.max_price_index] = self.imbalance_msg_interpreter.get_charge_price()
         environment_step[self.min_price_index] = self.imbalance_msg_interpreter.get_discharge_price()
+        if self.network_environment.verbose_lvl > 3:
+            print(f'\tCharge price: {environment_step[self.max_price_index]}\n'
+                  f'\tDischarge price: {environment_step[self.min_price_index]}')
         return self.original_take_step(environment_step)

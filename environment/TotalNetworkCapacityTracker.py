@@ -18,10 +18,13 @@ class TotalNetworkCapacityTracker:
         self.network_environment.end_of_environment_message = self.end_of_environment_message
 
     def check_action(self, action_kw):
+        if self.network_environment.verbose_lvl > 3:
+            print(f'\tNetwork connection measuring: {action_kw}kW')
+
         if abs(action_kw) > self.maximum_kw:
             self.number_of_congestion_time_steps += 1
-            if self.network_environment.verbose_lvl > 2:
-                print('Network congestion measured')
+            if self.network_environment.verbose_lvl > 3:
+                print('\t\tNetwork congestion measured')
         return self.original_check_action
 
     def done_in_mean_time(self):
