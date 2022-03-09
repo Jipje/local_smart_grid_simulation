@@ -420,8 +420,8 @@ if __name__ == '__main__':
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
-    # super_naive_baseline(verbose_lvl)
-    # baseline(verbose_lvl)
+    super_naive_baseline(verbose_lvl)
+    baseline(verbose_lvl)
     for month_index in range(1, 13):
         month_baseline(verbose_lvl, month_index)
     wombat_solarvation_limited_charging()
