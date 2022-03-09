@@ -386,6 +386,7 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
 
 if __name__ == '__main__':
     congestion_kw = 14000
+
     solarvation_df = load_solarvation_data()
     solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, congestion_kw)
 

@@ -6,7 +6,7 @@ import dateutil.tz
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 
 if __name__ == '__main__':
-    directory_str = '../data/solar_data/solarvation/raw_solarvation_lelystad_1'
+    directory_str = '../../data/solar_data/solarvation/raw_solarvation_lelystad_2'
     directory = os.fsencode(directory_str)
 
     month_tracker = None
@@ -96,4 +96,4 @@ if __name__ == '__main__':
     res_df = res_df.append(month_df)
 
     print(res_df)
-    res_df.to_csv('../data/solar_data/solarvation/solarvation_lelystad_1.csv')
+    res_df.to_csv('../../data/solar_data/solarvation/solarvation_lelystad_2.csv')
