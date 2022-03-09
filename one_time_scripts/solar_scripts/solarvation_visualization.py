@@ -27,13 +27,13 @@ def load_solarvation_data(solarvation_filename='../../data/environments/lelystad
     return solarvation_df
 
 
-def do_basic_analysis(solarvation_df, congestion_kw=None):
+def do_basic_analysis(solarvation_df, max_kw=None, congestion_kw=None, solar_farm_name=''):
     # ['tennet_balansdelta.mean_max_price', 'tennet_balansdelta.mean_mid_price', 'tennet_balansdelta.mean_min_price',
     #  'power', 'irradiance', 'expected_power', 'lower_range', 'upper_range', 'losses']
     plt.hist(solarvation_df['power'], bins=100)
     plt.ylabel('Number of occurrences')
     plt.xlabel('Power generation (kW)')
-    plt.title('Histogram of power generation by solar field Lelystad 1')
+    plt.title(f'Histogram of power generation by solar farm {solar_farm_name}')
     if congestion_kw is not None:
         plt.vlines(congestion_kw, 0, 100000, ls='--', colors='red')
     plt.show()
@@ -42,7 +42,7 @@ def do_basic_analysis(solarvation_df, congestion_kw=None):
     plt.ylim(0, 4000)
     plt.ylabel('Number of occurrences')
     plt.xlabel('Power generation (kW)')
-    plt.title('Histogram of power generation by solar field Lelystad 1')
+    plt.title(f'Histogram of power generation by solar farm {solar_farm_name}')
     if congestion_kw is not None:
         plt.vlines(congestion_kw, 0, 4000, ls='--', colors='red')
     plt.show()
@@ -50,14 +50,15 @@ def do_basic_analysis(solarvation_df, congestion_kw=None):
     plt.scatter(solarvation_df['hour_of_production'], solarvation_df['power'])
     plt.ylabel('Generated power 1m (kW)')
     plt.xlabel('Hour in which power was generated (UTC)')
-    plt.title('Scatterplot of power generation by solar field Lelystad 1')
-    plt.ylim(0, 20000)
+    plt.title(f'Scatterplot of power generation by solar farm {solar_farm_name}')
+    if max_kw is not None:
+        plt.ylim(0, max_kw)
     if congestion_kw is not None:
         plt.hlines(congestion_kw, 0, 23, ls='--', colors='red')
     plt.show()
 
 
-def do_monthly_analysis(solarvation_df, congestion_kw=None):
+def do_monthly_analysis(solarvation_df, max_kw, congestion_kw=None, solar_farm_name=''):
     fig, axs = plt.subplots(4, 3, figsize=(12, 9))
     for i in range(1, 13):
         month = i
@@ -82,12 +83,12 @@ def do_monthly_analysis(solarvation_df, congestion_kw=None):
         month_df.index = pd.to_datetime(month_df['time_utc'], errors='coerce', utc=True)
         axs[axes_x, axes_y].scatter(month_df['hour_of_production'], month_df['power'])
         axs[axes_x, axes_y].set_title('{}'.format(start_of_month.strftime('%B')))
-        axs[axes_x, axes_y].set_ylim((0, 20000))
+        axs[axes_x, axes_y].set_ylim((0, max_kw))
         axs[axes_x, axes_y].set_xlim((0, 23))
         if congestion_kw is not None:
             axs[axes_x, axes_y].axhline(congestion_kw, 0, 23, ls='--', c='red')
 
-    fig.suptitle('Scatterplot of generated power per month')
+    fig.suptitle(f'Scatterplot of generated power per month of the {solar_farm_name} solar farm')
     for ax in axs.flat:
         ax.set(xlabel='Hour (UTC)', ylabel='Generated power (kW)')
         ax.label_outer()
@@ -385,9 +386,21 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
 
 
 if __name__ == '__main__':
+    solarvation_filename = '../../data/environments/lelystad_1_2021.csv'
+    max_kw = 20000
+    solar_field_name = "Lelystad 1"
+
+    # solarvation_filename = '../../data/environments/lelystad_2_2021.csv'
+    # max_kw = 10000
+    # solar_field_name = "Lelystad 2"
+
+    # solarvation_filename = '../../data/environments/lelystad_3_2021.csv'
+    # max_kw = 30000
+    # solar_field_name = "Wissentweg"
+
     congestion_kw = 14000
 
-    solarvation_df = load_solarvation_data()
+    solarvation_df = load_solarvation_data(solarvation_filename)
     solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, congestion_kw)
 
     # daily_vis(solarvation_df, dt.datetime(2021, 8, 7, tzinfo=utc))
@@ -397,9 +410,9 @@ if __name__ == '__main__':
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # congestion_kw = None
-    do_basic_analysis(solarvation_df, congestion_kw=congestion_kw)
+    do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
     do_range_investigation(solarvation_df)
-    do_monthly_analysis(solarvation_df, congestion_kw=congestion_kw)
+    do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
