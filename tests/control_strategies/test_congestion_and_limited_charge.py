@@ -32,6 +32,16 @@ class TestCongestionAndLimitedCharge(unittest.TestCase):
         simple_strategy_controller.take_step([-200, -200, 12000], [0, 1, 2])
         self.assertEqual(7005, rhino.state_of_charge_kwh)
 
+    def test_normal_charge_with_transportation(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6825)
+        simple_strategy_controller = SolveCongestionAndLimitedChargeControlTower(name="Rhino Battery Controller", network_object=rhino,
+                                                                 congestion_kw=14000, congestion_safety_margin=1, strategy=csv_strategy,
+                                                                                 transportation_kw=2000)
+        # Normal charging
+        simple_strategy_controller.take_step([-200, -200, 10000], [0, 1, 2])
+        self.assertEqual(7005, rhino.state_of_charge_kwh)
+
     def test_normal_discharge(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
         rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=7005)
@@ -92,6 +102,45 @@ class TestCongestionAndLimitedCharge(unittest.TestCase):
         # Limited charging constraints
         simple_strategy_controller.take_step([-200, -200, 6000, -500], [0, 1, 2])
         self.assertEqual(7095, rhino.state_of_charge_kwh)
+
+    def test_limited_charge_with_extra_transport(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=7005)
+        simple_strategy_controller = SolveCongestionAndLimitedChargeControlTower(name="Rhino Battery Controller",
+                                                                                 network_object=rhino,
+                                                                                 strategy=csv_strategy,
+                                                                                 congestion_kw=14000,
+                                                                                 congestion_safety_margin=1,
+                                                                                 transportation_kw=2000)
+        # Limited charging constraints
+        simple_strategy_controller.take_step([-200, -200, 4000, -500], [0, 1, 2])
+        self.assertEqual(7095, rhino.state_of_charge_kwh)
+
+    def test_extra_transport_no_cause_congestion(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6825)
+        simple_strategy_controller = SolveCongestionAndLimitedChargeControlTower(name="Rhino Battery Controller",
+                                                                                 network_object=rhino,
+                                                                                 strategy=csv_strategy,
+                                                                                 congestion_kw=10000,
+                                                                                 congestion_safety_margin=1,
+                                                                                 transportation_kw=2000)
+        # Limited charging constraints
+        simple_strategy_controller.take_step([-200, -200, 10000, -500], [0, 1, 2])
+        self.assertEqual(7005, rhino.state_of_charge_kwh)
+
+    def test_extra_transport_congestion_limit(self):
+        csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
+        rhino = Battery('test_max_charge', 7500, 12000, starting_soc_kwh=6825)
+        simple_strategy_controller = SolveCongestionAndLimitedChargeControlTower(name="Rhino Battery Controller",
+                                                                                 network_object=rhino,
+                                                                                 strategy=csv_strategy,
+                                                                                 congestion_kw=5000,
+                                                                                 congestion_safety_margin=1,
+                                                                                 transportation_kw=5000)
+        # Limited charging constraints
+        simple_strategy_controller.take_step([-200, -200, 10000, -500], [0, 1, 2])
+        self.assertEqual(7005, rhino.state_of_charge_kwh)
 
     def test_original_battery_constraint(self):
         csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv=self.strategy_one_path)
