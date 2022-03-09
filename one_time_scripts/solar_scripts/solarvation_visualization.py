@@ -173,7 +173,7 @@ def time_congestion_events(solarvation_df):
     temp_df['congestion_end'] = temp_df['congestion_start']
     if len(temp_df) == 0:
         print('\tNo congestion events found.')
-        return 0
+        return {}
     temp_df = temp_df.resample('1D').agg({'congestion_start': min, 'congestion_end': max})
     temp_df['congestion_length'] = temp_df['congestion_end'] - temp_df['congestion_start']
 
@@ -205,6 +205,19 @@ def time_congestion_events(solarvation_df):
           f"\tMax congestion length is {max_length}\n" \
           f"\tMin congestion length is {min_length}"
     print(msg)
+    res_dict = {
+        'earliest_start': min_start,
+        'latest_ending': max_end,
+        'mean_start': mean_start,
+        'mean_end': mean_end,
+        'median_start': median_start,
+        'median_end': median_end,
+        'mean_length': mean_length,
+        'median_length': median_length,
+        'max_length': max_length,
+        'min_length': min_length
+    }
+    return res_dict
 
 
 def size_congestion_events(solarvation_df):
@@ -221,7 +234,7 @@ def size_congestion_events(solarvation_df):
 
     if len(time_congestion_df) == 0:
         print('\tNo congestion events found.')
-        return 0
+        return {}
 
     time_congestion_df = time_congestion_df.resample('1D').agg(
         {'max_power': max, 'min_power': min,  'excess_capacity': sum})
@@ -242,6 +255,15 @@ def size_congestion_events(solarvation_df):
           f"\tMean capacity generated during congestion is {mean_capacity} kWh\n" \
           f"\tMedian capacity generated during congestion is {median_capacity} kWh"
     print(msg)
+    res_dict = {
+        'min_power': min_power,
+        'max_power': max_power,
+        'min_capacity': min_capacity,
+        'max_capacity': max_capacity,
+        'mean_capacity': mean_capacity,
+        'median_capacity': median_capacity
+    }
+    return res_dict
 
 
 def daily_vis(solarvation_df, day_dt=None):
@@ -334,20 +356,29 @@ def retrieve_months(year=2021):
 
 
 def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
+    res_arr = []
     for i in range(len(starting_times)):
         period_df = solarvation_df[starting_times[i]:ending_times[i]]
 
         if labels is not None:
             print(labels[i] + ' - Time investigation')
-        time_congestion_events(period_df)
+        res_dict = time_congestion_events(period_df)
         if labels is not None:
             print(labels[i] + ' - Size investigation')
-        size_congestion_events(period_df)
+        size_dict = size_congestion_events(period_df)
+
+        res_dict.update(size_dict)
+        res_arr.append(res_dict)
+    res_df = pd.DataFrame(res_arr)
+    res_df = res_df.transpose()
+    res_df.columns = labels
+    print(res_df.to_string())
+    return res_df
 
 
 if __name__ == '__main__':
     solarvation_df = load_solarvation_data()
-    solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 10000)
+    solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, 14000)
 
     # daily_vis(solarvation_df, dt.datetime(2021, 8, 7, tzinfo=utc))
 
@@ -355,19 +386,19 @@ if __name__ == '__main__':
     # end_filter = dt.datetime(2021, 6, 22, 0, 0, 0, tzinfo=utc)
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
-    do_basic_analysis(solarvation_df)
-    do_range_investigation(solarvation_df)
-    do_monthly_analysis(solarvation_df)
+    # do_basic_analysis(solarvation_df)
+    # do_range_investigation(solarvation_df)
+    # do_monthly_analysis(solarvation_df)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December']
     time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
 
-    print('2021 - Time investigation')
-    time_congestion_events(solarvation_df)
-    print('2021 - Size investigation')
-    size_congestion_events(solarvation_df)
+    # print('2021 - Time investigation')
+    # time_congestion_events(solarvation_df)
+    # print('2021 - Size investigation')
+    # size_congestion_events(solarvation_df)
 
     # start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
     # end_date = dt.datetime(2022, 1, 1, tzinfo=utc)
