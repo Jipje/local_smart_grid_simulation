@@ -7,6 +7,7 @@ class NaiveControlTower(NetworkObject):
         super().__init__(name)
         self.battery = network_object
         self.verbose_lvl = verbose_lvl
+        self.earnings = self.battery.earnings
 
     def take_step(self, environment_step, action_parameters) -> int:
         if self.verbose_lvl > 3:
