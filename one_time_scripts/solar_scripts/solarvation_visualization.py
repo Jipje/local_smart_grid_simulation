@@ -215,8 +215,8 @@ def time_congestion_events(solarvation_df):
           f"\tMin congestion length is {min_length}"
     print(msg)
     res_dict = {
-        'earliest_start': min_start,
-        'latest_ending': max_end,
+        'earliest_start': dt.datetime.strptime(min_start, '%H:%M:%S'),
+        'latest_ending': dt.datetime.strptime(max_end, '%H:%M:%S'),
         'mean_start': mean_start,
         'mean_end': mean_end,
         'median_start': median_start,
@@ -364,6 +364,30 @@ def retrieve_months(year=2021):
     return starting_times, ending_times
 
 
+def time_and_size_congestion_dict(dict, strategy=1):
+    res_dict = time_and_size_conservative(dict)
+    return res_dict
+
+
+def time_and_size_leip(res_dict):
+    if len(res_dict) != 0:
+        res_dict['congestion_start'] = res_dict['earliest_start']
+        res_dict['congestion_end'] = res_dict['latest_ending']
+        max_length = (res_dict['latest_ending'] - res_dict['earliest_start']).seconds / 3600
+        res_dict['prep_max_soc'] = 28500 - min(abs(res_dict['max_capacity'] * 1.2), 27000, max_length * 5000)
+        res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=(30000 - res_dict['prep_max_soc']) / 14000)
+    return res_dict
+
+
+def time_and_size_conservative(res_dict):
+    if len(res_dict) != 0:
+        res_dict['congestion_start'] = res_dict['earliest_start']
+        res_dict['congestion_end'] = res_dict['latest_ending']
+        res_dict['prep_max_soc'] = 1500
+        res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
+    return res_dict
+
+
 def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
     res_arr = []
     for i in range(len(starting_times)):
@@ -377,6 +401,9 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         size_dict = size_congestion_events(period_df)
 
         res_dict.update(size_dict)
+        res_dict = time_and_size_congestion_dict(res_dict)
+        print(res_dict)
+
         res_arr.append(res_dict)
     res_df = pd.DataFrame(res_arr)
     res_df = res_df.transpose()
@@ -410,9 +437,9 @@ if __name__ == '__main__':
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # congestion_kw = None
-    do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
-    do_range_investigation(solarvation_df)
-    do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    # do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    # do_range_investigation(solarvation_df)
+    # do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
