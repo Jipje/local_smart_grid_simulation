@@ -190,11 +190,21 @@ def wombat_solarvation_limited_charging(verbose_lvl=1):
     wombat = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
     strategy_limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(
         name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl,
-        transportation_kw=0)
+        transportation_kw=2000)
 
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 4])
 
+    run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+
+
+def solarvation_dumb_discharging(verbose_lvl=1, congestion_kw=14000):
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
+
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
     run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
@@ -289,7 +299,7 @@ def super_naive_baseline(verbose_lvl=1):
 def baseline(verbose_lvl=1):
     congestion_kw = 14000
     congestion_safety_margin = 0.99
-    transportation_kw = 0
+    transportation_kw = 2000
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -346,7 +356,7 @@ def baseline(verbose_lvl=1):
     run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def month_baseline(verbose_lvl=2, month=1, transportation_kw=0):
+def month_baseline(verbose_lvl=2, month=1, transportation_kw=2000):
     assert 13 > month > 0
 
     congestion_kw = 14000
@@ -448,6 +458,7 @@ if __name__ == '__main__':
     for month_index in range(1, 13):
         month_baseline(verbose_lvl, month_index)
     wombat_solarvation_limited_charging()
+    solarvation_dumb_discharging(verbose_lvl)
 
     # Setup for a new experiment
     network_capacity = 14000
