@@ -58,5 +58,12 @@ class RenewableEnergyGenerator(NetworkObject):
             res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: €{}".format(avg_earnings_str)
         return res_msg
 
+    def end_of_environment_metrics(self):
+        earnings_str = '{:,.2f}'.format(self.earnings())
+        res = {
+            f'{self.name}_reg_revenue': earnings_str
+        }
+        return res
+
     def __str__(self):
         return "{} renewable energy generator:\nTotal Earnings: €{}".format(self.name, round(self.earnings(), 2))

@@ -53,5 +53,5 @@ class NetworkEnvironment(object):
         res_dict = current_metrics
         for object_index in range(len(self.network_objects)):
             network_object = self.network_objects[object_index]
-            res_dict[f'{network_object.name}_revenue'] = network_object.earnings()
+            res_dict.update(network_object.end_of_environment_metrics())
         return res_dict
