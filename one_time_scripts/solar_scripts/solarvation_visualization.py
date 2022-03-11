@@ -385,8 +385,12 @@ def time_and_size_leip(res_dict, max_kwh=28500, safety_margin=1.2, min_kwh=1500,
     res_dict = time_and_size_spot_on(res_dict)
     res_dict['congestion_start'] = res_dict['congestion_start'] - dt.timedelta(minutes=res_dict['congestion_start'].minute % 15)
     res_dict['congestion_end'] = res_dict['congestion_end'] + dt.timedelta(minutes=(15 - res_dict['congestion_end'].minute % 15))
-    max_length = (res_dict['congestion_end'] - res_dict['congestion_start']).seconds / 3600
-    res_dict['prep_max_soc'] = round(max_kwh - min(abs(res_dict['max_capacity'] * safety_margin), max_kwh - min_kwh, max_length * max_congestion_kw), 0)
+
+    max_capacity_in_congestion = abs(res_dict['max_capacity'] * safety_margin)
+    worst_case_capacity = min(max_kwh-min_kwh, max_capacity_in_congestion)
+    worst_case_capacity = round(worst_case_capacity, 0)
+    res_dict['prep_max_soc'] = max_kwh - worst_case_capacity
+
     res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=round((max_kwh - res_dict['prep_max_soc']) / max_kw, 1))
     return res_dict
 
