@@ -372,7 +372,7 @@ def time_and_size_congestion_dict(dict, strategy=1):
                     'prep_start': None
                     }
     else:
-        res_dict = time_and_size_conservative(dict)
+        res_dict = time_and_size_leip(dict)
 
         res_dict['congestion_start'] = res_dict['congestion_start'].time()
         res_dict['congestion_end'] = res_dict['congestion_end'].time()
@@ -382,11 +382,12 @@ def time_and_size_congestion_dict(dict, strategy=1):
 
 
 def time_and_size_leip(res_dict):
-    res_dict['congestion_start'] = res_dict['earliest_start']
-    res_dict['congestion_end'] = res_dict['latest_ending']
-    max_length = (res_dict['latest_ending'] - res_dict['earliest_start']).seconds / 3600
-    res_dict['prep_max_soc'] = 28500 - min(abs(res_dict['max_capacity'] * 1.2), 27000, max_length * 5000)
-    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=(30000 - res_dict['prep_max_soc']) / 14000)
+    res_dict = time_and_size_spot_on(res_dict)
+    res_dict['congestion_start'] = res_dict['congestion_start'] - dt.timedelta(minutes=res_dict['congestion_start'].minute % 15)
+    res_dict['congestion_end'] = res_dict['congestion_end'] + dt.timedelta(minutes=(15 - res_dict['congestion_end'].minute % 15))
+    max_length = (res_dict['congestion_end'] - res_dict['congestion_start']).seconds / 3600
+    res_dict['prep_max_soc'] = round(28500 - min(abs(res_dict['max_capacity'] * 1.2), 27000, max_length * 5000), 0)
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=round((30000 - res_dict['prep_max_soc']) / 14000, 1))
     return res_dict
 
 
