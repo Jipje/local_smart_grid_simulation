@@ -365,26 +365,36 @@ def retrieve_months(year=2021):
 
 
 def time_and_size_congestion_dict(dict, strategy=1):
-    res_dict = time_and_size_conservative(dict)
+    if len(dict) == 0:
+        res_dict = {'congestion_start': None,
+                    'congestion_end': None,
+                    'prep_max_soc': None,
+                    'prep_start': None
+                    }
+    else:
+        res_dict = time_and_size_spot_on(dict)
+
+        res_dict['congestion_start'] = res_dict['congestion_start'].time()
+        res_dict['congestion_end'] = res_dict['congestion_end'].time()
+        res_dict['prep_start'] = res_dict['prep_start'].time()
+
     return res_dict
 
 
 def time_and_size_leip(res_dict):
-    if len(res_dict) != 0:
-        res_dict['congestion_start'] = res_dict['earliest_start']
-        res_dict['congestion_end'] = res_dict['latest_ending']
-        max_length = (res_dict['latest_ending'] - res_dict['earliest_start']).seconds / 3600
-        res_dict['prep_max_soc'] = 28500 - min(abs(res_dict['max_capacity'] * 1.2), 27000, max_length * 5000)
-        res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=(30000 - res_dict['prep_max_soc']) / 14000)
+    res_dict['congestion_start'] = res_dict['earliest_start']
+    res_dict['congestion_end'] = res_dict['latest_ending']
+    max_length = (res_dict['latest_ending'] - res_dict['earliest_start']).seconds / 3600
+    res_dict['prep_max_soc'] = 28500 - min(abs(res_dict['max_capacity'] * 1.2), 27000, max_length * 5000)
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=(30000 - res_dict['prep_max_soc']) / 14000)
     return res_dict
 
 
-def time_and_size_conservative(res_dict):
-    if len(res_dict) != 0:
-        res_dict['congestion_start'] = res_dict['earliest_start']
-        res_dict['congestion_end'] = res_dict['latest_ending']
-        res_dict['prep_max_soc'] = 1500
-        res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
+def time_and_size_spot_on(res_dict):
+    res_dict['congestion_start'] = res_dict['earliest_start']
+    res_dict['congestion_end'] = res_dict['latest_ending']
+    res_dict['prep_max_soc'] = 1500
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
     return res_dict
 
 
