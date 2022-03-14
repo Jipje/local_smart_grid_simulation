@@ -13,3 +13,6 @@ class NetworkObject(object):
 
     def end_of_environment_message(self, num_of_days=None):
         return ''
+
+    def end_of_environment_metrics(self):
+        return {}

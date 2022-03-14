@@ -31,3 +31,6 @@ class NaiveControlTower(NetworkObject):
 
     def end_of_environment_message(self, num_of_days=None):
         return self.battery.end_of_environment_message(num_of_days)
+
+    def end_of_environment_metrics(self):
+        return self.battery.end_of_environment_metrics()

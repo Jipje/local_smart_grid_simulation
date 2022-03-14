@@ -187,6 +187,15 @@ class Battery(NetworkObject):
                f"Total number of cycles: {round(self.cycle_counter.cycle_count, 2)}\n" \
                f"Total Earnings: €{round(self.earnings(), 2)}"
 
+    def end_of_environment_metrics(self):
+        snake_case_name = (self.name.lower()).replace(' ', '_')
+        res = {
+            f'{snake_case_name}_battery_revenue': round(self.earnings(), 2),
+            f'{snake_case_name}_battery_cycles': round(self.cycle_counter.cycle_count, 2)
+        }
+        return res
+
+    # Legacy method to handle unittests
     def take_imbalance_action(self, charge_price, discharge_price, action):
         self.take_step([charge_price, discharge_price], [0, 1])
         action_kw = self.take_action(action)
