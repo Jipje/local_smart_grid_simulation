@@ -381,21 +381,35 @@ def time_and_size_congestion_dict(dict, strategy=1):
     return res_dict
 
 
+# This method will time and size congestion slightly smarter
+#  for timing that is, the earliest start time rounded down, and the latest end time rounded up
+#  for sizing that is the battery should be empty enough to handle the worst case capacity * 20%
+#  and there is enough hours to prepare the battery for that case
 def time_and_size_leip(res_dict, max_kwh=28500, safety_margin=1.2, min_kwh=1500, max_congestion_kw=5000, max_kw=14000):
+    # This simply copies the timing from the conservative system
     res_dict = time_and_size_conservative(res_dict)
 
+    # The max capacity is multiplied with the safety margin
     max_capacity_in_congestion = abs(res_dict['max_capacity'] * safety_margin)
+    # However the worst case is limited by the size of the battery
     worst_case_capacity = min(max_kwh-min_kwh, max_capacity_in_congestion)
     worst_case_capacity = round(worst_case_capacity, 0)
+    # Save how much room there has to be in the battery
     res_dict['prep_max_soc'] = max_kwh - worst_case_capacity
 
+    # So if the battery is full, how much needs to be discharged in the preparation period?
     worst_case_to_discharge_capacity = (max_kwh + min_kwh) - res_dict['prep_max_soc']
     prep_hours = round(worst_case_to_discharge_capacity / max_kw, 1)
     res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=prep_hours)
+    # And round the preparation period down to a PTU
     res_dict['prep_start'] = res_dict['prep_start'] - dt.timedelta(minutes=res_dict['prep_start'].minute % 15)
     return res_dict
 
 
+# This method will time and size congestion spot on the worst case values
+#  for timing that is, the earliest start time, and the latest end time
+#  for sizing that is the battery should be fully empty
+#  and there is 2 hours to prepare the battery for that case
 def time_and_size_spot_on(res_dict):
     res_dict['congestion_start'] = res_dict['earliest_start']
     res_dict['congestion_end'] = res_dict['latest_ending']
@@ -404,6 +418,10 @@ def time_and_size_spot_on(res_dict):
     return res_dict
 
 
+# This method will time and size congestion slightly conservatively
+#  for timing that is, the earliest start time rounded down, and the latest end time rounded up
+#  for sizing that is the battery should be fully empty
+#  and there is 2 hours to prepare the battery for that case
 def time_and_size_conservative(res_dict):
     res_dict = time_and_size_spot_on(res_dict)
     res_dict['congestion_start'] = res_dict['congestion_start'] - dt.timedelta(minutes=res_dict['congestion_start'].minute % 15)
