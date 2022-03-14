@@ -19,7 +19,6 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
 
         res_dict.update(size_dict)
         res_dict = time_and_size_congestion_dict(res_dict)
-        print(res_dict)
 
         res_arr.append(res_dict)
     res_df = pd.DataFrame(res_arr)
@@ -75,7 +74,7 @@ def time_and_size_conservative(res_dict):
     res_dict['congestion_start'] = res_dict['congestion_start'] - dt.timedelta(minutes=res_dict['congestion_start'].minute % 15)
     res_dict['congestion_end'] = res_dict['congestion_end'] + dt.timedelta(minutes=(15 - res_dict['congestion_end'].minute % 15))
     res_dict['prep_max_soc'] = 1500
-    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2.5)
     return res_dict
 
 
@@ -87,7 +86,7 @@ def time_and_size_congestion_dict(dict, strategy=1):
                     'prep_start': None
                     }
     else:
-        res_dict = time_and_size_leip(dict)
+        res_dict = time_and_size_conservative(dict)
 
         res_dict['congestion_start'] = res_dict['congestion_start'].time().replace(tzinfo=utc)
         res_dict['congestion_end'] = res_dict['congestion_end'].time().replace(tzinfo=utc)

@@ -399,7 +399,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                  transportation_kw=transportation_kw)
 
     res_df = get_month_congestion_timings(solarvation_filename='data/environments/lelystad_1_2021.csv')
-    print(res_df)
+    print(res_df.to_string())
 
     earning_money_until = res_df.loc['prep_start']
     preparing_for_congestion_until = res_df.loc['congestion_start']
