@@ -35,7 +35,7 @@ class TestMonthOfModesOfOperationController(unittest.TestCase):
         cls.greedy_discharge_path = greedy_discharge_path
         cls.always_discharge_path = always_discharge_path
 
-    def test_base(self):
+    def test_base_workings(self):
         rhino = Battery('test_simple_congestion', 7500, 12000, starting_soc_kwh=3000, verbose_lvl=4)
         month_of_modes_of_operation_control_tower = MonthOfModesOfOperationController('test_base', rhino)
 
@@ -60,3 +60,39 @@ class TestMonthOfModesOfOperationController(unittest.TestCase):
         month_of_modes_of_operation_control_tower.take_step([-200, -200, 6000, dt.datetime(2021, 7, 6, 1, 32, tzinfo=utc)], [0, 1, 2, 3])
         month_moo[6].determine_step.assert_called_once_with([-200, -200, 6000, dt.datetime(2021, 7, 6, 1, 32, tzinfo=utc)], [0, 1, 2, 3])
         self.assertEqual(3045, rhino.state_of_charge_kwh)
+
+    def test_faulty_initialization(self):
+        rhino = Battery('test_simple_congestion', 7500, 12000, starting_soc_kwh=3000, verbose_lvl=4)
+        month_of_modes_of_operation_control_tower = MonthOfModesOfOperationController('test_base', rhino)
+
+        month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December']
+        month_moo = []
+        for i in range(12):
+            name = month_names[i]
+            moo = ModesOfOperationController(name, rhino)
+            moo.determine_step = MagicMock(name='determine_step')
+            moo.determine_step.return_value = 'CHARGE', i * 500
+
+            month_moo.append(moo)
+            month_of_modes_of_operation_control_tower.add_controller(moo)
+
+        self.assertRaises(AttributeError, month_of_modes_of_operation_control_tower.add_controller, None)
+
+    def test_not_ready_yet(self):
+        rhino = Battery('test_simple_congestion', 7500, 12000, starting_soc_kwh=3000, verbose_lvl=4)
+        month_of_modes_of_operation_control_tower = MonthOfModesOfOperationController('test_base', rhino)
+
+        month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December']
+        month_moo = []
+        for i in range(10):
+            name = month_names[i]
+            moo = ModesOfOperationController(name, rhino)
+            moo.determine_step = MagicMock(name='determine_step')
+            moo.determine_step.return_value = 'CHARGE', i * 500
+
+            month_moo.append(moo)
+            month_of_modes_of_operation_control_tower.add_controller(moo)
+
+        self.assertRaises(AttributeError, month_of_modes_of_operation_control_tower.determine_step, [], [])
