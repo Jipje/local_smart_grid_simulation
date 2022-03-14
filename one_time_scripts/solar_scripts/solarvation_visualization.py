@@ -239,20 +239,20 @@ if __name__ == '__main__':
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # congestion_kw = None
-    # do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
-    # do_range_investigation(solarvation_df)
-    # do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    do_range_investigation(solarvation_df)
+    do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December']
-    res_df = time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels)
+    res_df = time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels, verbose_lvl=4)
     print(res_df.to_string())
 
     print('2021 - Time investigation')
-    print(time_congestion_events(solarvation_df))
+    print(time_congestion_events(solarvation_df, verbose_lvl=4))
     print('2021 - Size investigation')
-    print(size_congestion_events(solarvation_df))
+    print(size_congestion_events(solarvation_df, verbose_lvl=4))
 
     # start_date = dt.datetime(2021, 1, 1, tzinfo=utc)
     # end_date = dt.datetime(2022, 1, 1, tzinfo=utc)

@@ -102,8 +102,9 @@ def time_congestion_events(solarvation_df, verbose_lvl=1):
     temp_df = pd.DataFrame()
     temp_df['congestion_start'] = solarvation_df[solarvation_df['congestion']]['time']
     temp_df['congestion_end'] = temp_df['congestion_start']
-    if len(temp_df) == 0 and verbose_lvl > 3:
-        print('\tNo congestion events found.')
+    if len(temp_df) == 0:
+        if verbose_lvl > 3:
+            print('\tNo congestion events found.')
         return {}
     temp_df = temp_df.resample('1D').agg({'congestion_start': min, 'congestion_end': max})
     temp_df['congestion_length'] = temp_df['congestion_end'] - temp_df['congestion_start']
@@ -164,8 +165,9 @@ def size_congestion_events(solarvation_df, verbose_lvl=1):
 
     time_congestion_df['excess_capacity'] = time_congestion_df['max_power'] * 1/60
 
-    if len(time_congestion_df) == 0 and verbose_lvl > 3:
-        print('\tNo congestion events found.')
+    if len(time_congestion_df) == 0:
+        if verbose_lvl > 3:
+            print('\tNo congestion events found.')
         return {}
 
     time_congestion_df = time_congestion_df.resample('1D').agg(
