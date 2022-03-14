@@ -215,8 +215,8 @@ def time_congestion_events(solarvation_df):
           f"\tMin congestion length is {min_length}"
     print(msg)
     res_dict = {
-        'earliest_start': min_start,
-        'latest_ending': max_end,
+        'earliest_start': dt.datetime.strptime(min_start, '%H:%M:%S'),
+        'latest_ending': dt.datetime.strptime(max_end, '%H:%M:%S'),
         'mean_start': mean_start,
         'mean_end': mean_end,
         'median_start': median_start,
@@ -364,6 +364,73 @@ def retrieve_months(year=2021):
     return starting_times, ending_times
 
 
+def time_and_size_congestion_dict(dict, strategy=1):
+    if len(dict) == 0:
+        res_dict = {'congestion_start': None,
+                    'congestion_end': None,
+                    'prep_max_soc': None,
+                    'prep_start': None
+                    }
+    else:
+        res_dict = time_and_size_leip(dict)
+
+        res_dict['congestion_start'] = res_dict['congestion_start'].time()
+        res_dict['congestion_end'] = res_dict['congestion_end'].time()
+        res_dict['prep_start'] = res_dict['prep_start'].time()
+
+    return res_dict
+
+
+# This method will time and size congestion slightly smarter
+#  for timing that is, the earliest start time rounded down, and the latest end time rounded up
+#  for sizing that is the battery should be empty enough to handle the worst case capacity * 20%
+#  and there is enough hours to prepare the battery for that case
+def time_and_size_leip(res_dict, max_kwh=28500, safety_margin=1.2, min_kwh=1500, max_congestion_kw=5000, max_kw=14000):
+    # This simply copies the timing from the conservative system
+    res_dict = time_and_size_conservative(res_dict)
+
+    # The max capacity is multiplied with the safety margin
+    max_capacity_in_congestion = abs(res_dict['max_capacity'] * safety_margin)
+    # However the worst case is limited by the size of the battery
+    worst_case_capacity = min(max_kwh-min_kwh, max_capacity_in_congestion)
+    worst_case_capacity = round(worst_case_capacity, 0)
+    # Save how much room there has to be in the battery
+    res_dict['prep_max_soc'] = max_kwh - worst_case_capacity
+
+    # So if the battery is full, how much needs to be discharged in the preparation period?
+    worst_case_to_discharge_capacity = (max_kwh + min_kwh) - res_dict['prep_max_soc']
+    prep_hours = round(worst_case_to_discharge_capacity / max_kw, 1)
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=prep_hours)
+    # And round the preparation period down to a PTU
+    res_dict['prep_start'] = res_dict['prep_start'] - dt.timedelta(minutes=res_dict['prep_start'].minute % 15)
+    return res_dict
+
+
+# This method will time and size congestion spot on the worst case values
+#  for timing that is, the earliest start time, and the latest end time
+#  for sizing that is the battery should be fully empty
+#  and there is 2 hours to prepare the battery for that case
+def time_and_size_spot_on(res_dict):
+    res_dict['congestion_start'] = res_dict['earliest_start']
+    res_dict['congestion_end'] = res_dict['latest_ending']
+    res_dict['prep_max_soc'] = 1500
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
+    return res_dict
+
+
+# This method will time and size congestion slightly conservatively
+#  for timing that is, the earliest start time rounded down, and the latest end time rounded up
+#  for sizing that is the battery should be fully empty
+#  and there is 2 hours to prepare the battery for that case
+def time_and_size_conservative(res_dict):
+    res_dict = time_and_size_spot_on(res_dict)
+    res_dict['congestion_start'] = res_dict['congestion_start'] - dt.timedelta(minutes=res_dict['congestion_start'].minute % 15)
+    res_dict['congestion_end'] = res_dict['congestion_end'] + dt.timedelta(minutes=(15 - res_dict['congestion_end'].minute % 15))
+    res_dict['prep_max_soc'] = 1500
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2)
+    return res_dict
+
+
 def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None):
     res_arr = []
     for i in range(len(starting_times)):
@@ -377,6 +444,9 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         size_dict = size_congestion_events(period_df)
 
         res_dict.update(size_dict)
+        res_dict = time_and_size_congestion_dict(res_dict)
+        print(res_dict)
+
         res_arr.append(res_dict)
     res_df = pd.DataFrame(res_arr)
     res_df = res_df.transpose()
@@ -410,9 +480,9 @@ if __name__ == '__main__':
     # solarvation_df = solarvation_df[start_filter:end_filter]
 
     # congestion_kw = None
-    do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
-    do_range_investigation(solarvation_df)
-    do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    # do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    # do_range_investigation(solarvation_df)
+    # do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',
