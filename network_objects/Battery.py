@@ -188,11 +188,10 @@ class Battery(NetworkObject):
                f"Total Earnings: €{round(self.earnings(), 2)}"
 
     def end_of_environment_metrics(self):
-        earnings_str = '{:,.2f}'.format(self.earnings())
         snake_case_name = (self.name.lower()).replace(' ', '_')
         res = {
-            f'{snake_case_name}_battery_revenue': earnings_str,
-            f'{snake_case_name}_battery_cycles': self.cycle_counter.cycle_count
+            f'{snake_case_name}_battery_revenue': round(self.earnings(), 2),
+            f'{snake_case_name}_battery_cycles': round(self.cycle_counter.cycle_count, 2)
         }
         return res
 

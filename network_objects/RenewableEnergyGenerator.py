@@ -59,10 +59,9 @@ class RenewableEnergyGenerator(NetworkObject):
         return res_msg
 
     def end_of_environment_metrics(self):
-        earnings_str = '{:,.2f}'.format(self.earnings())
         snake_case_name = (self.name.lower()).replace(' ', '_')
         res = {
-            f'{snake_case_name}_revenue': earnings_str
+            f'{snake_case_name}_revenue': round(self.earnings(), 2)
         }
         return res
 
