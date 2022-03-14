@@ -1,6 +1,8 @@
 import datetime as dt
-
+import dateutil.tz
 import pandas as pd
+
+utc = dateutil.tz.tzutc()
 
 
 def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None, verbose_lvl=1):
@@ -22,7 +24,8 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         res_arr.append(res_dict)
     res_df = pd.DataFrame(res_arr)
     res_df = res_df.transpose()
-    res_df.columns = labels
+    if labels is not None:
+        res_df.columns = labels
     return res_df
 
 
@@ -86,9 +89,9 @@ def time_and_size_congestion_dict(dict, strategy=1):
     else:
         res_dict = time_and_size_leip(dict)
 
-        res_dict['congestion_start'] = res_dict['congestion_start'].time()
-        res_dict['congestion_end'] = res_dict['congestion_end'].time()
-        res_dict['prep_start'] = res_dict['prep_start'].time()
+        res_dict['congestion_start'] = res_dict['congestion_start'].time().replace(tzinfo=utc)
+        res_dict['congestion_end'] = res_dict['congestion_end'].time().replace(tzinfo=utc)
+        res_dict['prep_start'] = res_dict['prep_start'].time().replace(tzinfo=utc)
 
     return res_dict
 
@@ -139,8 +142,8 @@ def time_congestion_events(solarvation_df, verbose_lvl=1):
     if verbose_lvl > 3:
         print(msg)
     res_dict = {
-        'earliest_start': dt.datetime.strptime(min_start, '%H:%M:%S'),
-        'latest_ending': dt.datetime.strptime(max_end, '%H:%M:%S'),
+        'earliest_start': dt.datetime.strptime(min_start, '%H:%M:%S').replace(tzinfo=utc),
+        'latest_ending': dt.datetime.strptime(max_end, '%H:%M:%S').replace(tzinfo=utc),
         'mean_start': mean_start,
         'mean_end': mean_end,
         'median_start': median_start,
