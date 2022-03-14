@@ -58,5 +58,12 @@ class RenewableEnergyGenerator(NetworkObject):
             res_msg = res_msg + "\n\t --------------------\n\tAverage earnings: €{}".format(avg_earnings_str)
         return res_msg
 
+    def end_of_environment_metrics(self):
+        snake_case_name = (self.name.lower()).replace(' ', '_')
+        res = {
+            f'{snake_case_name}_revenue': round(self.earnings(), 2)
+        }
+        return res
+
     def __str__(self):
         return "{} renewable energy generator:\nTotal Earnings: €{}".format(self.name, round(self.earnings(), 2))

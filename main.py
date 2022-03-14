@@ -30,8 +30,9 @@ def run_random_thirty_days(scenario=base_scenario, verbose_lvl=2, simulation_env
     starting_timestep = start_day * 24 * 60
     number_of_steps = 1 * 24 * 60
     print('Random thirty days - Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
-    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
+    res = run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran random thirty days.- Starting timestep: {} - Number of Steps: {}'.format(starting_timestep, number_of_steps))
+    return res
 
 
 def run_single_month(month, scenario=base_scenario, verbose_lvl=2, simulation_environment=None):
@@ -44,9 +45,10 @@ def run_single_month(month, scenario=base_scenario, verbose_lvl=2, simulation_en
     starting_timestep = starting_timesteps[month]
     number_of_steps = starting_timesteps[month + 1] - starting_timestep
     print('Run {} - Starting timestep: {} - Number of Steps: {}'.format(month_str, starting_timestep, number_of_steps))
-    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl,
+    res = run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl,
                    simulation_environment=simulation_environment)
     print('Just ran {} - Starting timestep: {} - Number of Steps: {}'.format(month_str, starting_timestep, number_of_steps))
+    return res
 
 
 def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environment=None):
@@ -54,8 +56,9 @@ def run_full_scenario(scenario=base_scenario, verbose_lvl=1, simulation_environm
     with open(scenario) as file:
         number_of_steps = len(file.readlines()) + 1
     print('Running full scenario {}'.format(scenario))
-    run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
+    res = run_simulation(starting_timestep, number_of_steps, scenario=scenario, verbose_lvl=verbose_lvl, simulation_environment=simulation_environment)
     print('Just ran full scenario {}\n'.format(scenario))
+    return res
 
 
 def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3, simulation_environment=None):
@@ -140,6 +143,7 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
         print('----------------------------------------')
         print('End of simulation, final PTU: {}'.format(time_step_string))
         print(simulation_environment.end_of_environment_message(environment_additions=[]))
+    return simulation_environment.end_of_environment_metrics(current_metrics={})
 
 
 def network_capacity_windnet_simulation(network_capacity=27000, verbose_lvl=1):
@@ -294,7 +298,7 @@ def super_naive_baseline(verbose_lvl=1):
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(congestion_controller, [1, 3, 4])
 
-    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
 def baseline(verbose_lvl=1):
@@ -455,11 +459,11 @@ if __name__ == '__main__':
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
-    solarvation_dumb_discharging(verbose_lvl)
-    wombat_solarvation_limited_charging()
-    super_naive_baseline(verbose_lvl)
-    baseline(verbose_lvl)
-    run_monthly_timed_baseline(verbose_lvl)
+    # print(solarvation_dumb_discharging(verbose_lvl))
+    # print(wombat_solarvation_limited_charging())
+    # print(super_naive_baseline(verbose_lvl))
+    # print(baseline(verbose_lvl))
+    print(run_monthly_timed_baseline(verbose_lvl))
 
     # Setup for a new experiment
     network_capacity = 14000

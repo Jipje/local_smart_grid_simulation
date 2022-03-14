@@ -38,11 +38,20 @@ class NetworkEnvironment(object):
     def end_of_environment_message(self, environment_additions):
         num_of_ptus = self.number_of_steps / 15
         num_of_days = num_of_ptus / 96
-        res_msg = 'Environment: \n\tNumber of 1m timesteps: {}\n\tNumber of PTUs: {}\n\tNumber of days: {}'\
-            .format(self.number_of_steps, num_of_ptus, num_of_days)
+        res_msg = 'Environment: ' \
+                  f'\n\tNumber of 1m timesteps: {self.number_of_steps}' \
+                  f'\n\tNumber of PTUs: {num_of_ptus}' \
+                  f'\n\tNumber of days: {num_of_days}'
         for msg in environment_additions:
             res_msg = res_msg + '\n\t' + msg
 
         for network_object in self.network_objects:
             res_msg = res_msg + network_object.end_of_environment_message(num_of_days)
         return res_msg
+
+    def end_of_environment_metrics(self, current_metrics):
+        res_dict = current_metrics
+        for object_index in range(len(self.network_objects)):
+            network_object = self.network_objects[object_index]
+            res_dict.update(network_object.end_of_environment_metrics())
+        return res_dict
