@@ -46,7 +46,7 @@ def time_and_size_leip(res_dict, max_kwh=28500, safety_margin=1.2, min_kwh=1500,
 
     # So if the battery is full, how much needs to be discharged in the preparation period?
     worst_case_to_discharge_capacity = (max_kwh + min_kwh) - res_dict['prep_max_soc']
-    prep_hours = round(worst_case_to_discharge_capacity / max_kw, 1)
+    prep_hours = round(worst_case_to_discharge_capacity / max_kw, 1) + 0.25
     res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=prep_hours)
     # And round the preparation period down to a PTU
     res_dict['prep_start'] = res_dict['prep_start'] - dt.timedelta(minutes=res_dict['prep_start'].minute % 15)
@@ -86,7 +86,7 @@ def time_and_size_congestion_dict(dict, strategy=1):
                     'prep_start': None
                     }
     else:
-        res_dict = time_and_size_conservative(dict)
+        res_dict = time_and_size_leip(dict)
 
         res_dict['congestion_start'] = res_dict['congestion_start'].time().replace(tzinfo=utc)
         res_dict['congestion_end'] = res_dict['congestion_end'].time().replace(tzinfo=utc)
