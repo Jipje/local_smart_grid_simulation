@@ -3,9 +3,11 @@ import os
 import random
 import datetime as dt
 import dateutil.tz
+from pandas import NaT
 
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
+from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
@@ -396,51 +398,25 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
 
-    if transportation_kw == 2000:
-        earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(9, 30, tzinfo=utc), dt.time(6, 30, tzinfo=utc),
-                               dt.time(5, 15, tzinfo=utc), dt.time(4, 15, tzinfo=utc), dt.time(4, 15, tzinfo=utc),
-                               dt.time(5, 0, tzinfo=utc), dt.time(5, 15, tzinfo=utc), dt.time(6, 30, tzinfo=utc),
-                               dt.time(7, 45, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
-        preparing_for_congestion_until = [-1, -1, dt.time(12, 0, tzinfo=utc), dt.time(9, 0, tzinfo=utc),
-                                          dt.time(7, 45, tzinfo=utc), dt.time(6, 45, tzinfo=utc),
-                                          dt.time(6, 45, tzinfo=utc),
-                                          dt.time(7, 30, tzinfo=utc), dt.time(7, 45, tzinfo=utc),
-                                          dt.time(9, 0, tzinfo=utc),
-                                          dt.time(10, 15, tzinfo=utc), -1, -1]
-        solving_congestion_until = [-1, -1, dt.time(12, 30, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
-                                    dt.time(15, 45, tzinfo=utc), dt.time(16, 15, tzinfo=utc),
-                                    dt.time(16, 30, tzinfo=utc),
-                                    dt.time(16, 15, tzinfo=utc), dt.time(16, 15, tzinfo=utc),
-                                    dt.time(14, 30, tzinfo=utc),
-                                    dt.time(13, 15, tzinfo=utc), -1, -1]
-    else:
-        earning_money_until = [-1, dt.time(23, 59, tzinfo=utc), dt.time(10, 14, tzinfo=utc), dt.time(7, 9, tzinfo=utc),
-                               dt.time(5, 50, tzinfo=utc), dt.time(4, 45, tzinfo=utc), dt.time(4, 56, tzinfo=utc),
-                               dt.time(5, 30, tzinfo=utc), dt.time(5, 50, tzinfo=utc), dt.time(7, 6, tzinfo=utc),
-                                dt.time(8, 25, tzinfo=utc), dt.time(23, 59, tzinfo=utc), dt.time(23, 59, tzinfo=utc)]
-        preparing_for_congestion_until = [-1, -1, dt.time(12, 14, tzinfo=utc), dt.time(9, 9, tzinfo=utc),
-                               dt.time(7, 50, tzinfo=utc), dt.time(6, 45, tzinfo=utc), dt.time(6, 56, tzinfo=utc),
-                               dt.time(7, 30, tzinfo=utc), dt.time(7, 50, tzinfo=utc), dt.time(9, 6, tzinfo=utc),
-                               dt.time(10, 25, tzinfo=utc), -1, -1]
-        solving_congestion_until = [-1, -1, dt.time(12, 26, tzinfo=utc), dt.time(14, 20, tzinfo=utc),
-                               dt.time(15, 38, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(16, 29, tzinfo=utc),
-                               dt.time(16, 5, tzinfo=utc), dt.time(16, 12, tzinfo=utc), dt.time(14, 30, tzinfo=utc),
-                               dt.time(13, 5, tzinfo=utc), -1, -1]
+    res_df = get_month_congestion_timings(solarvation_filename='data/environments/lelystad_1_2021.csv')
+    print(res_df.to_string())
+
+    earning_money_until = res_df.loc['prep_start']
+    preparing_for_congestion_until = res_df.loc['congestion_start']
+    solving_congestion_until = res_df.loc['congestion_end']
 
     main_controller = MonthOfModesOfOperationController(name='Wombat main controller',
                                                         network_object=battery,
                                                         verbose_lvl=verbose_lvl)
-    for month in range(1, 13):
+    for month in range(12):
         moo = ModesOfOperationController(name=f'Wombat controller month {month}',
                                          network_object=battery,
                                          verbose_lvl=verbose_lvl)
-        if month in [1, 11, 12]:
-            moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
-        else:
+        if earning_money_until[month] is not NaT:
             moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
             moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
             moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
-            moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+        moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
         main_controller.add_controller(moo)
 
     imbalance_environment.add_object(solarvation, [1, 3, 4])

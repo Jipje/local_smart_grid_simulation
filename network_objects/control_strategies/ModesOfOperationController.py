@@ -21,7 +21,7 @@ class ModesOfOperationController(NaiveControlTower):
         try:
             assert start_time.tzinfo == utc
         except AssertionError:
-            raise AttributeError('This modes of operation controller only handles a single day')
+            raise AttributeError('The modes of operation controller needs a time in utc')
 
         try:
             assert start_time > self.timings[len(self.timings) - 1]
