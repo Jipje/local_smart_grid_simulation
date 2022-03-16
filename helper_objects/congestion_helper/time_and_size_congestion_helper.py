@@ -1,6 +1,7 @@
 import datetime as dt
 import dateutil.tz
 import pandas as pd
+from pandas import NaT
 
 utc = dateutil.tz.tzutc()
 
@@ -21,6 +22,9 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         res_dict = time_and_size_congestion_dict(res_dict)
 
         res_arr.append(res_dict)
+    strategy = 4
+    if strategy == 4:
+        res_arr = time_and_size_year_worst_case_array(res_arr)
     res_df = pd.DataFrame(res_arr)
     res_df = res_df.transpose()
     if labels is not None:
@@ -51,6 +55,41 @@ def time_and_size_leip(res_dict, max_kwh=28500, safety_margin=1.2, min_kwh=1500,
     # And round the preparation period down to a PTU
     res_dict['prep_start'] = res_dict['prep_start'] - dt.timedelta(minutes=res_dict['prep_start'].minute % 15)
     return res_dict
+
+
+# This method will time and size congestion based on the worst case of the year
+#  for timing that is, the earliest start time rounded down, and the latest end time rounded up
+#  for sizing that is the battery should be empty
+#  and there is enough hours to prepare the battery for that case
+def time_and_size_year_worst_case(res_dict, earliest_start=None, latest_ending=None):
+    if earliest_start is None:
+        res_dict['congestion_start'] = res_dict['earliest_start']
+        res_dict['congestion_end'] = res_dict['latest_ending']
+    else:
+        res_dict['congestion_start'] = earliest_start
+        res_dict['congestion_end'] = latest_ending
+    res_dict['prep_max_soc'] = 1500
+    res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2.25)
+    return res_dict
+
+
+def time_and_size_year_worst_case_array(res_arr):
+    earliest_start = dt.datetime(1900, 1, 1, 23, 59, tzinfo=utc)
+    latest_ending = dt.datetime(1900, 1, 1, 0, 0, tzinfo=utc)
+    for dict in res_arr:
+        try:
+            if dict['earliest_start'] is not NaT:
+                if dict['earliest_start'] < earliest_start:
+                    earliest_start = dict['earliest_start']
+
+                if dict['latest_ending'] > latest_ending:
+                    latest_ending = dict['latest_ending']
+        except KeyError:
+            continue
+
+    for i in range(len(res_arr)):
+        res_arr[i] = time_and_size_year_worst_case(res_arr[i], earliest_start=earliest_start, latest_ending=latest_ending)
+    return res_arr
 
 
 # This method will time and size congestion spot on the worst case values
