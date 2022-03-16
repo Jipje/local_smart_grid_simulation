@@ -48,11 +48,17 @@ if __name__ == '__main__':
         y_min = prep_starts_y_min[i]
         y_max = prep_starts_y_max[i]
         color = colors[i]
-        opacity = preparing_max_kwh[i] / largest_prep_kwh * 0.75 + 0.1
+        opacity = 0.1
+        if y_min is None:
+            end_of_prep_y = None
+        else:
+            end_of_prep_y = preparing_max_kwh[i] / 30000 * 12 + 2 + y_min
         plt.plot([prep_starts[i], prep_starts[i]], [y_min, y_max], color=color)
         plt.fill([prep_starts[i], prep_starts[i], congestion_starts[i], congestion_starts[i]], [y_min, y_max, y_max, y_min], color=color, alpha=opacity)
+        plt.fill([prep_starts[i], prep_starts[i], congestion_starts[i], congestion_starts[i]], [y_min, y_max, end_of_prep_y, y_min], color=color, alpha=0.4)
         plt.plot([congestion_starts[i], congestion_starts[i]], [y_min, y_max], color=color)
         plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max, y_max, y_min], color=color, alpha=opacity)
+        plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [y_min, end_of_prep_y, end_of_prep_y, y_min], color=color, alpha=0.4)
         plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max], color=color)
 
     my_fmt = mdates.DateFormatter('%H:%M')
