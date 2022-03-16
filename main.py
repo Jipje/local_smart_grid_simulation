@@ -9,6 +9,7 @@ from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 from helper_objects.strategies.CsvStrategy import CsvStrategy
+from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
 from network_objects.control_strategies.ModesOfOperationController import ModesOfOperationController
@@ -403,6 +404,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
 
     earning_money_until = res_df.loc['prep_start']
     preparing_for_congestion_until = res_df.loc['congestion_start']
+    preparing_max_kwh = res_df.loc['prep_max_soc']
     solving_congestion_until = res_df.loc['congestion_end']
 
     main_controller = MonthOfModesOfOperationController(name='Wombat main controller',
@@ -414,6 +416,20 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                          verbose_lvl=verbose_lvl)
         if earning_money_until[month] is not NaT:
             moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
+
+            max_kwh_in_prep = float(preparing_max_kwh[month])
+            max_soc_perc_in_prep = int(max_kwh_in_prep / battery.max_kwh * 100)
+            discharge_until_strategy = DischargeUntilStrategy(base_strategy=csv_strategy,
+                                                              name='Discharge Money Earner',
+                                                              discharge_until_soc_perc=max_soc_perc_in_prep
+                                                              )
+            prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                                 network_object=battery,
+                                                                                 congestion_kw=congestion_kw,
+                                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                                                 strategy=discharge_until_strategy,
+                                                                                 verbose_lvl=verbose_lvl)
+
             moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
             moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
         moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)

@@ -73,6 +73,8 @@ class TestStrategyBattery(unittest.TestCase):
         self.assertEqual(rhino_strategy.make_decision(2, 2, 71), 'WAIT')
         self.assertEqual(rhino_strategy.make_decision(64, 64, 94), 'WAIT')
 
+    # TODO add test for discharge buckets
+
     def test_extreme_buckets(self):
         rhino_strategy = CsvStrategy(name='Basic Rhino strategy', strategy_csv=self.strategy_one_path)
         # First bucket
