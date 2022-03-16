@@ -35,10 +35,10 @@ if __name__ == '__main__':
             prep_starts[i] = dt.datetime(1970, 1, 1, prep_starts[i].hour, prep_starts[i].minute, tzinfo=utc)
             congestion_starts[i] = dt.datetime(1970, 1, 1, congestion_starts[i].hour, congestion_starts[i].minute, tzinfo=utc)
             solving_congestion_until[i] = dt.datetime(1970, 1, 1, solving_congestion_until[i].hour, solving_congestion_until[i].minute, tzinfo=utc)
-            prep_starts_y_min.append(i * 20 + 2)
-            prep_starts_y_max.append((i * 20) + 22)
+            prep_starts_y_min.append((i * 20) + 5)
+            prep_starts_y_max.append((i * 20) + 20)
         colors.append('#%06X' % randint(0, 0xFFFFFF))
-        y_ticks.append(i * 20 + 12)
+        y_ticks.append((i * 20) + 12.5)
 
     for i in range(12):
         y_min = prep_starts_y_min[i]
