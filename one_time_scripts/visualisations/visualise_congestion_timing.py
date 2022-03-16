@@ -4,6 +4,7 @@ from helper_objects.congestion_helper.month_congestion_size_and_timer import get
 import matplotlib.pyplot as plt
 import datetime as dt
 import dateutil.tz
+from random import randint
 
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
@@ -20,6 +21,7 @@ if __name__ == '__main__':
 
     prep_starts_y_min = []
     prep_starts_y_max = []
+    colors = []
     for i in range(len(prep_starts)):
         if prep_starts[i] is NaT:
             prep_starts[i] = dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc)
@@ -33,13 +35,17 @@ if __name__ == '__main__':
             solving_congestion_until[i] = dt.datetime(1970, 1, 1, solving_congestion_until[i].hour, solving_congestion_until[i].minute, tzinfo=utc)
             prep_starts_y_min.append(i * 20)
             prep_starts_y_max.append((i * 20) + 20)
+        colors.append('#%06X' % randint(0, 0xFFFFFF))
 
     for i in range(12):
-        plt.plot([prep_starts[i], prep_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
-        plt.fill([prep_starts[i], prep_starts[i], congestion_starts[i], congestion_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i], prep_starts_y_max[i], prep_starts_y_min[i]])
-        plt.plot([congestion_starts[i], congestion_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
-        plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [prep_starts_y_min[i], prep_starts_y_max[i], prep_starts_y_max[i], prep_starts_y_min[i]])
-        plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
+        y_min = prep_starts_y_min[i]
+        y_max = prep_starts_y_max[i]
+        color = colors[i]
+        plt.plot([prep_starts[i], prep_starts[i]], [y_min, y_max], color=color)
+        plt.fill([prep_starts[i], prep_starts[i], congestion_starts[i], congestion_starts[i]], [y_min, y_max, y_max, y_min], color=color, alpha=0.5)
+        plt.plot([congestion_starts[i], congestion_starts[i]], [y_min, y_max], color=color)
+        plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max, y_max, y_min], color=color, alpha=0.5)
+        plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max], color=color)
 
     plt.xlim(dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc), dt.datetime(1970, 1, 1, 23, 59))
     plt.ylim(0, 250)
