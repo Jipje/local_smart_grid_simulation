@@ -2,6 +2,7 @@ from pandas import NaT
 
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import datetime as dt
 import dateutil.tz
 from random import randint
@@ -21,6 +22,7 @@ if __name__ == '__main__':
 
     prep_starts_y_min = []
     prep_starts_y_max = []
+    y_ticks = []
     colors = []
     for i in range(len(prep_starts)):
         if prep_starts[i] is NaT:
@@ -33,9 +35,10 @@ if __name__ == '__main__':
             prep_starts[i] = dt.datetime(1970, 1, 1, prep_starts[i].hour, prep_starts[i].minute, tzinfo=utc)
             congestion_starts[i] = dt.datetime(1970, 1, 1, congestion_starts[i].hour, congestion_starts[i].minute, tzinfo=utc)
             solving_congestion_until[i] = dt.datetime(1970, 1, 1, solving_congestion_until[i].hour, solving_congestion_until[i].minute, tzinfo=utc)
-            prep_starts_y_min.append(i * 20)
-            prep_starts_y_max.append((i * 20) + 20)
+            prep_starts_y_min.append(i * 20 + 2)
+            prep_starts_y_max.append((i * 20) + 22)
         colors.append('#%06X' % randint(0, 0xFFFFFF))
+        y_ticks.append(i * 20 + 12)
 
     for i in range(12):
         y_min = prep_starts_y_min[i]
@@ -47,6 +50,14 @@ if __name__ == '__main__':
         plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max, y_max, y_min], color=color, alpha=0.5)
         plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max], color=color)
 
+    my_fmt = mdates.DateFormatter('%H:%M')
+    plt.title('Fixed schedule to prepare for and solve congestion')
+    plt.ylabel('Month')
+    plt.xlabel('Time')
     plt.xlim(dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc), dt.datetime(1970, 1, 1, 23, 59))
     plt.ylim(0, 250)
+
+    plt.gca().xaxis.set_major_formatter(my_fmt)
+
+    plt.yticks(y_ticks, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
     plt.show()
