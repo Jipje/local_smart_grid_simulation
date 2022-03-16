@@ -36,7 +36,9 @@ if __name__ == '__main__':
 
     for i in range(12):
         plt.plot([prep_starts[i], prep_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
+        plt.fill([prep_starts[i], prep_starts[i], congestion_starts[i], congestion_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i], prep_starts_y_max[i], prep_starts_y_min[i]])
         plt.plot([congestion_starts[i], congestion_starts[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
+        plt.fill([congestion_starts[i], congestion_starts[i], solving_congestion_until[i], solving_congestion_until[i]], [prep_starts_y_min[i], prep_starts_y_max[i], prep_starts_y_max[i], prep_starts_y_min[i]])
         plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [prep_starts_y_min[i], prep_starts_y_max[i]])
 
     plt.xlim(dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc), dt.datetime(1970, 1, 1, 23, 59))
