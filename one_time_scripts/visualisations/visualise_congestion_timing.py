@@ -1,20 +1,20 @@
 from pandas import NaT
 
-from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
+from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings, \
+    get_month_congestion_timings_with_df
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as dt
 import dateutil.tz
 from random import randint
 
+from one_time_scripts.solar_scripts.solarvation_visualization import load_solarvation_data
+
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
 
-if __name__ == '__main__':
-    res_df = get_month_congestion_timings(verbose_lvl=1)
-    print(res_df.to_string())
-
+def visualise_congestion_time_and_sizes(res_df, title=None):
     prep_starts = res_df.loc['prep_start'].array
     congestion_starts = res_df.loc['congestion_start'].array
     preparing_max_kwh = res_df.loc['prep_max_soc'].array
@@ -62,7 +62,10 @@ if __name__ == '__main__':
         plt.plot([solving_congestion_until[i], solving_congestion_until[i]], [y_min, y_max], color=color)
 
     my_fmt = mdates.DateFormatter('%H:%M')
-    plt.title('Fixed schedule to prepare for and solve congestion')
+    title_suffix = ''
+    if title is not None:
+        title_suffix = '\n' + title
+    plt.title('Fixed schedule to prepare for and solve congestion' + title_suffix)
     plt.ylabel('Month')
     plt.xlabel('Time')
     plt.xlim(dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc), dt.datetime(1970, 1, 1, 23, 59))
@@ -72,3 +75,15 @@ if __name__ == '__main__':
 
     plt.yticks(y_ticks, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
     plt.show()
+
+
+if __name__ == '__main__':
+    solarvation_identifier = '../../data/environments/lelystad_1_2021.csv'
+    solarvation_df = load_solarvation_data(solarvation_identifier)
+
+    strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times']
+    for strategy_num in range(1, 5):
+        congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
+        visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
+
+    print(congestion_df.to_string())
