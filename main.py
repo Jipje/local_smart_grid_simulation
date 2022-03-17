@@ -399,7 +399,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
 
-    res_df = get_month_congestion_timings(solarvation_filename='data/environments/lelystad_1_2021.csv')
+    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=1)
     print(res_df.to_string())
 
     earning_money_until = res_df.loc['prep_start']
@@ -444,17 +444,17 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
 
 
 if __name__ == '__main__':
-    verbose_lvl = 1
+    verbose_lvl = 0
 
     # baseline_rhino_simulation(verbose_lvl)
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
-    # print(solarvation_dumb_discharging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging())
-    # print(super_naive_baseline(verbose_lvl))
-    # print(baseline(verbose_lvl))
+    print(solarvation_dumb_discharging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(super_naive_baseline(verbose_lvl))
+    print(baseline(verbose_lvl))
     print(run_monthly_timed_baseline(verbose_lvl))
 
     # Setup for a new experiment
