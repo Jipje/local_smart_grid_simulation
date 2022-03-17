@@ -33,7 +33,7 @@ def generate_random_discharge_relative_strategy(seed=None, name=None):
     if seed is None:
         seed = random.randrange(sys.maxsize)
     random.seed(seed)
-    print(seed)
+
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
 
