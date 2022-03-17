@@ -6,7 +6,7 @@ from pandas import NaT
 utc = dateutil.tz.tzutc()
 
 
-def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None, verbose_lvl=1):
+def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None, verbose_lvl=1, strategy=4):
     res_arr = []
     for i in range(len(starting_times)):
         period_df = solarvation_df[starting_times[i]:ending_times[i]]
@@ -19,10 +19,9 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
         size_dict = size_congestion_events(period_df, verbose_lvl)
 
         res_dict.update(size_dict)
-        res_dict = time_and_size_congestion_dict(res_dict)
+        res_dict = time_and_size_congestion_dict(res_dict, strategy=strategy)
 
         res_arr.append(res_dict)
-    strategy = 4
     if strategy == 4:
         res_arr = time_and_size_year_worst_case_array(res_arr)
     res_df = pd.DataFrame(res_arr)
@@ -125,7 +124,12 @@ def time_and_size_congestion_dict(dict, strategy=1):
                     'prep_start': None
                     }
     else:
-        res_dict = time_and_size_leip(dict)
+        if strategy == 2:
+            res_dict = time_and_size_conservative(dict)
+        elif strategy == 3:
+            res_dict = time_and_size_spot_on(dict)
+        else:
+            res_dict = time_and_size_leip(dict)
 
         res_dict['congestion_start'] = res_dict['congestion_start'].time().replace(tzinfo=utc)
         res_dict['congestion_end'] = res_dict['congestion_end'].time().replace(tzinfo=utc)

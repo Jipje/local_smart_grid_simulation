@@ -12,7 +12,7 @@ utc = dateutil.tz.tzutc()
 
 
 if __name__ == '__main__':
-    res_df = get_month_congestion_timings(verbose_lvl=1)
+    res_df = get_month_congestion_timings(verbose_lvl=1, strategy=1)
     print(res_df.to_string())
 
     prep_starts = res_df.loc['prep_start'].array
