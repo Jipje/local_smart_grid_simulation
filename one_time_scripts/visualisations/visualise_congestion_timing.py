@@ -1,11 +1,14 @@
 from pandas import NaT
 
-from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
+from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings, \
+    get_month_congestion_timings_with_df
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import datetime as dt
 import dateutil.tz
 from random import randint
+
+from one_time_scripts.solar_scripts.solarvation_visualization import load_solarvation_data
 
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
@@ -75,8 +78,12 @@ def visualise_congestion_time_and_sizes(res_df, title=None):
 
 
 if __name__ == '__main__':
-    strategy = 1
+    solarvation_identifier = '../../data/environments/lelystad_1_2021.csv'
+    solarvation_df = load_solarvation_data(solarvation_identifier)
+
     strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times']
-    congestion_df = get_month_congestion_timings(verbose_lvl=1, strategy=1)
-    visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy])
+    for strategy_num in range(1, 5):
+        congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
+        visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
+
     print(congestion_df.to_string())
