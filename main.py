@@ -458,6 +458,8 @@ def run_random_strategy_with_monthly_times(verbose_lvl=1, seed=None, transportat
 
     # Initialise random strategy
     random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
+    if seed is None:
+        print(f'{random_point_based_strategy.name}')
     greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
     always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
 
@@ -541,7 +543,13 @@ if __name__ == '__main__':
     print(baseline(verbose_lvl))
     print(run_monthly_timed_baseline(verbose_lvl))
 
-    print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=4899458002697043430))
+    # Good performing seeds:
+    #   660352027716011711
+    #   8582482338119250238
+    #   964853903656661948
+    # Bad performing seeds:
+    #   4803163394865071306
+    print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=None))
 
     # Setup for a new experiment
     network_capacity = 14000
