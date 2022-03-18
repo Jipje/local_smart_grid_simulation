@@ -1,3 +1,5 @@
+import random
+
 from evolutionary_algorithm.Individual import Individual
 from helper_objects.strategies import RandomStrategyGenerator
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
@@ -41,7 +43,26 @@ class StrategyIndividual(Individual):
 
 
     def mutate(self, mutate_params):
-        pass
+        original_charge = self.value.charge_points
+        original_discharge = self.value.discharge_points
+
+        new_individual = PointBasedStrategy(name=f'Mutated {self.value.name}')
+        for i in range(len(original_charge)):
+            original_charge_point = original_charge[i]
+            original_discharge_point = original_discharge[i]
+            new_charge_point = [None, None, 'CHARGE']
+            new_discharge_point = [None, None, 'DISCHARGE']
+
+            new_charge_point[0] = original_charge_point[0] + random.randint(-2, 2)
+            new_charge_point[1] = original_charge_point[1] + random.randint(-1, 1) * 5
+            new_discharge_point[0] = original_discharge_point[0] + random.randint(-2, 2)
+            new_discharge_point[1] = original_discharge_point[1] + random.randint(-1, 1) * 5
+
+            new_individual.add_point((new_charge_point[0], new_charge_point[1], new_charge_point[2]))
+            new_individual.add_point((new_discharge_point[0], new_discharge_point[1], new_discharge_point[2]))
+        new_individual.upload_strategy()
+        return StrategyIndividual(new_individual)
+
 
     def _random_init(self, init_params):
         return RandomStrategyGenerator.generate_random_discharge_relative_strategy(number_of_points=init_params['number_of_points'])
@@ -53,4 +74,6 @@ if __name__ == '__main__':
     other = StrategyIndividual(init_params=init_params)
 
     baby = current.pair(other, pair_params=None)
+    visualize_strategy(baby.value)
+    baby = baby.mutate(mutate_params=None)
     visualize_strategy(baby.value)
