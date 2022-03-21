@@ -30,9 +30,27 @@ class Fitness(object):
         self.congestion_safety_margin = congestion_safety_margin
 
         self.scenario = '../data/environments/lelystad_1_2021.csv'
+
+        if 'lelystad_1' in self.scenario:
+            self.scenario_name = 'Lelystad 1 - 19 MW Solar Farm, 14MW connection'
         res_df = pd.read_csv(self.scenario)
         self.scenario_df = res_df.to_dict('records')
         self.congestion_df = get_month_congestion_timings(solarvation_identifier='../data/environments/lelystad_1_2021.csv', strategy=1)
+
+        self.starting_timestep = 0
+        with open(self.scenario) as file:
+            self.number_of_steps = len(file.readlines()) + 1
+
+    def set_month(self, month):
+        starting_timesteps = [0, 60, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595, 480795, 525376]
+        assert 13 > month > 0
+
+        dt_month = dt.datetime(2021, month, 1)
+        month_str = dt_month.strftime('%B %Y')
+        self.scenario_name = month_str + ' ' + self.scenario_name
+        self.starting_timestep = starting_timesteps[month]
+        self.number_of_steps = starting_timesteps[month + 1] - self.starting_timestep
+
 
     def fitness(self, individual):
         # Initialise environment
@@ -108,13 +126,9 @@ class Fitness(object):
         imbalance_environment.add_object(solarvation, [1, 3, 4])
         imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
 
-        starting_timestep = 0
-        with open(self.scenario) as file:
-            number_of_steps = len(file.readlines()) + 1 - starting_timestep
-        print('\nRunning full scenario {}'.format(self.scenario))
-        res_dict = run_simulation_from_dict_of_df(starting_timestep, number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
+        print('\nRunning scenario {}'.format(self.scenario_name))
+        res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
                                        simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
-        print('Just ran full scenario {}'.format(self.scenario))
         print(res_dict)
         return res_dict['wombat_battery_revenue']
 
@@ -122,4 +136,5 @@ class Fitness(object):
 if __name__ == '__main__':
     random_individual = StrategyIndividual(init_params={'number_of_points': 4})
     fitness = Fitness(verbose_lvl=1)
+    fitness.set_month(7)
     print(fitness.fitness(random_individual))

@@ -24,6 +24,7 @@ utc = dateutil.tz.tzutc()
 
 if __name__ == '__main__':
     fitness_class = Fitness()
+    fitness_class.set_month(7)
     evo = Evolution(
         pool_size=10, fitness=fitness_class.fitness, individual_class=StrategyIndividual, n_offsprings=3,
         pair_params={},
