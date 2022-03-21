@@ -1,6 +1,7 @@
 from helper_objects.strategies.Strategy import Strategy
 import random
 
+
 class PointBasedStrategy(Strategy):
     def __init__(self, name, price_step_size=5):
         super().__init__(name, price_step_size)
