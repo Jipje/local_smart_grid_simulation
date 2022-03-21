@@ -111,10 +111,11 @@ class Fitness(object):
         starting_timestep = 0
         with open(self.scenario) as file:
             number_of_steps = len(file.readlines()) + 1 - starting_timestep
-        print('Running full scenario {}'.format(self.scenario))
+        print('\nRunning full scenario {}'.format(self.scenario))
         res_dict = run_simulation_from_dict_of_df(starting_timestep, number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
                                        simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
-        print('Just ran full scenario {}\n'.format(self.scenario))
+        print('Just ran full scenario {}'.format(self.scenario))
+        print(res_dict)
         return res_dict['wombat_battery_revenue']
 
 
