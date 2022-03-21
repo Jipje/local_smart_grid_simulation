@@ -63,9 +63,18 @@ class StrategyIndividual(Individual):
         new_individual.upload_strategy()
         return StrategyIndividual(new_individual)
 
-
     def _random_init(self, init_params):
         return RandomStrategyGenerator.generate_random_discharge_relative_strategy(number_of_points=init_params['number_of_points'])
+
+    def __str__(self):
+        visualize_strategy(self.value)
+        msg = f'{self.value.name}:\n CHARGING POINTS\n'
+        for point in self.value.charge_points:
+            msg = msg + f'\t({point[0]}, {point[1]})\n'
+        msg = msg + 'DISCHARGING POINTS\n'
+        for point in self.value.discharge_points:
+            msg = msg + f'\t({point[0]}, {point[1]})\n'
+        return msg
 
 
 if __name__ == '__main__':
@@ -74,6 +83,6 @@ if __name__ == '__main__':
     other = StrategyIndividual(init_params=init_params)
 
     baby = current.pair(other, pair_params=None)
-    visualize_strategy(baby.value)
+    print(baby)
     baby = baby.mutate(mutate_params=None)
-    visualize_strategy(baby.value)
+    print(baby)

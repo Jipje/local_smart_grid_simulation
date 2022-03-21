@@ -36,4 +36,6 @@ if __name__ == '__main__':
     for i in range(n_epochs):
         evo.step()
 
-    print(evo.pool.individuals[-1].value)
+    print(evo.pool.individuals[-1])
+    print(evo.pool.individuals[-2])
+    print(evo.pool.individuals[-3])
