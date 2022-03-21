@@ -149,6 +149,89 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
     return simulation_environment.end_of_environment_metrics(current_metrics={})
 
 
+def run_simulation_from_dict_of_df(starting_time_step=0, number_of_steps=100, scenario=base_scenario, verbose_lvl=3,
+                                   simulation_environment=None, dict_of_df=None):
+    if simulation_environment is None or dict_of_df is None:
+        baseline_rhino_simulation(verbose_lvl=verbose_lvl)
+
+    steps_taken = 0
+    old_day = 0
+    old_week = 0
+    old_month = 0
+
+    # Open the scenario
+    for environment_dict in dict_of_df:
+        if starting_time_step >= 0:  # Skip lines until we reach the starting step.
+            starting_time_step = starting_time_step - 1
+        else:
+            environment_data = []
+            # Figure out date of the data
+            time_step_dt = dt.datetime.strptime(environment_dict['time_utc'], '%Y-%m-%d %H:%M:%S%z')
+            time_step_dt = time_step_dt.astimezone(tz=dt.timezone.utc)
+            environment_data.append(time_step_dt)
+            time_step_string = time_step_dt.strftime('%H:%M %d-%m-%Y UTC')
+
+            # Announce start of simulation
+            if steps_taken == 0 and verbose_lvl >= 0:
+                print('Starting simulation from PTU {}'.format(time_step_string))
+
+            # Give an update of how it is going in the mean_time
+            curr_month = time_step_dt.month
+            curr_week = time_step_dt.isocalendar()[1]
+            curr_day = time_step_dt.day
+            if curr_day != old_day and verbose_lvl > 2 or \
+                    curr_week != old_week and verbose_lvl > 1 or \
+                    curr_month != old_month and verbose_lvl > 0:
+                msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
+                print(msg)
+                old_day = curr_day
+                old_week = curr_week
+                old_month = curr_month
+
+            # End simulation here if number of steps have been taken.
+            if steps_taken >= number_of_steps:  # If we reach our maximum amount of steps. Stop the simulation
+                break
+            else:
+                # Otherwise, ensure data of enviroment steps is correct
+                try:
+                    if environment_dict['tennet_balansdelta.mean_max_price'] == 'nan':
+                        raise ValueError
+                    if scenario.__contains__('windnet'):
+                        environment_data.append(float(environment_dict['tennet_balansdelta.mean_max_price']))
+                        environment_data.append(float(environment_dict['tennet_balansdelta.mean_mid_price']))
+                        environment_dict[3] = float(environment_dict[3])
+                        environment_dict[5] = float(environment_dict[5])
+                        environment_dict[7] = float(environment_dict[7])
+                    elif scenario.__contains__('lelystad'):
+                        environment_data.append(float(environment_dict['tennet_balansdelta.mean_max_price']))
+                        environment_data.append(float(environment_dict['tennet_balansdelta.mean_mid_price']))
+                        environment_data.append(float(environment_dict['tennet_balansdelta.mean_min_price']))
+                        environment_data.append(float(environment_dict['power']))
+                        environment_data.append(None if environment_dict['irradiance'] == '' else float(environment_dict['irradiance']))
+                        environment_data.append(None if environment_dict['expected_power'] == '' else float(environment_dict['expected_power']))
+                        environment_data.append(None if environment_dict['lower_range'] == '' else float(environment_dict['lower_range']))
+                        environment_data.append(None if environment_dict['upper_range'] == '' else float(environment_dict['upper_range']))
+                        environment_data.append(None if environment_dict['losses'] == '' else float(environment_dict['losses']))
+                        if verbose_lvl > 3:
+                            print(f'Running environment step {time_step_string}')
+                except ValueError:
+                    if verbose_lvl > 2:
+                        print("Skipping timestep {} as data is missing".format(time_step_string))
+                    continue
+                # The environment should take a step here.
+                simulation_environment.take_step(environment_data)
+
+            # Update steps taken
+            steps_taken = steps_taken + 1
+
+    # Print information at the end of the simulation.
+    if verbose_lvl >= 0:
+        print('----------------------------------------')
+        print('End of simulation, final PTU: {}'.format(time_step_string))
+        print(simulation_environment.end_of_environment_message(environment_additions=[]))
+    return simulation_environment.end_of_environment_metrics(current_metrics={})
+
+
 def network_capacity_windnet_simulation(network_capacity=27000, verbose_lvl=1):
     # Setup environment
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
@@ -612,11 +695,11 @@ if __name__ == '__main__':
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
-    print(solarvation_dumb_discharging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl))
-    print(super_naive_baseline(verbose_lvl))
-    print(baseline(verbose_lvl))
-    print(run_monthly_timed_baseline(verbose_lvl))
+    # print(solarvation_dumb_discharging(verbose_lvl))
+    # print(wombat_solarvation_limited_charging(verbose_lvl))
+    # print(super_naive_baseline(verbose_lvl))
+    # print(baseline(verbose_lvl))
+    # print(run_monthly_timed_baseline(verbose_lvl))
 
     # Good performing seeds:
     #   660352027716011711
