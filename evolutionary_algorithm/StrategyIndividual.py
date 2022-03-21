@@ -17,7 +17,7 @@ class StrategyIndividual(Individual):
         assert len(original_charge) == len(other_charge)
         assert len(original_discharge) == len(other_discharge)
 
-        new_individual = PointBasedStrategy(name=f'Child of {self.value.name} and {other.value.name}')
+        new_individual = PointBasedStrategy(name=f'Child of {self.value.name} and\n{other.value.name}')
         for i in range(len(original_charge)):
             original_point = original_charge[i]
             other_point = other_charge[i]
