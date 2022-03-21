@@ -8,7 +8,7 @@ from helper_objects.strategies.Strategy import Strategy
 
 
 def visualize_strategy(strategy: Strategy):
-    strategy_matrix = strategy.strategy_matrix
+    strategy_matrix = [row[:] for row in strategy.strategy_matrix]
     red = (0.934, 0.277, 0.434)
     blue = (0.129, 0.535, 0.492)
     white = (1, 1, 1)

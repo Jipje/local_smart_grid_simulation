@@ -443,8 +443,169 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                              simulation_environment=imbalance_environment)
 
 
+def run_random_strategy_with_monthly_times(verbose_lvl=1, seed=None, transportation_kw=2000, congestion_kw=14000):
+    congestion_safety_margin = 0.99
+
+    # Initialise environment
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
+
+    # Initialise solar farm
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    # Initialise battery
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
+
+    # Initialise random strategy
+    random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
+    if seed is None:
+        print(f'{random_point_based_strategy.name}')
+    greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
+    always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
+
+    solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
+                                                                       network_object=battery,
+                                                                       congestion_kw=congestion_kw,
+                                                                       congestion_safety_margin=congestion_safety_margin,
+                                                                       strategy=greedy_discharge_strat,
+                                                                       verbose_lvl=verbose_lvl,
+                                                                       transportation_kw=transportation_kw)
+    prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                         network_object=battery,
+                                                                         congestion_kw=congestion_kw,
+                                                                         congestion_safety_margin=congestion_safety_margin,
+                                                                         strategy=always_discharge_strat,
+                                                                         verbose_lvl=verbose_lvl,
+                                                                         transportation_kw=transportation_kw)
+    earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
+                                                                 network_object=battery,
+                                                                 congestion_kw=congestion_kw,
+                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                             strategy=random_point_based_strategy,
+                                                                 verbose_lvl=verbose_lvl,
+                                                                 transportation_kw=transportation_kw)
+
+    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=1)
+    print(res_df.to_string())
+
+    earning_money_until = res_df.loc['prep_start']
+    preparing_for_congestion_until = res_df.loc['congestion_start']
+    preparing_max_kwh = res_df.loc['prep_max_soc']
+    solving_congestion_until = res_df.loc['congestion_end']
+
+    main_controller = MonthOfModesOfOperationController(name='Wombat main controller',
+                                                        network_object=battery,
+                                                        verbose_lvl=verbose_lvl)
+    for month in range(12):
+        moo = ModesOfOperationController(name=f'Wombat controller month {month}',
+                                         network_object=battery,
+                                         verbose_lvl=verbose_lvl)
+        if earning_money_until[month] is not NaT:
+            moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
+
+            max_kwh_in_prep = float(preparing_max_kwh[month])
+            max_soc_perc_in_prep = int(max_kwh_in_prep / battery.max_kwh * 100)
+            discharge_until_strategy = DischargeUntilStrategy(base_strategy=random_point_based_strategy,
+                                                              name='Discharge Money Earner',
+                                                              discharge_until_soc_perc=max_soc_perc_in_prep
+                                                              )
+            prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                                 network_object=battery,
+                                                                                 congestion_kw=congestion_kw,
+                                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                                                 strategy=discharge_until_strategy,
+                                                                                 verbose_lvl=verbose_lvl)
+
+            moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
+            moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
+        moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+        main_controller.add_controller(moo)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
+
+    return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv',
+                             verbose_lvl=verbose_lvl,
+                             simulation_environment=imbalance_environment)
+
+
+def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw=2000, congestion_kw=14000, month=None):
+    if month is None:
+        return run_random_strategy_with_monthly_times(verbose_lvl, seed, transportation_kw, congestion_kw)
+    congestion_safety_margin = 0.99
+
+    # Initialise environment
+    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
+    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
+    TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
+
+    # Initialise solar farm
+    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    # Initialise battery
+    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
+
+    # Initialise random strategy
+    random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
+    if seed is None:
+        print(f'{random_point_based_strategy.name}')
+    greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
+    always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
+
+    solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
+                                                                       network_object=battery,
+                                                                       congestion_kw=congestion_kw,
+                                                                       congestion_safety_margin=congestion_safety_margin,
+                                                                       strategy=greedy_discharge_strat,
+                                                                       verbose_lvl=verbose_lvl,
+                                                                       transportation_kw=transportation_kw)
+    earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
+                                                                 network_object=battery,
+                                                                 congestion_kw=congestion_kw,
+                                                                 congestion_safety_margin=congestion_safety_margin,
+                                                                 strategy=random_point_based_strategy,
+                                                                 verbose_lvl=verbose_lvl,
+                                                                 transportation_kw=transportation_kw)
+
+    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=1)
+
+    earning_money_until = res_df.loc['prep_start']
+    preparing_for_congestion_until = res_df.loc['congestion_start']
+    preparing_max_kwh = res_df.loc['prep_max_soc']
+    solving_congestion_until = res_df.loc['congestion_end']
+
+    assert 12 >= month >= 1
+    month = month - 1
+    print(res_df[month].to_string())
+    moo = ModesOfOperationController(name=f'Wombat controller month {month}',
+                                     network_object=battery,
+                                     verbose_lvl=verbose_lvl)
+    if earning_money_until[month] is not NaT:
+        moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
+
+        max_kwh_in_prep = float(preparing_max_kwh[month])
+        max_soc_perc_in_prep = int(max_kwh_in_prep / battery.max_kwh * 100)
+        discharge_until_strategy = DischargeUntilStrategy(base_strategy=random_point_based_strategy,
+                                                          name='Discharge Money Earner',
+                                                          discharge_until_soc_perc=max_soc_perc_in_prep
+                                                          )
+        prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                                                                             network_object=battery,
+                                                                             congestion_kw=congestion_kw,
+                                                                             congestion_safety_margin=congestion_safety_margin,
+                                                                             strategy=discharge_until_strategy,
+                                                                             verbose_lvl=verbose_lvl)
+
+        moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
+        moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
+    moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
+    imbalance_environment.add_object(moo, [1, 3, 4, 0])
+
+    return run_single_month(month + 1, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
 if __name__ == '__main__':
-    verbose_lvl = 0
+    verbose_lvl = 1
 
     # baseline_rhino_simulation(verbose_lvl)
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
@@ -456,6 +617,19 @@ if __name__ == '__main__':
     print(super_naive_baseline(verbose_lvl))
     print(baseline(verbose_lvl))
     print(run_monthly_timed_baseline(verbose_lvl))
+
+    # Good performing seeds:
+    #   660352027716011711
+    #   8582482338119250238
+    #   964853903656661948
+    #   454813819652852503
+    # Bad performing seeds:
+    #   4803163394865071306
+    #   6874272345382431524
+    print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=2700745881053767637))
+    # Good peforming seeds:
+    #   8: 2700745881053767637
+    print(run_single_month_random_strategy(verbose_lvl=verbose_lvl, month=8, seed=2700745881053767637))
 
     # Setup for a new experiment
     network_capacity = 14000

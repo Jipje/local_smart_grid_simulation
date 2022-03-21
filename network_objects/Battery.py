@@ -122,7 +122,8 @@ class Battery(NetworkObject):
 
     def take_action(self, action, action_kw=None):
         if action not in ['CHARGE', 'DISCHARGE', 'WAIT']:
-            raise AttributeError('Please offer an actual action to the battery object')
+            raise AttributeError('Please offer an actual action to the battery object.'
+                                 f' {action} was offered')
         if action_kw is None:
             action_kw = self.max_kw
         if action_kw > self.max_kw or action_kw < 0:

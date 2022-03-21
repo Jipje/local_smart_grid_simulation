@@ -30,10 +30,12 @@ def generate_fully_random_strategy(seed=None, name=None):
 
 
 def generate_random_discharge_relative_strategy(seed=None, name=None):
+    flag_visualise = False
     if seed is None:
         seed = random.randrange(sys.maxsize)
+        flag_visualise = True
     random.seed(seed)
-    print(seed)
+
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
 
@@ -66,6 +68,8 @@ def generate_random_discharge_relative_strategy(seed=None, name=None):
     point_based_strat.add_point((discharge_soc, discharge_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
+    if flag_visualise:
+        visualize_strategy(point_based_strat)
     return point_based_strat
 
 
