@@ -26,6 +26,8 @@ class StrategyIndividual(Individual):
             for j in range(2):
                 new_point[j] = int(min(original_point[j], other_point[j]) +
                                    random.random() * abs(original_point[j] - other_point[j]))
+            new_point[0] = max(new_point[0], 5)
+            new_point[0] = min(new_point[0], 95)
             new_point[1] = new_point[1] - new_point[1] % 5
             new_point[2] = 'CHARGE'
             new_individual.add_point((new_point[0], new_point[1], new_point[2]))
@@ -37,6 +39,8 @@ class StrategyIndividual(Individual):
             for j in range(2):
                 new_point[j] = int(min(original_point[j], other_point[j]) +
                                    random.random() * abs(original_point[j] - other_point[j]))
+            new_point[0] = max(new_point[0], 5)
+            new_point[0] = min(new_point[0], 95)
             new_point[1] = new_point[1] + 5 - new_point[1] % 5
             new_point[2] = 'DISCHARGE'
             new_individual.add_point((new_point[0], new_point[1], new_point[2]))
