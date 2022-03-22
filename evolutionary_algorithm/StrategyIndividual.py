@@ -71,5 +71,3 @@ if __name__ == '__main__':
 
     baby = current.pair(other, pair_params=None)
     print(baby)
-    baby = baby.mutate(mutate_params=None)
-    print(baby)
