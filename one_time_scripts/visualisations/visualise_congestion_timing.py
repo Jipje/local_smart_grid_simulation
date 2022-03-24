@@ -87,7 +87,7 @@ def visualise_daily_profile_per_month(solarvation_df, max_kw, congestion_kw=None
     early_start_color = (0.64, 0.26, 0.75, 0.85)
     late_end_color = (0.75, 0.26, 0.62, 0.85)
     max_cap_color = (0.75, 0.26, 0.37, 0.85)
-    base_color = (0.26, 0.62, 0.75, 0.1)
+    base_color = (0.26, 0.62, 0.75, 0.2)
 
     for month in range(1, 13):
         start_of_month = dt.datetime(2021, month, 1, tzinfo=utc)
