@@ -2,7 +2,7 @@ from pandas import DataFrame
 
 from helper_objects.congestion_helper.time_and_size_congestion_helper import time_and_size_multiple_congestion_events, \
     identify_congestion
-from one_time_scripts.solar_scripts.solarvation_visualization import load_solarvation_data
+from one_time_scripts.helper_objects.solarvation_loader import load_solarvation_data
 from one_time_scripts.helper_objects.date_helper import retrieve_months
 
 
