@@ -168,6 +168,11 @@ def time_congestion_events(solarvation_df, verbose_lvl=1):
     max_length = time_congestion_df['congestion_length'].max()
     min_length = time_congestion_df[time_congestion_df['congestion_length'] > dt.timedelta(minutes=0)]['congestion_length'].min()
 
+    earliest_start_day = time_congestion_df[
+        time_congestion_df['congestion_start'] == time_congestion_df['congestion_start'].min()].index.values[0]
+    latest_end_day = time_congestion_df[
+        time_congestion_df['congestion_end'] == time_congestion_df['congestion_end'].max()].index.values[0]
+
     # print(solarvation_df[solarvation_df['congestion_length'] == min_length])
 
     msg = f"\tEarliest starting time of congestion is {min_start}\n" \
@@ -180,7 +185,10 @@ def time_congestion_events(solarvation_df, verbose_lvl=1):
           f"\tMean congestion length is {mean_length}\n" \
           f"\tMedian congestion length is {median_length}\n" \
           f"\tMax congestion length is {max_length}\n" \
-          f"\tMin congestion length is {min_length}"
+          f"\tMin congestion length is {min_length}" \
+          "-----------------------------------\n" \
+          f"\tDay with the earliest starting time is {earliest_start_day}\n" \
+          f"\tDay with the latest ending time is {latest_end_day}"
     if verbose_lvl > 3:
         print(msg)
     res_dict = {
@@ -193,7 +201,9 @@ def time_congestion_events(solarvation_df, verbose_lvl=1):
         'mean_length': mean_length,
         'median_length': median_length,
         'max_length': max_length,
-        'min_length': min_length
+        'min_length': min_length,
+        'earliest_start_day': earliest_start_day,
+        'latest_end_day': latest_end_day
     }
     return res_dict
 
@@ -226,13 +236,19 @@ def size_congestion_events(solarvation_df, verbose_lvl=1):
     median_capacity = round(time_congestion_df['excess_capacity'].median(), 2)
     mean_capacity = round(time_congestion_df['excess_capacity'].mean(), 2)
 
+    min_capacity_day = time_congestion_df[time_congestion_df['excess_capacity'] == time_congestion_df['excess_capacity'].min()].index.values[0]
+    max_capacity_day = time_congestion_df[time_congestion_df['excess_capacity'] == time_congestion_df['excess_capacity'].max()].index.values[0]
+
     msg = f"\tMinimum measured power during congestion is {min_power} kW\n" \
           f"\tMaximum measured power during congestion is {max_power} kW\n" \
           "-----------------------------------\n" \
           f"\tMinimum capacity generated during congestion is {min_capacity} kWh\n" \
           f"\tMaximum capacity generated during congestion is {max_capacity} kWh\n" \
           f"\tMean capacity generated during congestion is {mean_capacity} kWh\n" \
-          f"\tMedian capacity generated during congestion is {median_capacity} kWh"
+          f"\tMedian capacity generated during congestion is {median_capacity} kWh\n" \
+          "-----------------------------------\n" \
+          f"\tDay with the minimum capacity generated during congestion is {min_capacity_day}\n" \
+          f"\tDay with the maximum capacity generated during congestion is {max_capacity_day}"
     if verbose_lvl > 3:
         print(msg)
     res_dict = {
@@ -241,7 +257,9 @@ def size_congestion_events(solarvation_df, verbose_lvl=1):
         'min_capacity': min_capacity,
         'max_capacity': max_capacity,
         'mean_capacity': mean_capacity,
-        'median_capacity': median_capacity
+        'median_capacity': median_capacity,
+        'min_capacity_day': min_capacity_day,
+        'max_capacity_day': max_capacity_day
     }
     return res_dict
 
