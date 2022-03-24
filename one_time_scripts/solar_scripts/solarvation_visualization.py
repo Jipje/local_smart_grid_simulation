@@ -7,34 +7,17 @@ import dateutil.tz
 from helper_objects.congestion_helper.time_and_size_congestion_helper import time_and_size_multiple_congestion_events, \
     time_congestion_events, size_congestion_events, identify_congestion
 from one_time_scripts.helper_objects.date_helper import retrieve_months
+from one_time_scripts.helper_objects.solarvation_loader import load_solarvation_data
+from one_time_scripts.visualisations.visualise_congestion_timing import visualise_daily_profile_per_month
 
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
 
-def date_parser(string):
-    return dt.datetime.strptime(string, '%Y-%m-%d %H:%M:%S%z').replace(tzinfo=utc)
-
-
-def load_solarvation_data(solarvation_filename='../../data/environments/lelystad_1_2021.csv'):
-    solarvation_df = pd.read_csv(solarvation_filename, parse_dates=[0], date_parser=date_parser)
-    try:
-        solarvation_df.index = pd.to_datetime(solarvation_df['time_utc'], errors='coerce', utc=True)
-    except KeyError:
-        solarvation_df.index = pd.to_datetime(solarvation_df['time_ams'], errors='coerce', utc=True)
-        solarvation_df = solarvation_df.drop('time_ams', axis=1)
-        solarvation_df['time_utc'] = solarvation_df.index
-
-    solarvation_df['hour_of_production'] = solarvation_df.index.hour
-    solarvation_df['time'] = solarvation_df['time_utc'].apply(lambda x: x.replace(year=1970, month=1, day=1))
-
-    return solarvation_df
-
-
-def do_basic_analysis(solarvation_df, max_kw=None, congestion_kw=None, solar_farm_name=''):
+def do_basic_analysis(sun_data_df, max_kw=None, congestion_kw=None, solar_farm_name=''):
     # ['tennet_balansdelta.mean_max_price', 'tennet_balansdelta.mean_mid_price', 'tennet_balansdelta.mean_min_price',
     #  'power', 'irradiance', 'expected_power', 'lower_range', 'upper_range', 'losses']
-    plt.hist(solarvation_df['power'], bins=100)
+    plt.hist(sun_data_df['power'], bins=100)
     plt.ylabel('Number of occurrences')
     plt.xlabel('Power generation (kW)')
     plt.title(f'Histogram of power generation by solar farm {solar_farm_name}')
@@ -42,7 +25,7 @@ def do_basic_analysis(solarvation_df, max_kw=None, congestion_kw=None, solar_far
         plt.vlines(congestion_kw, 0, 100000, ls='--', colors='red')
     plt.show()
 
-    plt.hist(solarvation_df['power'], bins=100)
+    plt.hist(sun_data_df['power'], bins=100)
     plt.ylim(0, 4000)
     plt.ylabel('Number of occurrences')
     plt.xlabel('Power generation (kW)')
@@ -51,7 +34,7 @@ def do_basic_analysis(solarvation_df, max_kw=None, congestion_kw=None, solar_far
         plt.vlines(congestion_kw, 0, 4000, ls='--', colors='red')
     plt.show()
 
-    plt.scatter(solarvation_df['hour_of_production'], solarvation_df['power'])
+    plt.scatter(sun_data_df['hour_of_production'], sun_data_df['power'])
     plt.ylabel('Generated power 1m (kW)')
     plt.xlabel('Hour in which power was generated (UTC)')
     plt.title(f'Scatterplot of power generation by solar farm {solar_farm_name}')
@@ -242,6 +225,7 @@ if __name__ == '__main__':
     do_basic_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
     do_range_investigation(solarvation_df)
     do_monthly_analysis(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
+    visualise_daily_profile_per_month(solarvation_df, max_kw=max_kw, congestion_kw=congestion_kw, solar_farm_name=solar_field_name)
 
     starting_times, ending_times = retrieve_months(2021)
     labels = ['January', 'February', 'March', 'April', 'May', 'June',

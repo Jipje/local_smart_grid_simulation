@@ -29,8 +29,7 @@ def generate_fully_random_strategy(seed=None, name=None):
     return point_based_strat
 
 
-def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_points=None):
-    flag_visualise = False
+def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_points=None, flag_visualise=False):
     if seed is None:
         seed = random.randrange(sys.maxsize)
         flag_visualise = True

@@ -143,6 +143,8 @@ def run_simulation(starting_time_step=0, number_of_steps=100, scenario=base_scen
 
     # Print information at the end of the simulation.
     if verbose_lvl >= 0:
+        msg = time_step_string[6:-4] + '\n\t' + simulation_environment.done_in_mean_time()
+        print(msg)
         print('----------------------------------------')
         print('End of simulation, final PTU: {}'.format(time_step_string))
         print(simulation_environment.end_of_environment_message(environment_additions=[]))
@@ -286,7 +288,7 @@ def wombat_solarvation_limited_charging(verbose_lvl=1):
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 4])
 
-    run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    return run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
 def solarvation_dumb_discharging(verbose_lvl=1, congestion_kw=14000):
@@ -296,7 +298,7 @@ def solarvation_dumb_discharging(verbose_lvl=1, congestion_kw=14000):
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
     imbalance_environment.add_object(solarvation, [1, 3, 4])
-    run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
+    return run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
 def baseline_windnet(verbose_lvl=1):
@@ -444,10 +446,10 @@ def baseline(verbose_lvl=1):
     # run_single_month(7, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
     # Run full scenario
-    run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000):
+def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000, congestion_strategy=1):
     congestion_safety_margin = 0.99
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
@@ -482,7 +484,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
 
-    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=1)
+    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=congestion_strategy)
     print(res_df.to_string())
 
     earning_money_until = res_df.loc['prep_start']
@@ -695,11 +697,12 @@ if __name__ == '__main__':
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
-    # print(solarvation_dumb_discharging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging(verbose_lvl))
-    # print(super_naive_baseline(verbose_lvl))
-    # print(baseline(verbose_lvl))
-    # print(run_monthly_timed_baseline(verbose_lvl))
+    print(solarvation_dumb_discharging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(super_naive_baseline(verbose_lvl))
+    print(baseline(verbose_lvl))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
 
     # Good performing seeds:
     #   660352027716011711
@@ -710,40 +713,7 @@ if __name__ == '__main__':
     # Bad performing seeds:
     #   4803163394865071306
     #   6874272345382431524
-    print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=2700745881053767637))
+    # print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=2700745881053767637))
     # Good peforming seeds:
     #   8: 2700745881053767637
-    print(run_single_month_random_strategy(verbose_lvl=verbose_lvl, month=8, seed=2700745881053767637))
-
-    # Setup for a new experiment
-    network_capacity = 14000
-    imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
-    ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
-    TotalNetworkCapacityTracker(imbalance_environment, network_capacity)
-
-    solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
-    battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=25000, verbose_lvl=verbose_lvl)
-    csv_strategy = CsvStrategy('Dumb discharge', strategy_csv='data/strategies/always_discharge.csv')
-    congestion_controller = SolveCongestionControlTower(name="Solarvation Congestion Controller",
-                                                                               network_object=battery,
-                                                                                congestion_kw=network_capacity,
-                                                                                congestion_safety_margin=0.99,
-                                                                               strategy=csv_strategy,
-                                                                               verbose_lvl=verbose_lvl)
-
-    imbalance_environment.add_object(solarvation, [1, 3, 4])
-    imbalance_environment.add_object(congestion_controller, [1, 3, 4])
-
-
-    # verbose_lvl = 4
-    # imbalance_environment.verbose_lvl = verbose_lvl
-    # imbalance_environment.network_objects[0].verbose_lvl = verbose_lvl
-    # imbalance_environment.network_objects[1].verbose_lvl = verbose_lvl
-    # imbalance_environment.network_objects[1].battery.verbose_lvl = verbose_lvl
-    #
-    # starting_timestep = 250600
-    # number_of_steps = 1440
-    # run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl,
-    #                simulation_environment=imbalance_environment)
-
-    # run_random_thirty_days(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    # print(run_single_month_random_strategy(verbose_lvl=verbose_lvl, month=8, seed=2700745881053767637))

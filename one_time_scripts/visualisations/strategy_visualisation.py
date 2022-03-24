@@ -7,6 +7,49 @@ from matplotlib.patches import Patch
 from helper_objects.strategies.Strategy import Strategy
 
 
+def visualize_strategies(strategies):
+    counter = 0
+
+    for strategy in strategies:
+        counter += 1
+        if counter == len(strategies):
+            opacity = 0.4
+        else:
+            opacity = 0.2
+        strategy_matrix = [row[:] for row in strategy.strategy_matrix]
+        red = (0.934, 0.277, 0.434)
+        blue = (0.129, 0.535, 0.492)
+        white = (1, 1, 1)
+
+        for row_index in range(len(strategy_matrix)):
+            row = strategy_matrix[row_index]
+            for column_index in range(len(row)):
+                item = row[column_index]
+
+                new_item = white
+                if item == 'CHARGE':
+                    new_item = red
+                elif item == 'DISCHARGE':
+                    new_item = blue
+
+                strategy_matrix[row_index][column_index] = new_item
+
+        strategy_matrix = [*zip(*strategy_matrix)]
+        plt.imshow(strategy_matrix, extent=[0, 100, strategy.min_price, strategy.max_price], interpolation='none',
+                   origin='lower', aspect='auto', alpha=opacity)
+
+    plt.title('{}'.format(strategy.name))
+    plt.ylabel('Imbalance price')
+    plt.xlabel('State of charge (SoC %)')
+
+    legend_elements = [Patch(facecolor=red, edgecolor='black', label='CHARGE'),
+                       Patch(facecolor=white, edgecolor='black', label='WAIT'),
+                       Patch(facecolor=blue, edgecolor='black', label='DISCHARGE')]
+    plt.legend(handles=legend_elements, loc='lower left')
+
+    plt.show()
+
+
 def visualize_strategy(strategy: Strategy):
     strategy_matrix = [row[:] for row in strategy.strategy_matrix]
     red = (0.934, 0.277, 0.434)
