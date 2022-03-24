@@ -170,4 +170,4 @@ if __name__ == '__main__':
         visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
 
     # print(congestion_df.to_string())
-    visualise_daily_profile_per_month(solarvation_df, max_kw=20000)
+    # visualise_daily_profile_per_month(solarvation_df, max_kw=20000)
