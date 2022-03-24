@@ -6,7 +6,7 @@ from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy
 
 
-class StrategyIndividual(Individual):
+class StrategyNormalDistPairIndividual(Individual):
 
     def pair(self, other, pair_params):
         original_charge = self.value.charge_points
@@ -45,7 +45,7 @@ class StrategyIndividual(Individual):
             new_point[2] = 'DISCHARGE'
             new_individual.add_point((new_point[0], new_point[1], new_point[2]))
         new_individual.upload_strategy()
-        return StrategyIndividual(new_individual)
+        return StrategyNormalDistPairIndividual(new_individual)
 
     def mutate(self, mutate_params):
         return self
@@ -66,8 +66,8 @@ class StrategyIndividual(Individual):
 
 if __name__ == '__main__':
     init_params = {'number_of_points': 4}
-    current = StrategyIndividual(init_params=init_params)
-    other = StrategyIndividual(init_params=init_params)
+    current = StrategyNormalDistPairIndividual(init_params=init_params)
+    other = StrategyNormalDistPairIndividual(init_params=init_params)
 
     baby = current.pair(other, pair_params=None)
     print(baby)
