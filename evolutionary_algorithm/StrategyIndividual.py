@@ -3,7 +3,7 @@ import random
 from evolutionary_algorithm.Individual import Individual
 from helper_objects.strategies import RandomStrategyGenerator
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
-from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy
+from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy, visualize_strategies
 
 
 class StrategyIndividual(Individual):
@@ -64,7 +64,12 @@ class StrategyIndividual(Individual):
         return StrategyIndividual(new_individual)
 
     def _random_init(self, init_params):
-        return RandomStrategyGenerator.generate_random_discharge_relative_strategy(number_of_points=init_params['number_of_points'])
+        try:
+            seed = init_params['seed']
+        except KeyError:
+            seed = None
+        return RandomStrategyGenerator.generate_random_discharge_relative_strategy(
+            number_of_points=init_params['number_of_points'], seed=seed, flag_visualise=True)
 
     def __str__(self):
         visualize_strategy(self.value)
@@ -78,11 +83,15 @@ class StrategyIndividual(Individual):
 
 
 if __name__ == '__main__':
-    init_params={'number_of_points': 4}
-    current = StrategyIndividual(init_params=init_params)
+    init_params = {'number_of_points': 4}
+
+    init_params['seed'] = 2668413331210231900
     other = StrategyIndividual(init_params=init_params)
+    init_params['seed'] = 6618115003047519509
+    current = StrategyIndividual(init_params=init_params)
 
     baby = current.pair(other, pair_params=None)
+    visualize_strategies([current.value, other.value, baby.value])
     print(baby)
     baby = baby.mutate(mutate_params=None)
     print(baby)
