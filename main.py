@@ -449,7 +449,7 @@ def baseline(verbose_lvl=1):
     return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000):
+def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000, congestion_strategy=1):
     congestion_safety_margin = 0.99
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
@@ -484,7 +484,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
 
-    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=1)
+    res_df = get_month_congestion_timings(solarvation_identifier='data/environments/lelystad_1_2021.csv', strategy=congestion_strategy)
     print(res_df.to_string())
 
     earning_money_until = res_df.loc['prep_start']
@@ -701,7 +701,8 @@ if __name__ == '__main__':
     print(wombat_solarvation_limited_charging(verbose_lvl))
     print(super_naive_baseline(verbose_lvl))
     print(baseline(verbose_lvl))
-    print(run_monthly_timed_baseline(verbose_lvl))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
 
     # Good performing seeds:
     #   660352027716011711
