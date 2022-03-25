@@ -23,14 +23,22 @@ class IndividualRandomNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    init_params = {'number_of_points': 4}
+    strategy_price_step_size = 7
+
+    init_params = {
+        'number_of_points': 4,
+        'strategy_price_step_size': strategy_price_step_size
+    }
+    pair_params = {
+        'strategy_price_step_size': strategy_price_step_size
+    }
 
     init_params['seed'] = 2668413331210231900
     other = IndividualRandomNormalDist(init_params=init_params)
     init_params['seed'] = 6618115003047519509
     current = IndividualRandomNormalDist(init_params=init_params)
 
-    baby = current.pair(other, pair_params={})
+    baby = current.pair(other, pair_params=pair_params)
     visualize_strategies([current.value, other.value, baby.value])
     print(baby)
     baby = baby.mutate(mutate_params={})
