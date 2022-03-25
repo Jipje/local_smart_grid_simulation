@@ -71,15 +71,29 @@ class PointBasedStrategy(Strategy):
 
 
 if __name__ == '__main__':
-    point_based_strat = PointBasedStrategy('TESTING')
+    # point_based_strat = PointBasedStrategy('TESTING')
+    #
+    # point_based_strat.add_point((50, 50, 'CHARGE'))
+    # point_based_strat.add_point((70, 30, 'CHARGE'))
+    # point_based_strat.add_point((95, 0, 'CHARGE'))
+    #
+    # point_based_strat.add_point((40, 100, 'DISCHARGE'))
+    # point_based_strat.add_point((70, 80, 'DISCHARGE'))
+    # point_based_strat.add_point((95, 65, 'DISCHARGE'))
+    #
+    # print(point_based_strat)
+    #
+    # point_based_strat.upload_strategy()
 
-    point_based_strat.add_point((50, 50, 'CHARGE'))
-    point_based_strat.add_point((70, 30, 'CHARGE'))
+    point_based_strat = PointBasedStrategy('TESTING', price_step_size=11)
+
+    point_based_strat.add_point((50, 55, 'CHARGE'))
+    point_based_strat.add_point((70, 33, 'CHARGE'))
     point_based_strat.add_point((95, 0, 'CHARGE'))
 
-    point_based_strat.add_point((40, 100, 'DISCHARGE'))
-    point_based_strat.add_point((70, 80, 'DISCHARGE'))
-    point_based_strat.add_point((95, 65, 'DISCHARGE'))
+    point_based_strat.add_point((40, 99, 'DISCHARGE'))
+    point_based_strat.add_point((70, 88, 'DISCHARGE'))
+    point_based_strat.add_point((95, 66, 'DISCHARGE'))
 
     print(point_based_strat)
 
