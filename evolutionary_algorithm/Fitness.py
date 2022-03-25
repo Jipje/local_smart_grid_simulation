@@ -3,12 +3,11 @@ from pandas import NaT
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
-from evolutionary_algorithm.StrategyIndividual import StrategyIndividual
+from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
-from helper_objects.strategies import RandomStrategyGenerator
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
-from main import run_full_scenario, run_simulation_from_dict_of_df
+from main import run_simulation_from_dict_of_df
 import pandas as pd
 import dateutil.tz
 import datetime as dt
