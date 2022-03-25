@@ -24,7 +24,13 @@ class StrategyIndividual(Individual):
         assert len(original_charge) == len(other_charge)
         assert len(original_discharge) == len(other_discharge)
 
-        new_individual = PointBasedStrategy(name=f'Child of {self.value.name} and\n{other.value.name}')
+        try:
+            strategy_price_step_size = pair_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
+        new_individual = PointBasedStrategy(name=f'Child of {self.value.name} and\n{other.value.name}',
+                                            price_step_size=strategy_price_step_size)
         for i in range(len(original_charge)):
             original_point = original_charge[i]
             other_point = other_charge[i]
@@ -45,7 +51,7 @@ class StrategyIndividual(Individual):
             min_soc_perc = 5
 
         try:
-            price_step_size = pair_params['price_step_size']
+            price_step_size = pair_params['strategy_price_step_size']
         except KeyError:
             price_step_size = 5
 
@@ -70,8 +76,16 @@ class StrategyIndividual(Individual):
             seed = init_params['seed']
         except KeyError:
             seed = None
+
+        try:
+            strategy_price_step_size = init_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
         return RandomStrategyGenerator.generate_random_discharge_relative_strategy(
-            number_of_points=init_params['number_of_points'], seed=seed, flag_visualise=True)
+            number_of_points=init_params['number_of_points'],
+            strategy_price_step_size=strategy_price_step_size,
+            seed=seed, flag_visualise=True)
 
     def __str__(self):
         visualize_strategy(self.value)
@@ -85,14 +99,26 @@ class StrategyIndividual(Individual):
 
 
 if __name__ == '__main__':
-    init_params = {'number_of_points': 4}
+    strategy_price_step_size = 7
+
+    init_params = {
+        'number_of_points': 4,
+        'strategy_price_step_size': strategy_price_step_size,
+        'min_soc_perc': 7,
+        'max_soc_perc': 98
+    }
+    pair_params = {
+        'strategy_price_step_size': strategy_price_step_size,
+        'min_soc_perc': 7,
+        'max_soc_perc': 98
+    }
 
     init_params['seed'] = 2668413331210231900
     other = StrategyIndividual(init_params=init_params)
     init_params['seed'] = 6618115003047519509
     current = StrategyIndividual(init_params=init_params)
 
-    baby = current.pair(other, pair_params={})
+    baby = current.pair(other, pair_params=pair_params)
     visualize_strategies([current.value, other.value, baby.value])
     print(baby)
     baby = baby.mutate(mutate_params={})
