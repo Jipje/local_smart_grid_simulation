@@ -7,6 +7,7 @@ class Evolution:
         self.mutate_params = mutate_params
         self.pool = Population(pool_size, fitness, individual_class, init_params)
         self.n_offsprings = n_offsprings
+        self.previous_best = None
 
     def step(self):
         mothers, fathers = self.pool.get_parents(self.n_offsprings)
@@ -18,3 +19,19 @@ class Evolution:
             offsprings.append(offspring)
 
         self.pool.replace(offsprings)
+
+    def early_end(self):
+        res = False
+
+        best_performing = self.pool.individuals[0].fitness
+        worst_performing = self.pool.individuals[-1].fitness
+        if worst_performing / best_performing * 100 >= 95:
+            res = True
+
+        if self.previous_best is not None:
+            if self.previous_best / best_performing * 100 >= 95:
+                res = True
+
+        self.previous_best = best_performing
+
+        return res

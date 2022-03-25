@@ -30,11 +30,15 @@ def generate_fully_random_strategy(seed=None, name=None):
 
 
 def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_points=None,
-                                                strategy_price_step_size=None, flag_visualise=False):
+                                                strategy_price_step_size=None, flag_visualise=None):
+
     if seed is None:
         seed = random.randrange(sys.maxsize)
-        flag_visualise = True
+        if flag_visualise is None:
+            flag_visualise = True
     random.seed(seed)
+    if flag_visualise is None:
+        flag_visualise = False
 
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)

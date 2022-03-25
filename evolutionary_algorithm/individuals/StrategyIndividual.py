@@ -71,6 +71,9 @@ class StrategyIndividual(Individual):
             new_point[j] = int(min(original_point[j], other_point[j]) + 0.5 * abs(original_point[j] - other_point[j]))
         return new_point
 
+    def set_fitness(self, fitness_value):
+        self.fitness = fitness_value
+
     def _random_init(self, init_params):
         try:
             seed = init_params['seed']
@@ -85,7 +88,7 @@ class StrategyIndividual(Individual):
         return RandomStrategyGenerator.generate_random_discharge_relative_strategy(
             number_of_points=init_params['number_of_points'],
             strategy_price_step_size=strategy_price_step_size,
-            seed=seed, flag_visualise=True)
+            seed=seed, flag_visualise=False)
 
     def __str__(self):
         visualize_strategy(self.value)
@@ -99,18 +102,14 @@ class StrategyIndividual(Individual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 7
+    strategy_price_step_size = 5
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size,
-        'min_soc_perc': 7,
-        'max_soc_perc': 98
+        'strategy_price_step_size': strategy_price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size,
-        'min_soc_perc': 7,
-        'max_soc_perc': 98
+        'strategy_price_step_size': strategy_price_step_size
     }
 
     init_params['seed'] = 2668413331210231900
