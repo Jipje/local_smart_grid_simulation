@@ -9,13 +9,19 @@ utc = dateutil.tz.tzutc()
 
 
 if __name__ == '__main__':
+    number_of_points = 4
+    price_step_size = 2
+
     fitness_class = Fitness()
-    fitness_class.set_month(2)
+    fitness_class.set_month(11)
     evo = Evolution(
         pool_size=30, fitness=fitness_class.fitness, individual_class=IndividualFixedNormalDist, n_offsprings=10,
-        pair_params={},
+        pair_params={'strategy_price_step_size': price_step_size},
         mutate_params={},
-        init_params={'number_of_points': 4}
+        init_params={
+            'number_of_points': number_of_points,
+            'strategy_price_step_size': price_step_size
+        }
     )
     n_epochs = 50
 
