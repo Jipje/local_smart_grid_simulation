@@ -7,6 +7,7 @@ class Individual(ABC):
             self.value = value
         else:
             self.value = self._random_init(init_params)
+        self.fitness = None
 
     @abstractmethod
     def pair(self, other, pair_params):

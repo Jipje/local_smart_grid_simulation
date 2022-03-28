@@ -129,6 +129,7 @@ class Fitness(object):
         res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
                                        simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
         print(res_dict)
+        individual.set_fitness(res_dict['wombat_battery_revenue'])
         return res_dict['wombat_battery_revenue']
 
 
