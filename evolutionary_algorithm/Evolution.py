@@ -7,7 +7,12 @@ class Evolution:
         self.mutate_params = mutate_params
         self.pool = Population(pool_size, fitness, individual_class, init_params)
         self.n_offsprings = n_offsprings
-        self.previous_best = None
+
+        assert pool_size > (2 * n_offsprings)
+
+        self.previous_average = None
+        self.total_steps = 0
+        self.strike_one = False
 
     def step(self):
         mothers, fathers = self.pool.get_parents(self.n_offsprings)
@@ -19,19 +24,47 @@ class Evolution:
             offsprings.append(offspring)
 
         self.pool.replace(offsprings)
+        self.total_steps += 1
 
     def early_end(self):
         res = False
 
-        best_performing = self.pool.individuals[0].fitness
-        worst_performing = self.pool.individuals[-1].fitness
+        best_performing = self.pool.individuals[-1].fitness
+        worst_performing = self.pool.individuals[0].fitness
         if worst_performing / best_performing * 100 >= 95:
+            print('\tToo little variation in population')
             res = True
 
-        if self.previous_best is not None:
-            if self.previous_best / best_performing * 100 >= 95:
+        total_fitness = 0
+        for individual in self.pool.individuals:
+            total_fitness += individual.fitness
+        avg_fitness = total_fitness / len(self.pool.individuals)
+
+        if self.previous_average is not None:
+            if self.previous_average / avg_fitness * 100 >= 99:
+                print('\tToo little average improvement in population')
                 res = True
 
-        self.previous_best = best_performing
+        self.previous_average = avg_fitness
+
+        if res:
+            if not self.strike_one:
+                self.strike_one = res
+                res = False
 
         return res
+
+    def report(self):
+        best_performing_individual = self.pool.individuals[-1]
+
+        total_fitness = 0
+        for individual in self.pool.individuals:
+            total_fitness += individual.fitness
+        average_fitness = total_fitness / len(self.pool.individuals)
+
+        msg = f'Generation {self.total_steps}: ' \
+              f'Best individual {best_performing_individual.fitness}. ' \
+              f'Average fitness: {average_fitness}'
+        # print(best_performing_individual)
+        print(msg)
+        return msg

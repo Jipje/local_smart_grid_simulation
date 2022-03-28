@@ -52,6 +52,8 @@ class Fitness(object):
 
 
     def fitness(self, individual):
+        if individual.fitness is not None:
+            return individual.fitness
         # Initialise environment
         imbalance_environment = NetworkEnvironment(verbose_lvl=self.verbose_lvl)
         ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -125,10 +127,10 @@ class Fitness(object):
         imbalance_environment.add_object(solarvation, [1, 3, 4])
         imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
 
-        print('\nRunning scenario {}'.format(self.scenario_name))
+        # print('\nRunning scenario {}'.format(self.scenario_name))
         res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
                                        simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
-        print(res_dict)
+        # print(res_dict)
         individual.set_fitness(res_dict['wombat_battery_revenue'])
         return res_dict['wombat_battery_revenue']
 
