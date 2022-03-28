@@ -68,3 +68,21 @@ class Evolution:
         # print(best_performing_individual)
         print(msg)
         return msg
+
+    def write_to_csv(self, filename=None):
+        if filename is None:
+            return None
+        best_performing_individual = self.pool.individuals[-1]
+
+        total_fitness = 0
+        for individual in self.pool.individuals:
+            total_fitness += individual.fitness
+        average_fitness = total_fitness / len(self.pool.individuals)
+
+        csv_msg = f'{self.total_steps}, {best_performing_individual.fitness}, {average_fitness}'
+        with open(filename, 'a+') as file:
+            file.seek(0)
+            data = file.read(100)
+            if len(data) > 0:
+                file.write("\n")
+            file.write(csv_msg)

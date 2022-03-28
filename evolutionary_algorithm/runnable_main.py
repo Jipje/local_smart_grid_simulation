@@ -13,7 +13,7 @@ if __name__ == '__main__':
     price_step_size = 2
 
     fitness_class = Fitness()
-    fitness_class.set_month(11)
+    fitness_class.set_month(1)
     evo = Evolution(
         pool_size=30, fitness=fitness_class.fitness, individual_class=IndividualFixedNormalDist, n_offsprings=10,
         pair_params={'strategy_price_step_size': price_step_size},
@@ -28,6 +28,7 @@ if __name__ == '__main__':
     for i in range(n_epochs):
         evo.step()
         evo.report()
+        evo.write_to_csv('../data/first_ea_runs/january.csv')
         if evo.early_end():
             break
 
