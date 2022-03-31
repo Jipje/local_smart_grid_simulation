@@ -21,14 +21,14 @@ class IndividualRandomNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 7
+    price_step_size = 7
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     mutate_params = no_mutation
     mutate_params['strategy_price_step_size'] = price_step_size

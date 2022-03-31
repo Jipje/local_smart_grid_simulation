@@ -20,18 +20,18 @@ class IndividualFixedNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 5
+    price_step_size = 5
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
 
     mutate_params = aggressive_mutation
-    mutate_params['strategy_price_step_size'] = strategy_price_step_size
+    mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
     other = IndividualFixedNormalDist(init_params=init_params)
