@@ -26,7 +26,8 @@ class PointBasedStrategy(Strategy):
 
         except Exception:
             raise ValueError("The offered point should be tuple of (SoC%, Imb Price, ACTION)."
-                             "First two integers respectively, other is a valid command, CHARGE, DISCHARGE.")
+                             "First two integers respectively, other is a valid command, CHARGE, DISCHARGE.\n"
+                             f"Received: {point} instead")
 
     def upload_strategy(self):
         self.initialize_strategy_matrix()
