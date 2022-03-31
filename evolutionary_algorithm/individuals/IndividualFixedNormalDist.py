@@ -11,6 +11,10 @@ class IndividualFixedNormalDist(StrategyIndividual):
         new_individual = self.make_new_individual(other, pair_params)
         return IndividualFixedNormalDist(new_individual)
 
+    def mutate(self, mutate_params):
+        new_individual = self.mutate_individual(mutate_params)
+        return IndividualFixedNormalDist(new_individual)
+
     def generate_new_point(self, new_point, original_point, other_point):
         random_dist = random.random()
         for j in range(2):

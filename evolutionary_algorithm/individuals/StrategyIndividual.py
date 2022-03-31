@@ -13,22 +13,7 @@ class StrategyIndividual(Individual):
         return StrategyIndividual(new_individual)
 
     def mutate(self, mutate_params):
-        try:
-            strategy_price_step_size = mutate_params['strategy_price_step_size']
-        except KeyError:
-            strategy_price_step_size = 5
-
-        original_charge = self.value.charge_points
-        original_discharge = self.value.discharge_points
-
-        new_individual = PointBasedStrategy(name=f'Mutated {self.value.name}', price_step_size=strategy_price_step_size)
-        for i in range(len(original_charge)):
-            original_charge_point = original_charge[i]
-            original_discharge_point = original_discharge[i]
-            new_individual.add_point(self.mutate_point(original_charge_point, mutate_params))
-            new_individual.add_point(self.mutate_point(original_discharge_point, mutate_params))
-
-        new_individual.upload_strategy()
+        new_individual = self.mutate_individual(mutate_params)
         return StrategyIndividual(new_individual)
 
     def make_new_individual(self, other, pair_params):
@@ -86,6 +71,25 @@ class StrategyIndividual(Individual):
         for j in range(2):
             new_point[j] = int(min(original_point[j], other_point[j]) + 0.5 * abs(original_point[j] - other_point[j]))
         return new_point
+
+    def mutate_individual(self, mutate_params):
+        try:
+            strategy_price_step_size = mutate_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
+        original_charge = self.value.charge_points
+        original_discharge = self.value.discharge_points
+
+        new_individual = PointBasedStrategy(name=f'Mutated {self.value.name}', price_step_size=strategy_price_step_size)
+        for i in range(len(original_charge)):
+            original_charge_point = original_charge[i]
+            original_discharge_point = original_discharge[i]
+            new_individual.add_point(self.mutate_point(original_charge_point, mutate_params))
+            new_individual.add_point(self.mutate_point(original_discharge_point, mutate_params))
+
+        new_individual.upload_strategy()
+        return new_individual
 
     def mutate_point(self, original_point, mutate_params):
         try:
@@ -155,14 +159,14 @@ class StrategyIndividual(Individual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 5
+    price_step_size = 5
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
 
     init_params['seed'] = 2668413331210231900

@@ -13,6 +13,10 @@ class IndividualMiddleAndMutate(StrategyIndividual):
         new_individual = self.make_new_individual(other, pair_params)
         return IndividualMiddleAndMutate(new_individual)
 
+    def mutate(self, mutate_params):
+        new_individual = self.mutate_individual(mutate_params)
+        return IndividualMiddleAndMutate(new_individual)
+
     def mutate_point(self, original_point, mutate_params):
         try:
             strategy_price_step_size = mutate_params['strategy_price_step_size']
