@@ -88,7 +88,41 @@ class StrategyIndividual(Individual):
         return new_point
 
     def mutate_point(self, original_point, mutate_params):
-        return original_point
+        try:
+            strategy_price_step_size = mutate_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
+        try:
+            soc_lower = mutate_params['soc_lower']
+            soc_upper = mutate_params['soc_upper']
+        except KeyError:
+            soc_lower = 0
+            soc_upper = 0
+
+        try:
+            charge_price_lower = mutate_params['charge_price_lower']
+            charge_price_upper = mutate_params['charge_price_upper']
+        except KeyError:
+            charge_price_lower = 0
+            charge_price_upper = 0
+
+        try:
+            discharge_price_lower = mutate_params['discharge_price_lower']
+            discharge_price_upper = mutate_params['discharge_price_upper']
+        except KeyError:
+            discharge_price_lower = 0
+            discharge_price_upper = 0
+
+        new_point = [None, None, original_point[2]]
+        new_point[0] = original_point[0] + random.randint(soc_lower, soc_upper)
+        if original_point[2] == 'CHARGE':
+            new_point[1] = original_point[1] + \
+                           random.randint(charge_price_lower, charge_price_upper) * strategy_price_step_size
+        elif original_point[2] == 'DISCHARGE':
+            new_point[1] = original_point[1] + \
+                           random.randint(discharge_price_lower, discharge_price_upper) * strategy_price_step_size
+        return new_point[0], new_point[1], new_point[2]
 
     def set_fitness(self, fitness_value):
         self.fitness = fitness_value
