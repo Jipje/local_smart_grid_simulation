@@ -73,7 +73,7 @@ if __name__ == '__main__':
         pool_size=30,
         fitness=fitness_class.fitness,
         individual_class=IndividualFixedNormalDist,
-        n_offsprings=10,
+        n_offsprings=15,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
         init_params={
