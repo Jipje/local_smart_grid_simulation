@@ -70,6 +70,36 @@ class PointBasedStrategy(Strategy):
         self.uploaded = True
         self.strategy_matrix = strategy_matrix
 
+    def sort_and_fix_points(self):
+        self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
+        self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
+        last_charge_price = None
+        last_discharge_price = None
+        for i in range(len(self.charge_points)):
+            if i != 0:
+                current_charge_price = self.charge_points[i][1]
+                current_discharge_price = self.discharge_points[i][1]
+
+                if last_charge_price < current_charge_price:
+                    new_last_point = (self.charge_points[i-1][0], current_charge_price, self.charge_points[i-1][2])
+                    new_current_point = (self.charge_points[i][0], last_charge_price, self.charge_points[i][2])
+                    self.charge_points[i - 1] = new_last_point
+                    self.charge_points[i] = new_current_point
+                else:
+                    last_charge_price = current_charge_price
+
+                if last_discharge_price < current_discharge_price:
+                    new_last_point = (self.discharge_points[i-1][0], current_discharge_price, self.discharge_points[i-1][2])
+                    new_current_point = (self.discharge_points[i][0], last_discharge_price, self.discharge_points[i][2])
+                    self.discharge_points[i - 1] = new_last_point
+                    self.discharge_points[i] = new_current_point
+                else:
+                    last_discharge_price = current_discharge_price
+
+            else:
+                last_charge_price = self.charge_points[i][1]
+                last_discharge_price = self.discharge_points[i][1]
+
 
 if __name__ == '__main__':
     # point_based_strat = PointBasedStrategy('TESTING')
