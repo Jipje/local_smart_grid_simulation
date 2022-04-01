@@ -1,6 +1,7 @@
 import random
 
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
+from evolutionary_algorithm.individuals.mutation_params import no_mutation
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategies
 
@@ -12,7 +13,8 @@ class IndividualRandomNormalDist(StrategyIndividual):
         return IndividualRandomNormalDist(new_individual)
 
     def mutate(self, mutate_params):
-        return self
+        new_individual = self.mutate_individual(mutate_params)
+        return IndividualRandomNormalDist(new_individual)
 
     def generate_new_point(self, new_point, original_point, other_point):
         for j in range(2):
@@ -23,15 +25,17 @@ class IndividualRandomNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 7
+    price_step_size = 7
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
+    mutate_params = no_mutation
+    mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
     other = IndividualRandomNormalDist(init_params=init_params)
@@ -41,5 +45,5 @@ if __name__ == '__main__':
     baby = current.pair(other, pair_params=pair_params)
     visualize_strategies([current.value, other.value, baby.value])
     print(baby)
-    baby = baby.mutate(mutate_params={})
+    baby = baby.mutate(mutate_params=mutate_params)
     print(baby)

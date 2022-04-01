@@ -13,7 +13,8 @@ class StrategyIndividual(Individual):
         return StrategyIndividual(new_individual)
 
     def mutate(self, mutate_params):
-        return self
+        new_individual = self.mutate_individual(mutate_params)
+        return StrategyIndividual(new_individual)
 
     def make_new_individual(self, other, pair_params):
         original_charge = self.value.charge_points
@@ -71,6 +72,63 @@ class StrategyIndividual(Individual):
             new_point[j] = int(min(original_point[j], other_point[j]) + 0.5 * abs(original_point[j] - other_point[j]))
         return new_point
 
+    def mutate_individual(self, mutate_params):
+        try:
+            strategy_price_step_size = mutate_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
+        original_charge = self.value.charge_points
+        original_discharge = self.value.discharge_points
+
+        new_individual = PointBasedStrategy(name=f'Mutated {self.value.name}', price_step_size=strategy_price_step_size)
+        for i in range(len(original_charge)):
+            original_charge_point = original_charge[i]
+            original_discharge_point = original_discharge[i]
+            new_individual.add_point(self.mutate_point(original_charge_point, mutate_params))
+            new_individual.add_point(self.mutate_point(original_discharge_point, mutate_params))
+
+        # new_individual.sort_and_fix_points()
+        new_individual.upload_strategy()
+        return new_individual
+
+    def mutate_point(self, original_point, mutate_params):
+        try:
+            strategy_price_step_size = mutate_params['strategy_price_step_size']
+        except KeyError:
+            strategy_price_step_size = 5
+
+        try:
+            soc_lower = mutate_params['soc_lower']
+            soc_upper = mutate_params['soc_upper']
+        except KeyError:
+            soc_lower = 0
+            soc_upper = 0
+
+        try:
+            charge_price_lower = mutate_params['charge_price_lower']
+            charge_price_upper = mutate_params['charge_price_upper']
+        except KeyError:
+            charge_price_lower = 0
+            charge_price_upper = 0
+
+        try:
+            discharge_price_lower = mutate_params['discharge_price_lower']
+            discharge_price_upper = mutate_params['discharge_price_upper']
+        except KeyError:
+            discharge_price_lower = 0
+            discharge_price_upper = 0
+
+        new_point = [None, None, original_point[2]]
+        new_point[0] = original_point[0] + random.randint(soc_lower, soc_upper)
+        if original_point[2] == 'CHARGE':
+            new_point[1] = original_point[1] + \
+                           random.randint(charge_price_lower, charge_price_upper) * strategy_price_step_size
+        elif original_point[2] == 'DISCHARGE':
+            new_point[1] = original_point[1] + \
+                           random.randint(discharge_price_lower, discharge_price_upper) * strategy_price_step_size
+        return new_point[0], new_point[1], new_point[2]
+
     def set_fitness(self, fitness_value):
         self.fitness = fitness_value
 
@@ -102,14 +160,14 @@ class StrategyIndividual(Individual):
 
 
 if __name__ == '__main__':
-    strategy_price_step_size = 5
+    price_step_size = 5
 
     init_params = {
         'number_of_points': 4,
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
     pair_params = {
-        'strategy_price_step_size': strategy_price_step_size
+        'strategy_price_step_size': price_step_size
     }
 
     init_params['seed'] = 2668413331210231900
