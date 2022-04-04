@@ -6,7 +6,7 @@ from evolutionary_algorithm.individuals.IndividualFixedNormalDist import Individ
 from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation
+from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation
 
 utc = dateutil.tz.tzutc()
 
@@ -23,7 +23,7 @@ def do_single_run(month=1, filename=None):
 
     fitness_class = Fitness()
     fitness_class.set_month(month)
-    mutate_params = small_mutation
+    mutate_params = big_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     evo = Evolution(
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     for _ in range(5):
-        do_single_run(4, filename='MiddleSmallMutation')
+        do_single_run(4, filename='MiddleBigMutation')
     #####################################
     # month = 1
     # number_of_points = 4
