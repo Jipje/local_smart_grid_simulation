@@ -3,8 +3,12 @@ import random
 import matplotlib.pyplot as plt
 import csv
 
-if __name__ == '__main__':
-    with open('../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv') as csv_file:
+
+def visualise_ea_run(filename=None):
+    if filename is None:
+        filename = '../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv'
+
+    with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file)
         res_dict = {}
         best_individuals_this_run = []
@@ -49,3 +53,7 @@ if __name__ == '__main__':
         plt.xlabel('Generation')
         plt.ylabel('Performance (Total EUR)')
         plt.show()
+
+
+if __name__ == '__main__':
+    visualise_ea_run()
