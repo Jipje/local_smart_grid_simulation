@@ -121,8 +121,8 @@ class StrategyIndividual(Individual):
 
         new_point = [None, None, original_point[2]]
         new_point[0] = original_point[0] + random.randint(soc_lower, soc_upper)
-        if new_point[0] >= 100:
-            new_point[0] = 99
+        if new_point[0] >= 95:
+            new_point[0] = 95
         if new_point[0] <= 0:
             new_point[0] = 1
 
