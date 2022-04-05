@@ -212,7 +212,10 @@ if __name__ == '__main__':
     filenames_2 = ['../../data/different_mutations/MiddleBigMutationWithSort.csv',
                  '../../data/different_mutations/MiddleBigMutation.csv',
                  '../../data/different_mutations/MiddleSmallMutation.csv']
-    filenames_all = [filenames_0, filenames_1, filenames_2]
+    filenames_3 = ['../../data/different_mutations/IndividualMutateNormalDistBigMutationWithSort.csv',
+                   '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv',
+                   '../../data/different_mutations/IndividualMutateNormalDistSmallMutation.csv']
+    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3]
     for filenames in filenames_all:
         visualise_ea_runs(filenames)
     # visualise_month_ea_runs()

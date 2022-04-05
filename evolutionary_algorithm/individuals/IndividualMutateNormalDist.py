@@ -25,7 +25,7 @@ class IndividualMutateNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    price_step_size = 5
+    price_step_size = 2
 
     init_params = {
         'number_of_points': 4,
@@ -39,9 +39,12 @@ if __name__ == '__main__':
     mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
-    other = IndividualFixedNormalDist(init_params=init_params)
+    other = IndividualMutateNormalDist(init_params=init_params)
     init_params['seed'] = 6618115003047519509
-    current = IndividualFixedNormalDist(init_params=init_params)
+    current = IndividualMutateNormalDist(init_params=init_params)
+
+    print(current)
+    print(other)
 
     baby = current.pair(other, pair_params=pair_params)
     visualize_strategies([current.value, other.value, baby.value])
