@@ -106,6 +106,7 @@ def visualise_ea_runs(filenames=None):
         filenames = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
                      '../../data/different_mutations/RandomNormalDistBigMutation.csv',
                      '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
+    title_file = filenames[0].split('/')[-1].split('Big')[0]
 
     all_dicts = []
     colors = []
@@ -146,7 +147,7 @@ def visualise_ea_runs(filenames=None):
         plt.plot(avg_best_individual, color=color, ls='-')
         plt.plot(avg_avg_individual, color=color, ls='--')
 
-    plt.title('Performance runs with:')
+    plt.title(f'Performance runs with {title_file}')
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
 
@@ -202,5 +203,14 @@ def visualise_month_ea_runs():
 
 if __name__ == '__main__':
     # visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
-    # visualise_ea_runs()
-    visualise_month_ea_runs()
+    # filenames = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
+    #              '../../data/different_mutations/RandomNormalDistBigMutation.csv',
+    #              '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
+    # filenames = ['../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv',
+    #              '../../data/different_mutations/FixedNormalDistBigMutation.csv',
+    #              '../../data/different_mutations/FixedNormalDistSmallMutation.csv']
+    filenames = ['../../data/different_mutations/MiddleBigMutationWithSort.csv',
+                 '../../data/different_mutations/MiddleBigMutation.csv',
+                 '../../data/different_mutations/MiddleSmallMutation.csv']
+    visualise_ea_runs(filenames)
+    # visualise_month_ea_runs()
