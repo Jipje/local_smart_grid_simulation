@@ -9,17 +9,25 @@ month_filenames = ['january', 'february', 'march', 'april',
                    'may', 'june', 'july', 'august',
                    'september', 'october', 'november', 'december']
 
-month_earn_money_earnings = [130500.87, 107192.03, 142600.56, 109017.08,
-                             156271.58, 104721.36, 114247.94, 139900.91,
-                             42786.29, 61004.36, 19284.03, 16843.24]
+month_earn_money_earnings = [130500.87, 107192.03, 142600.56,
+                             109017.08, 156271.58, 104721.36,
+                             114247.94, 139900.91, 42786.29,
+                             61004.36, 19284.03, 16843.24]
 
-month_yearly_conservative = [8933.13, 8811.59, 31063.05, 35778.22,
-                             33732.25, 59726.94, 27623.87, 26580.90,
-                             7583.99, 11982.21, 3436.14, 10799.56]
+month_yearly_conservative = [8933.13, 8811.59, 31063.05,
+                             35778.22, 33732.25, 59726.94,
+                             27623.87, 26580.90, 7583.99,
+                             11982.21, 3436.14, 10799.56]
 
-month_monthly_conservative = [124241.32, 84140.65, 66311.19, 50313.49,
-                              39865.07, 62377.17, 29378.14, 30846.15,
-                              9692.89, 23074.21, 20071.13, 16862.47]
+month_monthly_conservative = [124241.32, 84140.65, 66311.19,
+                              50313.49, 39865.07, 62377.17,
+                              29378.14, 30846.15, 9692.89,
+                              23074.21, 20071.13, 16862.47]
+
+month_monthly_optimized = [124241.32, 98744.28, 101843.76,
+                           50753.54, 39487.02, 61665.89,
+                           31980.34, 38298.46, 12016.82,
+                           40636.44, 20071.13, 16862.47]
 
 
 def convert_file_into_dict(filename=None):
@@ -62,6 +70,7 @@ def convert_file_into_dict(filename=None):
 def visualise_ea_run(filename=None):
     if filename is None:
         filename = '../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv'
+    title_file = filename.split('/')[-1]
 
     res_dict, num_of_runs = convert_file_into_dict(filename)
     base_color = (0.26, 0.62, 0.75, 1)
@@ -82,11 +91,11 @@ def visualise_ea_run(filename=None):
         month_name = month_filenames[i]
         if month_name in filename:
             plt.hlines(month_earn_money_earnings[i], 0, max_generations, color=base_color, ls=':')
-            plt.hlines(month_yearly_conservative[i], 0, max_generations, color=base_color, ls=':')
+            plt.hlines(month_monthly_optimized[i], 0, max_generations, color=base_color, ls=':')
             plt.hlines(month_monthly_conservative[i], 0, max_generations, color=base_color, ls=':')
             break
 
-    plt.title('Performance of 5 different runs with:')
+    plt.title(f'Performance of 5 runs {title_file}')
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
     plt.show()
@@ -149,7 +158,49 @@ def visualise_ea_runs(filenames=None):
     plt.show()
 
 
+def visualise_month_ea_runs():
+    source_folder = '../../data/first_ea_runs/'
+    baseline_color = (0.64, 0.26, 0.75, 0.85)
+    run_color = (0.26, 0.62, 0.75, 1)
+
+    fig, axs = plt.subplots(4, 3, figsize=(12, 9))
+    for month in range(1, 13):
+        if month in [1, 4, 7, 10]:
+            axes_y = 0
+        elif month in [2, 5, 8, 11]:
+            axes_y = 1
+        else:
+            axes_y = 2
+
+        axes_x = None
+        for j in range(1, 5):
+            if month <= (j * 3):
+                axes_x = j - 1
+                break
+
+        month_name = month_filenames[month - 1]
+        filename = source_folder + month_name + '.csv'
+        month_dict, num_of_runs = convert_file_into_dict(filename)
+
+        max_generations = -1
+        for i in range(num_of_runs):
+            axs[axes_x, axes_y].plot(month_dict[f'run_{i}_best_individual'], color=run_color, ls='-')
+            axs[axes_x, axes_y].plot(month_dict[f'run_{i}_avg_individual'], color=run_color, ls='--')
+            if len(month_dict[f'run_{i}_avg_individual']) > max_generations:
+                max_generations = len(month_dict[f'run_{i}_avg_individual'])
+
+        axs[axes_x, axes_y].axhline(month_earn_money_earnings[month - 1], 0, max_generations, color=baseline_color, ls=':')
+        axs[axes_x, axes_y].axhline(month_monthly_optimized[month - 1], 0, max_generations, color=baseline_color, ls=':')
+        axs[axes_x, axes_y].axhline(month_monthly_conservative[month - 1], 0, max_generations, color=baseline_color, ls=':')
+        axs[axes_x, axes_y].set_ylim((15000, 170000))
+
+    for ax in axs.flat:
+        ax.set(xlabel='Generation', ylabel='Fitness (Total EUR)')
+        ax.label_outer()
+    plt.show()
+
+
 if __name__ == '__main__':
-    visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
+    # visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
     # visualise_ea_runs()
-    # visualise_month_ea_runs()
+    visualise_month_ea_runs()
