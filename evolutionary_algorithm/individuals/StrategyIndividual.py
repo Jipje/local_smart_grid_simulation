@@ -88,7 +88,7 @@ class StrategyIndividual(Individual):
             new_individual.add_point(self.mutate_point(original_charge_point, mutate_params))
             new_individual.add_point(self.mutate_point(original_discharge_point, mutate_params))
 
-        # new_individual.sort_and_fix_points()
+        new_individual.sort_and_fix_points()
         new_individual.upload_strategy()
         return new_individual
 
@@ -120,7 +120,16 @@ class StrategyIndividual(Individual):
             discharge_price_upper = 0
 
         new_point = [None, None, original_point[2]]
-        new_point[0] = original_point[0] + random.randint(soc_lower, soc_upper)
+        if original_point[0] == 95:
+            new_point[0] = original_point[0]
+        else:
+            new_point[0] = original_point[0] + random.randint(soc_lower, soc_upper)
+
+        if new_point[0] >= 95:
+            new_point[0] = 95
+        if new_point[0] <= 0:
+            new_point[0] = 1
+
         if original_point[2] == 'CHARGE':
             new_point[1] = original_point[1] + \
                            random.randint(charge_price_lower, charge_price_upper) * strategy_price_step_size
