@@ -203,14 +203,16 @@ def visualise_month_ea_runs():
 
 if __name__ == '__main__':
     # visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
-    # filenames = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
-    #              '../../data/different_mutations/RandomNormalDistBigMutation.csv',
-    #              '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
-    # filenames = ['../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv',
-    #              '../../data/different_mutations/FixedNormalDistBigMutation.csv',
-    #              '../../data/different_mutations/FixedNormalDistSmallMutation.csv']
-    filenames = ['../../data/different_mutations/MiddleBigMutationWithSort.csv',
+    filenames_0 = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
+                 '../../data/different_mutations/RandomNormalDistBigMutation.csv',
+                 '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
+    filenames_1 = ['../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv',
+                 '../../data/different_mutations/FixedNormalDistBigMutation.csv',
+                 '../../data/different_mutations/FixedNormalDistSmallMutation.csv']
+    filenames_2 = ['../../data/different_mutations/MiddleBigMutationWithSort.csv',
                  '../../data/different_mutations/MiddleBigMutation.csv',
                  '../../data/different_mutations/MiddleSmallMutation.csv']
-    visualise_ea_runs(filenames)
+    filenames_all = [filenames_0, filenames_1, filenames_2]
+    for filenames in filenames_all:
+        visualise_ea_runs(filenames)
     # visualise_month_ea_runs()
