@@ -5,6 +5,22 @@ import csv
 
 from matplotlib.lines import Line2D
 
+month_filenames = ['january', 'february', 'march', 'april',
+                   'may', 'june', 'july', 'august',
+                   'september', 'october', 'november', 'december']
+
+month_earn_money_earnings = [130500.87, 107192.03, 142600.56, 109017.08,
+                             156271.58, 104721.36, 114247.94, 139900.91,
+                             42786.29, 61004.36, 19284.03, 16843.24]
+
+month_yearly_conservative = [8933.13, 8811.59, 31063.05, 35778.22,
+                             33732.25, 59726.94, 27623.87, 26580.90,
+                             7583.99, 11982.21, 3436.14, 10799.56]
+
+month_monthly_conservative = [124241.32, 84140.65, 66311.19, 50313.49,
+                              39865.07, 62377.17, 29378.14, 30846.15,
+                              9692.89, 23074.21, 20071.13, 16862.47]
+
 
 def convert_file_into_dict(filename=None):
     if filename is None:
@@ -48,15 +64,28 @@ def visualise_ea_run(filename=None):
         filename = '../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv'
 
     res_dict, num_of_runs = convert_file_into_dict(filename)
+    base_color = (0.26, 0.62, 0.75, 1)
     colors = []
 
     for i in range(num_of_runs):
         colors.append('#%06X' % random.randint(0, 0xFFFFFF))
 
+    max_generations = -1
     for i in range(num_of_runs):
         color = colors[i]
-        plt.plot(res_dict[f'run_{i}_best_individual'], color=color, ls='-')
-        plt.plot(res_dict[f'run_{i}_avg_individual'], color=color, ls='--')
+        plt.plot(res_dict[f'run_{i}_best_individual'], color=color, ls='-', alpha=0.75)
+        plt.plot(res_dict[f'run_{i}_avg_individual'], color=color, ls='--', alpha=0.75)
+        if len(res_dict[f'run_{i}_avg_individual']) > max_generations:
+            max_generations = len(res_dict[f'run_{i}_avg_individual'])
+
+    for i in range(len(month_filenames)):
+        month_name = month_filenames[i]
+        if month_name in filename:
+            plt.hlines(month_earn_money_earnings[i], 0, max_generations, color=base_color, ls=':')
+            plt.hlines(month_yearly_conservative[i], 0, max_generations, color=base_color, ls=':')
+            plt.hlines(month_monthly_conservative[i], 0, max_generations, color=base_color, ls=':')
+            break
+
     plt.title('Performance of 5 different runs with:')
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
@@ -121,6 +150,6 @@ def visualise_ea_runs(filenames=None):
 
 
 if __name__ == '__main__':
-    # visualise_ea_run()
-    visualise_ea_runs()
-
+    visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
+    # visualise_ea_runs()
+    # visualise_month_ea_runs()
