@@ -164,8 +164,9 @@ if __name__ == '__main__':
     solarvation_identifier = '../../data/environments/lelystad_1_2021.csv'
     solarvation_df = load_solarvation_data(solarvation_identifier)
 
-    strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times']
-    for strategy_num in range(1, 5):
+    strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times',
+                       'Preparation timed on MAX profile', 'Preparation timed on AVG profile']
+    for strategy_num in range(1, 7):
         congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
         visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
 
