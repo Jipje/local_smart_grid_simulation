@@ -677,7 +677,7 @@ def run_single_month_set_strategy(verbose_lvl=1, strategy=None, transportation_k
         max_kwh_in_prep = float(preparing_max_kwh[month])
         max_soc_perc_in_prep = int(max_kwh_in_prep / battery.max_kwh * 100)
         discharge_until_strategy = DischargeUntilStrategy(base_strategy=money_earning_strategy,
-                                                          name='Discharge Money Earner',
+                                                          name=f'Discharge until {max_kwh_in_prep} -> Money Earner',
                                                           discharge_until_soc_perc=max_soc_perc_in_prep
                                                           )
         prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
