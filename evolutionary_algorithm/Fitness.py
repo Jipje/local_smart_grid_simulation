@@ -130,12 +130,13 @@ class Fitness(object):
         # print('\nRunning scenario {}'.format(self.scenario_name))
         res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
                                        simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
-        print(res_dict)
+
+        penalty = 1
         if res_dict['time_steps_with_congestion'] > 0:
-            print('This individual caused congestion: ')
-            print(individual)
-        individual.set_fitness(res_dict['wombat_battery_revenue'])
-        return res_dict['wombat_battery_revenue']
+            penalty = 0.5
+        fitness = res_dict['wombat_battery_revenue'] * penalty
+        individual.set_fitness(fitness)
+        return fitness
 
 
 if __name__ == '__main__':
