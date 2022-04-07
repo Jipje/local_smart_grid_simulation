@@ -1,7 +1,7 @@
 import random
 
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import random_mutation
+from evolutionary_algorithm.individuals.mutation_params import random_mutation, small_mutation
 from helper_objects.strategies import RandomStrategyGenerator
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy, visualize_strategies
@@ -30,20 +30,16 @@ class IndividualMiddleAndMutate(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    price_step_size = 3
+    price_step_size = 2
 
     init_params = {
         'number_of_points': 4,
         'strategy_price_step_size': price_step_size,
-        'min_soc_perc': 3,
-        'max_soc_perc': 96
     }
     pair_params = {
         'strategy_price_step_size': price_step_size,
-        'min_soc_perc': 3,
-        'max_soc_perc': 96
     }
-    mutate_params = random_mutation
+    mutate_params = small_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
