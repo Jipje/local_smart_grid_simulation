@@ -703,38 +703,40 @@ def run_single_month_set_strategy(verbose_lvl=1, strategy=None, transportation_k
 
 
 if __name__ == '__main__':
-    verbose_lvl = 4
+    verbose_lvl = 1
 
     # baseline_rhino_simulation(verbose_lvl)
     # random_rhino_strategy_simulation(verbose_lvl=verbose_lvl, seed=4899458002697043430)
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
-    congestion_causing_strategy = PointBasedStrategy('Congestion cause', price_step_size=2)
 
-    congestion_causing_strategy.add_point((13, 152, 'CHARGE'))
-    congestion_causing_strategy.add_point((25, 126, 'CHARGE'))
-    congestion_causing_strategy.add_point((48, 108, 'CHARGE'))
-    congestion_causing_strategy.add_point((61, 80, 'CHARGE'))
-    congestion_causing_strategy.add_point((95, 26, 'CHARGE'))
+    ####################################################################
+    # congestion_causing_strategy = PointBasedStrategy('Congestion cause', price_step_size=2)
+    #
+    # congestion_causing_strategy.add_point((13, 152, 'CHARGE'))
+    # congestion_causing_strategy.add_point((25, 126, 'CHARGE'))
+    # congestion_causing_strategy.add_point((48, 108, 'CHARGE'))
+    # congestion_causing_strategy.add_point((61, 80, 'CHARGE'))
+    # congestion_causing_strategy.add_point((95, 26, 'CHARGE'))
+    # congestion_causing_strategy.add_point((32, 192, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((45, 154, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((76, 178, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((94, 164, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((95, -68, 'DISCHARGE'))
+    #
+    # congestion_causing_strategy.upload_strategy()
+    # print(congestion_causing_strategy)
+    # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
+    ####################################################################
 
-    congestion_causing_strategy.add_point((32, 192, 'DISCHARGE'))
-    congestion_causing_strategy.add_point((45, 154, 'DISCHARGE'))
-    congestion_causing_strategy.add_point((76, 178, 'DISCHARGE'))
-    congestion_causing_strategy.add_point((94, 164, 'DISCHARGE'))
-    congestion_causing_strategy.add_point((95, -68, 'DISCHARGE'))
-
-    congestion_causing_strategy.upload_strategy()
-
-    print(congestion_causing_strategy)
-
-    print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
-
-    # print(solarvation_dumb_discharging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging(verbose_lvl))
-    # print(super_naive_baseline(verbose_lvl))
-    # print(baseline(verbose_lvl))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
+    print(solarvation_dumb_discharging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(super_naive_baseline(verbose_lvl))
+    print(baseline(verbose_lvl))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
 
     # Good performing seeds:
     #   660352027716011711
