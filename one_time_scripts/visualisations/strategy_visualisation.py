@@ -100,3 +100,24 @@ if __name__ == '__main__':
     point_based_strat.upload_strategy()
 
     visualize_strategy(point_based_strat)
+
+    point_based_strat = PointBasedStrategy('Random strategy', price_step_size=11)
+
+    point_based_strat.add_point((50, 55, 'CHARGE'))
+    point_based_strat.add_point((60, 33, 'CHARGE'))
+    point_based_strat.add_point((70, 44, 'CHARGE'))
+    point_based_strat.add_point((95, 0, 'CHARGE'))
+
+    point_based_strat.add_point((40, 99, 'DISCHARGE'))
+    point_based_strat.add_point((60, 88, 'DISCHARGE'))
+    point_based_strat.add_point((70, 77, 'DISCHARGE'))
+    point_based_strat.add_point((95, 66, 'DISCHARGE'))
+
+    point_based_strat.upload_strategy()
+
+    visualize_strategy(point_based_strat)
+
+    point_based_strat.name = 'Sorted random strategy'
+    point_based_strat.sort_and_fix_points()
+    point_based_strat.upload_strategy()
+    visualize_strategy(point_based_strat)

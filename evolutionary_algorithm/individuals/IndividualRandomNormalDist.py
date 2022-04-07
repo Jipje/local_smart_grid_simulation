@@ -1,7 +1,7 @@
 import random
 
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import no_mutation
+from evolutionary_algorithm.individuals.mutation_params import no_mutation, small_mutation
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategies
 
@@ -25,7 +25,7 @@ class IndividualRandomNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    price_step_size = 7
+    price_step_size = 2
 
     init_params = {
         'number_of_points': 4,
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     pair_params = {
         'strategy_price_step_size': price_step_size
     }
-    mutate_params = no_mutation
+    mutate_params = small_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900

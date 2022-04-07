@@ -108,8 +108,18 @@ def visualise_ea_runs(filenames=None):
                      '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
     title_file = filenames[0].split('/')[-1].split('Big')[0]
 
+    legend_names = []
+    for filename in filenames:
+        legend_names.append(filename.split('/')[-1])
+
     all_dicts = []
-    colors = []
+
+    baseline_color = (0.64, 0.26, 0.75, 1)
+    month_optimized = (0.75, 0.26, 0.62, 1)
+    month_conservative = (0.75, 0.26, 0.37, 1)
+
+    colors = [baseline_color, month_optimized, month_conservative]
+
     for filename in filenames:
         res_dict, num_of_runs = convert_file_into_dict(filename)
         all_dicts.append((res_dict, num_of_runs))
@@ -154,7 +164,7 @@ def visualise_ea_runs(filenames=None):
     own_lines = []
     for i in range(len(all_dicts)):
         own_lines.append(Line2D([0], [0], color=colors[i], lw=2))
-    plt.legend(own_lines, filenames)
+    plt.legend(own_lines, legend_names)
 
     plt.show()
 
@@ -162,7 +172,9 @@ def visualise_ea_runs(filenames=None):
 def visualise_month_ea_runs():
     source_folder = '../../data/first_ea_runs/'
     baseline_color = (0.64, 0.26, 0.75, 0.85)
-    run_color = (0.26, 0.62, 0.75, 1)
+    run_color = (0.26, 0.62, 0.75, 0.65)
+    month_optimized = (0.75, 0.26, 0.62, 0.85)
+    month_conservative = (0.75, 0.26, 0.37, 0.85)
 
     fig, axs = plt.subplots(4, 3, figsize=(12, 9))
     for month in range(1, 13):
@@ -190,15 +202,73 @@ def visualise_month_ea_runs():
             if len(month_dict[f'run_{i}_avg_individual']) > max_generations:
                 max_generations = len(month_dict[f'run_{i}_avg_individual'])
 
+        axs[axes_x, axes_y].set_title(f'{month_name}')
         axs[axes_x, axes_y].axhline(month_earn_money_earnings[month - 1], 0, max_generations, color=baseline_color, ls=':')
-        axs[axes_x, axes_y].axhline(month_monthly_optimized[month - 1], 0, max_generations, color=baseline_color, ls=':')
-        axs[axes_x, axes_y].axhline(month_monthly_conservative[month - 1], 0, max_generations, color=baseline_color, ls=':')
+        axs[axes_x, axes_y].axhline(month_monthly_optimized[month - 1], 0, max_generations, color=month_optimized, ls=':')
+        axs[axes_x, axes_y].axhline(month_monthly_conservative[month - 1], 0, max_generations, color=month_conservative, ls=':')
         axs[axes_x, axes_y].set_ylim((15000, 170000))
 
     for ax in axs.flat:
         ax.set(xlabel='Generation', ylabel='Fitness (Total EUR)')
         ax.label_outer()
+
+    own_lines = [
+        Line2D([0], [0], color=baseline_color, ls=':', lw=2),
+        Line2D([0], [0], color=run_color, lw=2),
+        Line2D([0], [0], color=run_color, ls='--', lw=2),
+        Line2D([0], [0], color=month_optimized, ls=':', lw=2),
+        Line2D([0], [0], color=month_conservative, ls=':', lw=2)
+    ]
+    plt.legend(own_lines, ['Pure Earn Money', 'Elite of generation',
+                           'Average of generation', 'Monthly optimized timings', 'Monthly conservative timings'])
+
+    fig.suptitle('Initial Evolutionary Algorithm Runs')
     plt.show()
+
+
+def visualise_single_month_ea_run(source_folder='../../data/first_ea_runs/', month=None):
+    baseline_color = (0.64, 0.26, 0.75, 0.85)
+    run_color = (0.26, 0.62, 0.75, 0.65)
+    month_optimized = (0.75, 0.26, 0.62, 0.85)
+    month_conservative = (0.75, 0.26, 0.37, 0.85)
+
+    if month is None:
+        months = range(1, 13)
+    else:
+        assert 1 <= month <= 12
+        months = [month]
+
+    for month in months:
+        month_name = month_filenames[month - 1]
+        filename = source_folder + month_name + '.csv'
+        month_dict, num_of_runs = convert_file_into_dict(filename)
+
+        max_generations = -1
+        for i in range(num_of_runs):
+            plt.plot(month_dict[f'run_{i}_best_individual'], color=run_color, ls='-')
+            plt.plot(month_dict[f'run_{i}_avg_individual'], color=run_color, ls='--')
+            if len(month_dict[f'run_{i}_avg_individual']) > max_generations:
+                max_generations = len(month_dict[f'run_{i}_avg_individual'])
+
+        plt.axhline(month_earn_money_earnings[month - 1], 0, max_generations, color=baseline_color, ls=':')
+        plt.axhline(month_monthly_optimized[month - 1], 0, max_generations, color=month_optimized, ls=':')
+        plt.axhline(month_monthly_conservative[month - 1], 0, max_generations, color=month_conservative, ls=':')
+
+        plt.xlabel('Generation')
+        plt.ylabel('Fitness (Total EUR)')
+        plt.title(f'First EA runs for {month_name}')
+
+        own_lines = [
+            Line2D([0], [0], color=baseline_color, ls=':', lw=2),
+            Line2D([0], [0], color=run_color, lw=2),
+            Line2D([0], [0], color=run_color, ls='--', lw=2),
+            Line2D([0], [0], color=month_optimized, ls=':', lw=2),
+            Line2D([0], [0], color=month_conservative, ls=':', lw=2)
+        ]
+        plt.legend(own_lines, ['Pure Earn Money', 'Elite of generation',
+                               'Average of generation', 'Monthly optimized timings', 'Monthly conservative timings'])
+
+        plt.show()
 
 
 if __name__ == '__main__':
@@ -218,4 +288,5 @@ if __name__ == '__main__':
     filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3]
     for filenames in filenames_all:
         visualise_ea_runs(filenames)
-    # visualise_month_ea_runs()
+    visualise_month_ea_runs()
+    visualise_single_month_ea_run()
