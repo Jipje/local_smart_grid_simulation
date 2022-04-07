@@ -1,7 +1,7 @@
 import random
 
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation
+from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategies
 
 
@@ -24,7 +24,7 @@ class IndividualFixedNormalDist(StrategyIndividual):
 
 
 if __name__ == '__main__':
-    price_step_size = 5
+    price_step_size = 2
 
     init_params = {
         'number_of_points': 4,
@@ -34,13 +34,16 @@ if __name__ == '__main__':
         'strategy_price_step_size': price_step_size
     }
 
-    mutate_params = aggressive_mutation
+    mutate_params = small_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
     other = IndividualFixedNormalDist(init_params=init_params)
     init_params['seed'] = 6618115003047519509
     current = IndividualFixedNormalDist(init_params=init_params)
+
+    print(current)
+    print(other)
 
     baby = current.pair(other, pair_params=pair_params)
     visualize_strategies([current.value, other.value, baby.value])
