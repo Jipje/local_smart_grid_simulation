@@ -6,6 +6,33 @@ from pandas import NaT
 utc = dateutil.tz.tzutc()
 
 
+def prep_based_on_load_profile(res_dict, highest_generation_df, max_kwh=28500):
+    prep_start_time = res_dict['prep_start']
+    if prep_start_time is None or prep_start_time is NaT:
+        return res_dict
+    congestion_start_time = res_dict['congestion_start']
+    midnight = dt.time(0, 0, tzinfo=utc)
+    highest_generation_df = highest_generation_df[midnight:congestion_start_time]
+
+    try:
+        highest_generation_df['time_utc']
+    except KeyError:
+        highest_generation_df['time_utc'] = highest_generation_df.index
+
+    highest_generation_df['excess_capacity'] = highest_generation_df['excess_power'] / 60
+    highest_generation_df['sum_excess_capacity'] = highest_generation_df['excess_capacity'].cumsum()
+
+    excess_capacity_at_congestion_start = highest_generation_df.loc[congestion_start_time].sum_excess_capacity.values[0]
+    highest_generation_df['excess_capacity_until_congestion'] = excess_capacity_at_congestion_start - highest_generation_df['sum_excess_capacity']
+    needed_capacity_worst_case_discharge = -1 * (max_kwh - res_dict['prep_max_soc'])
+    highest_generation_df = highest_generation_df[highest_generation_df['excess_capacity_until_congestion'] < needed_capacity_worst_case_discharge]
+
+    sufficient_prep_time = highest_generation_df.iloc[len(highest_generation_df) - 1]
+    sufficient_prep_time = sufficient_prep_time['time_utc']
+    res_dict['prep_start'] = (sufficient_prep_time - dt.timedelta(minutes=sufficient_prep_time.minute % 15)).time().replace(tzinfo=utc)
+    return res_dict
+
+
 def time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, labels=None, verbose_lvl=1, strategy=4):
     res_arr = []
     for i in range(len(starting_times)):
@@ -20,6 +47,13 @@ def time_and_size_multiple_congestion_events(solarvation_df, starting_times, end
 
         res_dict.update(size_dict)
         res_dict = time_and_size_congestion_dict(res_dict, strategy=strategy)
+
+        if strategy == 5:
+            highest_generation_df = period_df.groupby(['time']).max()
+            res_dict = prep_based_on_load_profile(res_dict, highest_generation_df)
+        elif strategy == 6:
+            average_generation_df = period_df.groupby(['time']).mean()
+            res_dict = prep_based_on_load_profile(res_dict, average_generation_df)
 
         res_arr.append(res_dict)
     if strategy == 4:

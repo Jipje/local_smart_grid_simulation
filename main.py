@@ -10,6 +10,7 @@ from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
+from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
 from network_objects.Battery import Battery
 from network_objects.control_strategies.ModesOfOperationController import ModesOfOperationController
@@ -615,8 +616,13 @@ def run_random_strategy_with_monthly_times(verbose_lvl=1, seed=None, transportat
 
 
 def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw=2000, congestion_kw=14000, month=None):
-    if month is None:
-        return run_random_strategy_with_monthly_times(verbose_lvl, seed, transportation_kw, congestion_kw)
+    random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
+    run_single_month_set_strategy(verbose_lvl, random_point_based_strategy, transportation_kw, congestion_kw, month)
+
+
+def run_single_month_set_strategy(verbose_lvl=1, strategy=None, transportation_kw=2000, congestion_kw=14000, month=None):
+    if month is None and strategy is None:
+        return run_random_strategy_with_monthly_times(verbose_lvl, None, transportation_kw, congestion_kw)
     congestion_safety_margin = 0.99
 
     # Initialise environment
@@ -630,9 +636,10 @@ def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw
     battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
 
     # Initialise random strategy
-    random_point_based_strategy = generate_random_discharge_relative_strategy(seed=seed)
-    if seed is None:
-        print(f'{random_point_based_strategy.name}')
+    if strategy is None:
+        money_earning_strategy = generate_random_discharge_relative_strategy()
+    else:
+        money_earning_strategy = strategy
     greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
     always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
 
@@ -647,7 +654,7 @@ def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw
                                                                  network_object=battery,
                                                                  congestion_kw=congestion_kw,
                                                                  congestion_safety_margin=congestion_safety_margin,
-                                                                 strategy=random_point_based_strategy,
+                                                                 strategy=money_earning_strategy,
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
 
@@ -669,8 +676,8 @@ def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw
 
         max_kwh_in_prep = float(preparing_max_kwh[month])
         max_soc_perc_in_prep = int(max_kwh_in_prep / battery.max_kwh * 100)
-        discharge_until_strategy = DischargeUntilStrategy(base_strategy=random_point_based_strategy,
-                                                          name='Discharge Money Earner',
+        discharge_until_strategy = DischargeUntilStrategy(base_strategy=money_earning_strategy,
+                                                          name=f'Discharge until {max_kwh_in_prep} -> Money Earner',
                                                           discharge_until_soc_perc=max_soc_perc_in_prep
                                                           )
         prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
@@ -687,7 +694,13 @@ def run_single_month_random_strategy(verbose_lvl=1, seed=None, transportation_kw
     imbalance_environment.add_object(solarvation, [1, 3, 4])
     imbalance_environment.add_object(moo, [1, 3, 4, 0])
 
-    return run_single_month(month + 1, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+    # Run single day
+    starting_timestep = 129600 + 25 * 1440
+    number_of_steps = 2 * 1440
+    return run_simulation(starting_timestep, number_of_steps, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
+    # return run_single_month(month + 1, verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
+
 
 if __name__ == '__main__':
     verbose_lvl = 1
@@ -697,12 +710,33 @@ if __name__ == '__main__':
     # rhino_windnet_limited_charging(verbose_lvl)
     # full_rhino_site_capacity()
 
+    ####################################################################
+    # congestion_causing_strategy = PointBasedStrategy('Congestion cause', price_step_size=2)
+    #
+    # congestion_causing_strategy.add_point((13, 152, 'CHARGE'))
+    # congestion_causing_strategy.add_point((25, 126, 'CHARGE'))
+    # congestion_causing_strategy.add_point((48, 108, 'CHARGE'))
+    # congestion_causing_strategy.add_point((61, 80, 'CHARGE'))
+    # congestion_causing_strategy.add_point((95, 26, 'CHARGE'))
+    # congestion_causing_strategy.add_point((32, 192, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((45, 154, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((76, 178, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((94, 164, 'DISCHARGE'))
+    # congestion_causing_strategy.add_point((95, -68, 'DISCHARGE'))
+    #
+    # congestion_causing_strategy.upload_strategy()
+    # print(congestion_causing_strategy)
+    # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
+    ####################################################################
+
     print(solarvation_dumb_discharging(verbose_lvl))
     print(wombat_solarvation_limited_charging(verbose_lvl))
     print(super_naive_baseline(verbose_lvl))
     print(baseline(verbose_lvl))
     print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
     print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
 
     # Good performing seeds:
     #   660352027716011711

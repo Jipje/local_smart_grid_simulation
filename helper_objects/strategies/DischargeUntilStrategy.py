@@ -13,5 +13,7 @@ class DischargeUntilStrategy(StrategyDecorator):
         overwrite_decision = base_decision
         if state_of_charge_perc > self.discharge_until_soc_perc:
             overwrite_decision = 'DISCHARGE'
+        elif state_of_charge_perc == self.discharge_until_soc_perc and not base_decision == 'DISCHARGE':
+            overwrite_decision = 'WAIT'
 
         return overwrite_decision
