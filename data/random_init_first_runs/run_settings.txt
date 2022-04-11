@@ -1,0 +1,63 @@
+StrategyIndividual Adjusted to generate fully random strategy
+
+RUN SETTINGS
+    number_of_points = 4
+    price_step_size = 2
+
+    fitness_class = Fitness()
+    fitness_class.set_month(month)
+    mutate_params = big_mutation_with_overshoot
+    mutate_params['strategy_price_step_size'] = price_step_size
+
+    evo = Evolution(
+        pool_size=100,
+        fitness=fitness_class.fitness,
+        individual_class=IndividualMutateNormalDist,
+        n_offsprings=50,
+        pair_params={'strategy_price_step_size': price_step_size},
+        mutate_params=mutate_params,
+        init_params={
+            'number_of_points': number_of_points,
+            'strategy_price_step_size': price_step_size
+        }
+    )
+    n_epochs = 20
+
+Early stopping mechanisms:
+    def early_end(self):
+        res = False
+
+        best_performing = self.pool.individuals[-1].fitness
+        worst_performing = self.pool.individuals[0].fitness
+        if worst_performing / best_performing * 100 >= 95:
+            print('\tToo little variation in population')
+            res = True
+
+        total_fitness = 0
+        for individual in self.pool.individuals:
+            total_fitness += individual.fitness
+        avg_fitness = total_fitness / len(self.pool.individuals)
+
+        if self.previous_average is not None:
+            if self.previous_average / avg_fitness * 100 >= 99:
+                print('\tToo little average improvement in population')
+                res = True
+
+        self.previous_average = avg_fitness
+
+        if res:
+            if not self.strike_one:
+                self.strike_one = res
+                res = False
+
+        return res
+
+Mutation settings:
+        big_mutation_with_overshoot = {
+            'soc_lower': -5,
+            'soc_upper': 5,
+            'charge_price_lower': -5,
+            'charge_price_upper': 2,
+            'discharge_price_lower': -2,
+            'discharge_price_upper': 5
+        }

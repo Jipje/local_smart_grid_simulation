@@ -169,8 +169,8 @@ def visualise_ea_runs(filenames=None):
     plt.show()
 
 
-def visualise_month_ea_runs():
-    source_folder = '../../data/first_ea_runs/'
+def visualise_month_ea_runs(source_folder='../../data/random_init_first_runs/',
+                            title='Random initialized Evolutionary Algorithm runs'):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
     month_optimized = (0.75, 0.26, 0.62, 0.85)
@@ -222,11 +222,11 @@ def visualise_month_ea_runs():
     plt.legend(own_lines, ['Pure Earn Money', 'Elite of generation',
                            'Average of generation', 'Monthly optimized timings', 'Monthly conservative timings'])
 
-    fig.suptitle('Initial Evolutionary Algorithm Runs')
+    fig.suptitle(title)
     plt.show()
 
 
-def visualise_single_month_ea_run(source_folder='../../data/first_ea_runs/', month=None):
+def visualise_single_month_ea_run(source_folder='../../data/random_init_first_runs/', month=None):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
     month_optimized = (0.75, 0.26, 0.62, 0.85)
@@ -289,4 +289,5 @@ if __name__ == '__main__':
     for filenames in filenames_all:
         visualise_ea_runs(filenames)
     visualise_month_ea_runs()
-    visualise_single_month_ea_run()
+    visualise_month_ea_runs(source_folder='../../data/first_ea_runs/',
+                            title='Initial Evolutionary Algorithm Runs')
