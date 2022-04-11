@@ -65,7 +65,7 @@ class Evolution:
         msg = f'Generation {self.total_steps}: ' \
               f'Best individual {best_performing_individual.fitness}. ' \
               f'Average fitness: {average_fitness}'
-        # print(best_performing_individual)
+        print(best_performing_individual)
         print(msg)
         return msg
 
