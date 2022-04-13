@@ -5,21 +5,21 @@ from evolutionary_algorithm.individuals.mutation_params import aggressive_mutati
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategies
 
 
-class Individual2DNormalDist(StrategyIndividual):
+class IndividualFixedUniformDist(StrategyIndividual):
 
     def pair(self, other, pair_params):
         new_individual = self.make_new_individual(other, pair_params)
-        return Individual2DNormalDist(new_individual)
+        return IndividualFixedUniformDist(new_individual)
 
     def mutate(self, mutate_params):
         new_individual = self.mutate_individual(mutate_params)
-        return Individual2DNormalDist(new_individual)
+        return IndividualFixedUniformDist(new_individual)
 
-    def generate_new_point(self, new_point, original_point, other_point, pair_params={}):
+    def generate_new_point(self, new_point, original_point, other_point, pair_params):
+        random_dist = random.random()
         for j in range(2):
-            middle = int(min(original_point[j], other_point[j]) + 0.5 * abs(original_point[j] - other_point[j]))
-            spread = abs(original_point[j] - other_point[j])
-            new_point[j] = random.gauss(middle, spread)
+            new_point[j] = int(min(original_point[j], other_point[j]) +
+                               random_dist * abs(original_point[j] - other_point[j]))
         return new_point
 
 
@@ -38,9 +38,9 @@ if __name__ == '__main__':
     mutate_params['strategy_price_step_size'] = price_step_size
 
     init_params['seed'] = 2668413331210231900
-    other = Individual2DNormalDist(init_params=init_params)
+    other = IndividualFixedUniformDist(init_params=init_params)
     init_params['seed'] = 6618115003047519509
-    current = Individual2DNormalDist(init_params=init_params)
+    current = IndividualFixedUniformDist(init_params=init_params)
 
     print(current)
     print(other)
