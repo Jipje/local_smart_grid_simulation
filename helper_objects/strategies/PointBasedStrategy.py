@@ -70,7 +70,18 @@ class PointBasedStrategy(Strategy):
         self.uploaded = True
         self.strategy_matrix = strategy_matrix
 
-    def sort_and_fix_points(self):
+    def sort_and_fix_points(self, sort_strategy):
+        if sort_strategy is None:
+            pass
+        else:
+            sort_strategy = int(sort_strategy)
+        match sort_strategy:
+            case 1:
+                self.sort_strategy_one_flip_prices()
+            case _:
+                pass
+
+    def sort_strategy_one_flip_prices(self):
         self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
         self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
         last_charge_price = None
