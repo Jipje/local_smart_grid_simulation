@@ -25,7 +25,7 @@ def do_single_run(month=1, filename=None):
 
     fitness_class = Fitness()
     fitness_class.set_month(month)
-    mutate_params = small_mutation
+    mutate_params = big_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     evo = Evolution(
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     for _ in range(5):
-        do_single_run(4, filename='FixedUniformDistSmallMutation')
+        do_single_run(4, filename='FixedUniformDistBigMutation')
     #####################################
     # month = 1
     # number_of_points = 4
