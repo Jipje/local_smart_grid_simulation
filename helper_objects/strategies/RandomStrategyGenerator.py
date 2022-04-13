@@ -5,10 +5,16 @@ from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy
 
 
-def generate_fully_random_strategy(seed=None, name=None, strategy_price_step_size=None, number_of_points=None):
+def generate_fully_random_strategy(seed=None, name=None, strategy_price_step_size=None, number_of_points=None,
+                                   flag_visualise=None):
     if seed is None:
         seed = random.randrange(sys.maxsize)
+        if flag_visualise is None:
+            flag_visualise = True
     random.seed(seed)
+    if flag_visualise is None:
+        flag_visualise = False
+
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
 
@@ -34,6 +40,8 @@ def generate_fully_random_strategy(seed=None, name=None, strategy_price_step_siz
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
+    if flag_visualise:
+        visualize_strategy(point_based_strat)
     return point_based_strat
 
 
@@ -97,7 +105,5 @@ def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_
 
 
 if __name__ == '__main__':
-    fully_random = generate_fully_random_strategy()
-    visualize_strategy(fully_random)
-    random_strategy = generate_random_discharge_relative_strategy(strategy_price_step_size=2, flag_visualise=False)
-    visualize_strategy(random_strategy)
+    fully_random = generate_fully_random_strategy(strategy_price_step_size=2, flag_visualise=True)
+    random_strategy = generate_random_discharge_relative_strategy(strategy_price_step_size=2, flag_visualise=True)
