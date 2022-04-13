@@ -152,10 +152,15 @@ class StrategyIndividual(Individual):
         except KeyError:
             strategy_price_step_size = 5
 
-        return RandomStrategyGenerator.generate_random_discharge_relative_strategy(
+        # return RandomStrategyGenerator.generate_random_discharge_relative_strategy(
+        #     number_of_points=init_params['number_of_points'],
+        #     strategy_price_step_size=strategy_price_step_size,
+        #     seed=seed, flag_visualise=False)
+
+        return RandomStrategyGenerator.generate_fully_random_strategy(
             number_of_points=init_params['number_of_points'],
             strategy_price_step_size=strategy_price_step_size,
-            seed=seed, flag_visualise=False)
+            seed=seed)
 
     def __str__(self):
         visualize_strategy(self.value)

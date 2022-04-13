@@ -5,24 +5,32 @@ from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from one_time_scripts.visualisations.strategy_visualisation import visualize_strategy
 
 
-def generate_fully_random_strategy(seed=None, name=None):
+def generate_fully_random_strategy(seed=None, name=None, strategy_price_step_size=None, number_of_points=None):
     if seed is None:
         seed = random.randrange(sys.maxsize)
     random.seed(seed)
     if name is None:
         name = 'Randomly generated strategy. Seed={}'.format(seed)
 
-    price_step_size = 5
+    if strategy_price_step_size is None:
+        price_step_size = 5
+    else:
+        price_step_size = int(strategy_price_step_size)
+
+    if number_of_points is None:
+        number_of_points = random.randint(1, 5)
+    else:
+        number_of_points = int(number_of_points)
+
     point_based_strat = PointBasedStrategy(name, price_step_size=price_step_size)
-    number_of_points = random.randint(1, 5)
 
     for _ in range(number_of_points):
         state_of_charge_perc = random.randint(6, 95)
-        imbalance_price = random.randrange(-100, 200, 5)
+        imbalance_price = random.randrange(-100, 200, price_step_size)
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'CHARGE'))
 
         state_of_charge_perc = random.randint(6, 95)
-        imbalance_price = random.randrange(-100, 200, 5)
+        imbalance_price = random.randrange(-100, 200, price_step_size)
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
@@ -91,5 +99,5 @@ def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_
 if __name__ == '__main__':
     fully_random = generate_fully_random_strategy()
     visualize_strategy(fully_random)
-    random_strategy = generate_random_discharge_relative_strategy(strategy_price_step_size=11)
+    random_strategy = generate_random_discharge_relative_strategy(strategy_price_step_size=2, flag_visualise=False)
     visualize_strategy(random_strategy)
