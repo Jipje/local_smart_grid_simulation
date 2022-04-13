@@ -32,6 +32,15 @@ big_mutation = {
     'discharge_price_upper': 5
 }
 
+big_mutation_with_overshoot = {
+    'soc_lower': -5,
+    'soc_upper': 5,
+    'charge_price_lower': -5,
+    'charge_price_upper': 2,
+    'discharge_price_lower': -2,
+    'discharge_price_upper': 5
+}
+
 random_mutation = {
     'soc_lower': -2,
     'soc_upper': 2,
