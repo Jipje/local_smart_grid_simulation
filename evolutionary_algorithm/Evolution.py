@@ -70,7 +70,7 @@ class Evolution:
 
         print(msg)
         # print(best_performing_individual)
-        # print(median_performing_individual)
+        print(median_performing_individual)
         return msg
 
     def write_to_csv(self, filename=None):
