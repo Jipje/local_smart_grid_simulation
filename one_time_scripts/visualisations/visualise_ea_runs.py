@@ -287,16 +287,21 @@ if __name__ == '__main__':
     filenames_3 = ['../../data/different_mutations/IndividualMutateNormalDistBigMutationWithSort.csv',
                    '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv',
                    '../../data/different_mutations/IndividualMutateNormalDistSmallMutation.csv']
-    filenames_4 = ['../../data/fixed_normal_dist/FixedUniformDistBigMutation.csv',
+    filenames_4 = ['../../data/different_mutations/RandomNormalDistBigMutation.csv',
+                   '../../data/different_mutations/FixedNormalDistBigMutation.csv',
+                   '../../data/different_mutations/MiddleBigMutation.csv',
+                   '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv']
+    filenames_5 = ['../../data/fixed_normal_dist/FixedUniformDistBigMutation.csv',
                    '../../data/fixed_normal_dist/MiddleBigMutation.csv',
                    '../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
                    '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv']
-    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4]
-    titles = [None, None, None, None, 'Random Initialisation Different Pairing Methods']
+    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4, filenames_5]
+    titles = [None, None, None, None,
+              'Guided Initialisation. Uniform Dist. Big Mutation.\nDifferent (Uniform dist based) pairing methods',
+              'Random Initialisation Different Pairing Methods']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
         title = titles[i]
         visualise_ea_runs(filenames, title)
-    visualise_month_ea_runs()
-    visualise_month_ea_runs(source_folder='../../data/first_ea_runs/',
-                            title='Initial Evolutionary Algorithm Runs')
+    # visualise_month_ea_runs()
+    # visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
