@@ -295,14 +295,19 @@ if __name__ == '__main__':
                    '../../data/fixed_normal_dist/MiddleBigMutation.csv',
                    '../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
                    '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv']
-    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4, filenames_5]
+    filesnames_6 = ['../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
+                    '../../data/fixed_normal_dist/MutateNormalDistSmallMutation.csv',
+                    '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv',
+                    '../../data/fixed_normal_dist/RandomNormalDistSmallMutation.csv']
+    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4, filenames_5, filesnames_6]
     titles = [None, None, None, None,
               'Guided Initialisation. Uniform Dist. Big Mutation.\nDifferent (Uniform dist based) pairing methods',
-              'Random Initialisation Different Pairing Methods']
+              'Random Initialisation Different Pairing Methods',
+              None]
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
         title = titles[i]
         visualise_ea_runs(filenames, title)
     visualise_month_ea_runs()
     visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
-    visualise_single_month_ea_run()
+    # visualise_single_month_ea_run()
