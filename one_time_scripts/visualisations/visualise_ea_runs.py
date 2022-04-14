@@ -303,5 +303,6 @@ if __name__ == '__main__':
         filenames = filenames_all[i]
         title = titles[i]
         visualise_ea_runs(filenames, title)
-    # visualise_month_ea_runs()
-    # visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
+    visualise_month_ea_runs()
+    visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
+    visualise_single_month_ea_run()
