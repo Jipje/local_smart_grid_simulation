@@ -75,6 +75,7 @@ class PointBasedStrategy(Strategy):
             pass
         else:
             sort_strategy = int(sort_strategy)
+
         if sort_strategy == 1:
             self.sort_strategy_one_flip_prices()
         elif sort_strategy == 2:
