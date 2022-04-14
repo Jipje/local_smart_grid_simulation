@@ -2,7 +2,7 @@ import dateutil.tz
 
 from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
-from evolutionary_algorithm.individuals.IndividualFixedNormalDist import IndividualFixedNormalDist
+from evolutionary_algorithm.individuals.IndividualFixedUniformDist import IndividualFixedUniformDist
 from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
 from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
@@ -25,14 +25,14 @@ def do_single_run(month=1, filename=None):
 
     fitness_class = Fitness()
     fitness_class.set_month(month)
-    mutate_params = big_mutation_with_overshoot
+    mutate_params = small_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     evo = Evolution(
-        pool_size=100,
+        pool_size=30,
         fitness=fitness_class.fitness,
-        individual_class=IndividualMutateNormalDist,
-        n_offsprings=50,
+        individual_class=IndividualRandomNormalDist,
+        n_offsprings=15,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
         init_params={
@@ -51,7 +51,7 @@ def do_single_run(month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'../data/random_init_first_runs/{filename}.csv')
+        evo.write_to_csv(f'../data/fixed_normal_dist/{filename}.csv')
         if evo.early_end():
             break
 
@@ -65,10 +65,10 @@ def do_single_run(month=1, filename=None):
 
 
 if __name__ == '__main__':
-    run_all_months()
+    # run_all_months()
     #####################################
-    # for _ in range(5):
-    #     do_single_run(4, filename='FullyRandomRun')
+    for _ in range(5):
+        do_single_run(4, filename='RandomNormalDistSmallMutation')
     #####################################
     # month = 1
     # number_of_points = 4

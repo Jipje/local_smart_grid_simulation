@@ -59,7 +59,7 @@ class StrategyIndividual(Individual):
         assert original_point[2] == other_point[2]
         new_point = [None, None, None]
 
-        new_point = self.generate_new_point(new_point, original_point, other_point)
+        new_point = self.generate_new_point(new_point, original_point, other_point, pair_params)
 
         new_point[0] = max(new_point[0], min_soc_perc)
         new_point[0] = min(new_point[0], max_soc_perc)
@@ -67,7 +67,7 @@ class StrategyIndividual(Individual):
         new_point[2] = original_point[2]
         return new_point[0], new_point[1], new_point[2]
 
-    def generate_new_point(self, new_point, original_point, other_point):
+    def generate_new_point(self, new_point, original_point, other_point, pair_params):
         for j in range(2):
             new_point[j] = int(min(original_point[j], other_point[j]) + 0.5 * abs(original_point[j] - other_point[j]))
         return new_point
@@ -160,7 +160,7 @@ class StrategyIndividual(Individual):
         return RandomStrategyGenerator.generate_fully_random_strategy(
             number_of_points=init_params['number_of_points'],
             strategy_price_step_size=strategy_price_step_size,
-            seed=seed)
+            seed=seed, flag_visualise=False)
 
     def __str__(self):
         visualize_strategy(self.value)
