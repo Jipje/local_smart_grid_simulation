@@ -1,11 +1,12 @@
 from evolutionary_algorithm.Population import Population
+from evolutionary_algorithm.populations.TournamentSelectionPopulation import TournamentSelectionPopulation
 
 
 class Evolution:
     def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params):
         self.pair_params = pair_params
         self.mutate_params = mutate_params
-        self.pool = Population(pool_size, fitness, individual_class, init_params)
+        self.pool = TournamentSelectionPopulation(pool_size, fitness, individual_class, init_params, tournament_size=4, n_offspring=n_offsprings)
         self.n_offsprings = n_offsprings
 
         assert pool_size >= (2 * n_offsprings)
@@ -70,7 +71,7 @@ class Evolution:
 
         print(msg)
         # print(best_performing_individual)
-        print(median_performing_individual)
+        # print(median_performing_individual)
         return msg
 
     def write_to_csv(self, filename=None):

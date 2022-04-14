@@ -8,7 +8,7 @@ from evolutionary_algorithm.individuals.IndividualMutateNormalDist import Indivi
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
 from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation, \
-    big_mutation_with_overshoot
+    big_mutation_with_overshoot, random_mutation
 
 utc = dateutil.tz.tzutc()
 
@@ -25,7 +25,7 @@ def do_single_run(month=1, filename=None):
 
     fitness_class = Fitness()
     fitness_class.set_month(month)
-    mutate_params = small_mutation
+    mutate_params = random_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
 
     evo = Evolution(
@@ -51,7 +51,7 @@ def do_single_run(month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'../data/fixed_normal_dist/{filename}.csv')
+        evo.write_to_csv(f'../data/tournament_investigation/{filename}.csv')
         if evo.early_end():
             break
 
