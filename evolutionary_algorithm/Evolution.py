@@ -56,6 +56,8 @@ class Evolution:
 
     def report(self):
         best_performing_individual = self.pool.individuals[-1]
+        middle_index = int(0.5 * len(self.pool.individuals))
+        median_performing_individual = self.pool.individuals[middle_index]
 
         total_fitness = 0
         for individual in self.pool.individuals:
@@ -65,8 +67,10 @@ class Evolution:
         msg = f'Generation {self.total_steps}: ' \
               f'Best individual {best_performing_individual.fitness}. ' \
               f'Average fitness: {average_fitness}'
-        # print(best_performing_individual)
+
         print(msg)
+        # print(best_performing_individual)
+        print(median_performing_individual)
         return msg
 
     def write_to_csv(self, filename=None):

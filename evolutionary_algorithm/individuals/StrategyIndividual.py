@@ -165,7 +165,7 @@ class StrategyIndividual(Individual):
         return RandomStrategyGenerator.generate_fully_random_strategy(
             number_of_points=init_params['number_of_points'],
             strategy_price_step_size=strategy_price_step_size,
-            seed=seed)
+            seed=seed, flag_visualise=False)
 
     def __str__(self):
         visualize_strategy(self.value)

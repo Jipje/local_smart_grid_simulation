@@ -31,7 +31,7 @@ def do_single_run(month=1, filename=None):
     evo = Evolution(
         pool_size=30,
         fitness=fitness_class.fitness,
-        individual_class=IndividualFixedUniformDist,
+        individual_class=IndividualRandomNormalDist,
         n_offsprings=15,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     for _ in range(5):
-        do_single_run(4, filename='FixedUniformDistSmallMutation')
+        do_single_run(4, filename='RandomNormalDistSmallMutation')
     #####################################
     # month = 1
     # number_of_points = 4
