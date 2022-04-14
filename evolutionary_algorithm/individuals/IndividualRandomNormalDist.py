@@ -16,7 +16,7 @@ class IndividualRandomNormalDist(StrategyIndividual):
         new_individual = self.mutate_individual(mutate_params)
         return IndividualRandomNormalDist(new_individual)
 
-    def generate_new_point(self, new_point, original_point, other_point):
+    def generate_new_point(self, new_point, original_point, other_point, pair_params):
         try:
             mu = pair_params['normal_mu']
             sigma = pair_params['normal_sigma']
