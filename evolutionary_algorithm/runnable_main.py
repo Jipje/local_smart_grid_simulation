@@ -52,7 +52,7 @@ def do_single_run(month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'../data/fixed_normal_dist/{filename}.csv')
+        evo.write_to_csv(f'../data/sorting_investigation/{filename}.csv')
         if evo.early_end():
             break
 
