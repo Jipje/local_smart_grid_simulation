@@ -16,9 +16,15 @@ class IndividualRandomNormalDist(StrategyIndividual):
         new_individual = self.mutate_individual(mutate_params)
         return IndividualRandomNormalDist(new_individual)
 
-    def generate_new_point(self, new_point, original_point, other_point):
+    def generate_new_point(self, new_point, original_point, other_point, pair_params):
+        try:
+            mu = pair_params['normal_mu']
+            sigma = pair_params['normal_sigma']
+        except KeyError:
+            mu = 0
+            sigma = 1
         for j in range(2):
-            random_dist = random.random()
+            random_dist = random.gauss(mu, sigma)
             new_point[j] = int(min(original_point[j], other_point[j]) +
                                random_dist * abs(original_point[j] - other_point[j]))
         return new_point

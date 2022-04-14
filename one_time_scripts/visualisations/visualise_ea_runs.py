@@ -101,12 +101,13 @@ def visualise_ea_run(filename=None):
     plt.show()
 
 
-def visualise_ea_runs(filenames=None):
+def visualise_ea_runs(filenames=None, title_file=None):
     if filenames is None:
         filenames = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
                      '../../data/different_mutations/RandomNormalDistBigMutation.csv',
                      '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
-    title_file = filenames[0].split('/')[-1].split('Big')[0]
+    if title_file is None:
+        title_file = filenames[0].split('/')[-1].split('Big')[0]
 
     legend_names = []
     for filename in filenames:
@@ -114,11 +115,12 @@ def visualise_ea_runs(filenames=None):
 
     all_dicts = []
 
-    baseline_color = (0.64, 0.26, 0.75, 1)
-    month_optimized = (0.75, 0.26, 0.62, 1)
-    month_conservative = (0.75, 0.26, 0.37, 1)
+    baseline_color = (0.11, 0.91, 0.99, 1)
+    month_optimized = (0.43, 0.92, 0.51, 1)
+    month_conservative = (0.07, 0.66, 0.91, 1)
+    color_4 = (0.99, 0.35, 0.39, 1)
 
-    colors = [baseline_color, month_optimized, month_conservative]
+    colors = [baseline_color, month_optimized, month_conservative, color_4]
 
     for filename in filenames:
         res_dict, num_of_runs = convert_file_into_dict(filename)
@@ -169,8 +171,8 @@ def visualise_ea_runs(filenames=None):
     plt.show()
 
 
-def visualise_month_ea_runs():
-    source_folder = '../../data/first_ea_runs/'
+def visualise_month_ea_runs(source_folder='../../data/random_init_first_runs/',
+                            title='Random initialized Evolutionary Algorithm runs'):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
     month_optimized = (0.75, 0.26, 0.62, 0.85)
@@ -222,11 +224,11 @@ def visualise_month_ea_runs():
     plt.legend(own_lines, ['Pure Earn Money', 'Elite of generation',
                            'Average of generation', 'Monthly optimized timings', 'Monthly conservative timings'])
 
-    fig.suptitle('Initial Evolutionary Algorithm Runs')
+    fig.suptitle(title)
     plt.show()
 
 
-def visualise_single_month_ea_run(source_folder='../../data/first_ea_runs/', month=None):
+def visualise_single_month_ea_run(source_folder='../../data/random_init_first_runs/', month=None):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
     month_optimized = (0.75, 0.26, 0.62, 0.85)
@@ -285,8 +287,27 @@ if __name__ == '__main__':
     filenames_3 = ['../../data/different_mutations/IndividualMutateNormalDistBigMutationWithSort.csv',
                    '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv',
                    '../../data/different_mutations/IndividualMutateNormalDistSmallMutation.csv']
-    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3]
-    for filenames in filenames_all:
-        visualise_ea_runs(filenames)
+    filenames_4 = ['../../data/different_mutations/RandomNormalDistBigMutation.csv',
+                   '../../data/different_mutations/FixedNormalDistBigMutation.csv',
+                   '../../data/different_mutations/MiddleBigMutation.csv',
+                   '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv']
+    filenames_5 = ['../../data/fixed_normal_dist/FixedUniformDistBigMutation.csv',
+                   '../../data/fixed_normal_dist/MiddleBigMutation.csv',
+                   '../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
+                   '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv']
+    filesnames_6 = ['../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
+                    '../../data/fixed_normal_dist/MutateNormalDistSmallMutation.csv',
+                    '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv',
+                    '../../data/fixed_normal_dist/RandomNormalDistSmallMutation.csv']
+    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4, filenames_5, filesnames_6]
+    titles = [None, None, None, None,
+              'Guided Initialisation. Uniform Dist. Big Mutation.\nDifferent (Uniform dist based) pairing methods',
+              'Random Initialisation Different Pairing Methods',
+              None]
+    for i in range(len(filenames_all)):
+        filenames = filenames_all[i]
+        title = titles[i]
+        visualise_ea_runs(filenames, title)
     visualise_month_ea_runs()
-    visualise_single_month_ea_run()
+    visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
+    # visualise_single_month_ea_run()

@@ -87,15 +87,17 @@ if __name__ == '__main__':
     csv_strategy = CsvStrategy(name='CSV Strategy', strategy_csv=csv_strategy_path, price_step_size=1)
     visualize_strategy(csv_strategy)
 
-    point_based_strat = PointBasedStrategy('Point Based Strategy', price_step_size=1)
+    point_based_strat = PointBasedStrategy('200k december strategy', price_step_size=2)
 
-    point_based_strat.add_point((50, 50, 'CHARGE'))
-    point_based_strat.add_point((70, 30, 'CHARGE'))
-    point_based_strat.add_point((95, 0, 'CHARGE'))
+    point_based_strat.add_point((47, 280, 'CHARGE'))
+    point_based_strat.add_point((70, 258, 'CHARGE'))
+    point_based_strat.add_point((79, 46, 'CHARGE'))
+    point_based_strat.add_point((84, 42, 'CHARGE'))
 
-    point_based_strat.add_point((40, 100, 'DISCHARGE'))
-    point_based_strat.add_point((70, 80, 'DISCHARGE'))
-    point_based_strat.add_point((95, 65, 'DISCHARGE'))
+    point_based_strat.add_point((37, 512, 'DISCHARGE'))
+    point_based_strat.add_point((52, 302, 'DISCHARGE'))
+    point_based_strat.add_point((82, 222, 'DISCHARGE'))
+    point_based_strat.add_point((95, -8, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
 
