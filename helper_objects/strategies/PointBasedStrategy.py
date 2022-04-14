@@ -75,15 +75,14 @@ class PointBasedStrategy(Strategy):
             pass
         else:
             sort_strategy = int(sort_strategy)
-        match sort_strategy:
-            case 1:
-                self.sort_strategy_one_flip_prices()
-            case 2:
-                self.sort_strategy_two_take_high_price()
-            case 3:
-                self.sort_strategy_three_take_low_price()
-            case _:
-                pass
+        if sort_strategy == 1:
+            self.sort_strategy_one_flip_prices()
+        elif sort_strategy == 2:
+            self.sort_strategy_two_take_high_price()
+        elif sort_strategy == 3:
+            self.sort_strategy_three_take_low_price()
+        else:
+            pass
 
     def sort_strategy_one_flip_prices(self):
         self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
