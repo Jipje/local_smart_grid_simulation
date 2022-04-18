@@ -1,3 +1,5 @@
+import os
+
 from pandas import NaT
 
 from environment.ImbalanceEnvironment import ImbalanceEnvironment
@@ -28,13 +30,13 @@ class Fitness(object):
         self.congestion_kw = congestion_kw
         self.congestion_safety_margin = congestion_safety_margin
 
-        self.scenario = '../data/environments/lelystad_1_2021.csv'
+        self.scenario = '..{0}data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep)
 
         if 'lelystad_1' in self.scenario:
             self.scenario_name = 'Lelystad 1 - 19 MW Solar Farm, 14MW connection'
         res_df = pd.read_csv(self.scenario)
         self.scenario_df = res_df.to_dict('records')
-        self.congestion_df = get_month_congestion_timings(solarvation_identifier='../data/environments/lelystad_1_2021.csv', strategy=1)
+        self.congestion_df = get_month_congestion_timings(solarvation_identifier='..{0}data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep), strategy=1)
 
         self.starting_timestep = 0
         with open(self.scenario) as file:
@@ -66,8 +68,8 @@ class Fitness(object):
 
         # Initialise random strategy
         random_point_based_strategy = individual.value
-        greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='../data/strategies/greedy_discharge_60.csv')
-        always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='../data/strategies/always_discharge.csv')
+        greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='..{0}data{0}strategies{0}greedy_discharge_60.csv'.format(os.path.sep))
+        always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='..{0}data{0}strategies{0}always_discharge.csv'.format(os.path.sep))
 
         solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
                                                                            network_object=battery,
