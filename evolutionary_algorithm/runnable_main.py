@@ -1,3 +1,5 @@
+import os
+
 import dateutil.tz
 
 from evolutionary_algorithm.Evolution import Evolution
@@ -52,7 +54,7 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'../data/ea_runs/population_investigation/{filename}.csv')
+        evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
