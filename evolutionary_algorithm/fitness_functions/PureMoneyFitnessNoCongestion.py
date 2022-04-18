@@ -15,8 +15,6 @@ class PureMoneyFitnessNoCongestion(Fitness):
         super().__init__(verbose_lvl, transportation_kw, congestion_kw, congestion_safety_margin)
 
     def run_simulation(self, individual):
-        if individual.fitness is not None:
-            return individual.fitness
         # Initialise environment
         imbalance_environment = NetworkEnvironment(verbose_lvl=self.verbose_lvl)
         ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -44,6 +42,9 @@ class PureMoneyFitnessNoCongestion(Fitness):
         return res_dict
 
     def fitness(self, individual):
+        if individual.fitness is not None:
+            return individual.fitness
+
         res_dict = self.run_simulation(individual)
 
         fitness_value = res_dict['wombat_battery_revenue']

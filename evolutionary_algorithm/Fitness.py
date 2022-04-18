@@ -68,8 +68,6 @@ class Fitness(object):
         self.number_of_steps = starting_timesteps[month + 1] - self.starting_timestep
 
     def run_simulation(self, individual):
-        if individual.fitness is not None:
-            return individual.fitness
         # Initialise environment
         imbalance_environment = NetworkEnvironment(verbose_lvl=self.verbose_lvl)
         ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
@@ -154,6 +152,9 @@ class Fitness(object):
         return res_dict
 
     def fitness(self, individual):
+        if individual.fitness is not None:
+            return individual.fitness
+
         res_dict = self.run_simulation(individual)
 
         penalty = 1
