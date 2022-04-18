@@ -1,17 +1,17 @@
 import os
 
 from evolutionary_algorithm.Evolution import Evolution
-from evolutionary_algorithm.Fitness import Fitness
+from evolutionary_algorithm.fitness_functions.PureMoneyFitnessNoCongestion import PureMoneyFitnessNoCongestion
 from evolutionary_algorithm.individuals.guided_initialisation.GuidedInitRandomNormalDist import \
     GuidedInitRandomNormalDist
-from evolutionary_algorithm.individuals.mutation_params import random_mutation, big_mutation_with_overshoot
+from evolutionary_algorithm.individuals.mutation_params import big_mutation_with_overshoot
 
 
 def do_single_run(month=1, filename=None, pool_size=64, n_offsprings=32):
     number_of_points = 4
     price_step_size = 2
 
-    fitness_class = Fitness()
+    fitness_class = PureMoneyFitnessNoCongestion()
     fitness_class.set_month(month)
     mutate_params = big_mutation_with_overshoot
     mutate_params['strategy_price_step_size'] = price_step_size
@@ -50,6 +50,6 @@ def do_single_run(month=1, filename=None, pool_size=64, n_offsprings=32):
 
 
 if __name__ == '__main__':
-    for month in [3, 4, 12]:
+    for month_index in [3, 4, 12]:
         for _ in range(5):
-            do_single_run(month=month)
+            do_single_run(month=month_index)
