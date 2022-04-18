@@ -9,6 +9,7 @@ from evolutionary_algorithm.individuals.IndividualRandomNormalDist import Indivi
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
 from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation, \
     big_mutation_with_overshoot, random_mutation
+import sys
 
 utc = dateutil.tz.tzutc()
 
@@ -68,13 +69,19 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
 
 
 if __name__ == '__main__':
-    for pop_size in [32, 64, 128, 256, 512, 1024, 2048, 4096]:
-        offspring_ratio = 0.5
-        offspring_size = int(pop_size * offspring_ratio)
-        filename = f'pop_size_{pop_size}'
-        do_single_run(4, filename, pop_size, offspring_size)
-        break
-
+    runnable_int = int(sys.argv[1])
+    if runnable_int == 1:
+        for pop_size in [32, 128, 512, 2048, 8192]:
+            offspring_ratio = 0.5
+            offspring_size = int(pop_size * offspring_ratio)
+            filename = f'pop_size_{pop_size}'
+            do_single_run(4, filename, pop_size, offspring_size)
+    else:
+        for pop_size in [64, 256, 512, 2048, 4096]:
+            offspring_ratio = 0.5
+            offspring_size = int(pop_size * offspring_ratio)
+            filename = f'pop_size_{pop_size}'
+            do_single_run(4, filename, pop_size, offspring_size)
     #####################################
     # run_all_months()
     #####################################
