@@ -78,6 +78,11 @@ class StrategyIndividual(Individual):
         except KeyError:
             strategy_price_step_size = 5
 
+        try:
+            sort_strategy = mutate_params['sort_strategy']
+        except KeyError:
+            sort_strategy = None
+
         original_charge = self.value.charge_points
         original_discharge = self.value.discharge_points
 
@@ -88,7 +93,7 @@ class StrategyIndividual(Individual):
             new_individual.add_point(self.mutate_point(original_charge_point, mutate_params))
             new_individual.add_point(self.mutate_point(original_discharge_point, mutate_params))
 
-        new_individual.sort_and_fix_points()
+        new_individual.sort_and_fix_points(sort_strategy=sort_strategy)
         new_individual.upload_strategy()
         return new_individual
 
