@@ -69,8 +69,12 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
     # print(evo.pool.individuals[-3].fitness)
     # print(evo.pool.individuals[-3])
 
+
 def main():
-    runnable_int = int(sys.argv[1])
+    try:
+        runnable_int = int(sys.argv[1])
+    except IndexError:
+        runnable_int = 0
 
     if runnable_int == 1:
         print('Running settings 1')
