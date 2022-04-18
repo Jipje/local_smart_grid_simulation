@@ -10,7 +10,7 @@ from network_objects.control_strategies.StrategyWithLimitedChargeCapacityControl
     StrategyWithLimitedChargeCapacityControlTower
 
 
-class PureMoneyFitness(Fitness):
+class PureMoneyFitnessNoCongestion(Fitness):
     def __init__(self, verbose_lvl=-1, transportation_kw=2000, congestion_kw=14000, congestion_safety_margin=0.99):
         super().__init__(verbose_lvl, transportation_kw, congestion_kw, congestion_safety_margin)
 
@@ -54,6 +54,6 @@ class PureMoneyFitness(Fitness):
 
 if __name__ == '__main__':
     random_individual = StrategyIndividual(init_params={'number_of_points': 4})
-    fitness = PureMoneyFitness(verbose_lvl=1)
+    fitness = PureMoneyFitnessNoCongestion(verbose_lvl=1)
     fitness.set_month(4)
     print(fitness.fitness(random_individual))
