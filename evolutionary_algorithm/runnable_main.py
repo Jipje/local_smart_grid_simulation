@@ -1,3 +1,5 @@
+import os
+
 import dateutil.tz
 
 from evolutionary_algorithm.Evolution import Evolution
@@ -9,6 +11,7 @@ from evolutionary_algorithm.individuals.IndividualRandomNormalDist import Indivi
 from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
 from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation, \
     big_mutation_with_overshoot, random_mutation
+import sys
 
 utc = dateutil.tz.tzutc()
 
@@ -19,7 +22,7 @@ def run_all_months():
             do_single_run(month)
 
 
-def do_single_run(month=1, filename=None):
+def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
     number_of_points = 4
     price_step_size = 2
 
@@ -27,12 +30,13 @@ def do_single_run(month=1, filename=None):
     fitness_class.set_month(month)
     mutate_params = random_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
+    mutate_params['sort_strategy'] = None
 
     evo = Evolution(
-        pool_size=30,
+        pool_size=pool_size,
         fitness=fitness_class.fitness,
         individual_class=IndividualRandomNormalDist,
-        n_offsprings=15,
+        n_offsprings=n_offsprings,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
         init_params={
@@ -40,7 +44,7 @@ def do_single_run(month=1, filename=None):
             'strategy_price_step_size': price_step_size
         }
     )
-    n_epochs = 20
+    n_epochs = 50
 
     if filename is None:
         month_filenames = ['january', 'february', 'march', 'april',
@@ -51,24 +55,52 @@ def do_single_run(month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'../data/tournament_investigation/{filename}.csv')
+        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
+        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
     # print('BEST PERFORMING INDIVIDUALS')
-    print(evo.pool.individuals[-1].fitness)
-    print(evo.pool.individuals[-1])
+    print('Best performing individual for run:\n'
+          f'\tPop size: {pool_size}\n'
+          f'\tElite fitness: {evo.pool.individuals[-1].fitness}')
+    # print(evo.pool.individuals[-1].fitness)
+    # print(evo.pool.individuals[-1])
     # print(evo.pool.individuals[-2].fitness)
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)
     # print(evo.pool.individuals[-3])
 
 
+def main():
+    try:
+        runnable_int = int(sys.argv[1])
+    except IndexError:
+        runnable_int = 0
+
+    if runnable_int == 1:
+        print('Running settings 1')
+        for pop_size in [32, 128, 512, 2048, 8192]:
+            offspring_ratio = 0.5
+            offspring_size = int(pop_size * offspring_ratio)
+            filename = f'pop_size_{pop_size}'
+            do_single_run(4, filename, pop_size, offspring_size)
+    else:
+        print('Running settings other')
+        for pop_size in [64, 256, 512, 2048, 4096]:
+            offspring_ratio = 0.5
+            offspring_size = int(pop_size * offspring_ratio)
+            filename = f'pop_size_{pop_size}'
+            do_single_run(4, filename, pop_size, offspring_size)
+
+
 if __name__ == '__main__':
+    main()
+    #####################################
     # run_all_months()
     #####################################
-    for _ in range(5):
-        do_single_run(4, filename='RandomNormalDistSmallMutation')
+    # for _ in range(5):
+    #     do_single_run(4, filename='RandomNormalDistSmallMutation')
     #####################################
     # month = 1
     # number_of_points = 4

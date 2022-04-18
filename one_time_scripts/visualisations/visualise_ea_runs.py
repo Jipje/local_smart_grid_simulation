@@ -32,7 +32,7 @@ month_monthly_optimized = [124241.32, 98744.28, 101843.76,
 
 def convert_file_into_dict(filename=None):
     if filename is None:
-        filename = '../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv'
+        filename = '../../data/ea_runs/different_mutations/FixedNormalDistBigMutationWithSort.csv'
 
     with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file)
@@ -69,7 +69,7 @@ def convert_file_into_dict(filename=None):
 
 def visualise_ea_run(filename=None):
     if filename is None:
-        filename = '../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv'
+        filename = '../../data/ea_runs/different_mutations/FixedNormalDistBigMutationWithSort.csv'
     title_file = filename.split('/')[-1]
 
     res_dict, num_of_runs = convert_file_into_dict(filename)
