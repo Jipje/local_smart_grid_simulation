@@ -81,7 +81,7 @@ class StrategyIndividual(Individual):
         try:
             sort_strategy = mutate_params['sort_strategy']
         except KeyError:
-            strategy_price_step_size = None
+            sort_strategy = None
 
         original_charge = self.value.charge_points
         original_discharge = self.value.discharge_points
