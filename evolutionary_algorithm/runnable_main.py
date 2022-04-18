@@ -30,7 +30,7 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
     fitness_class.set_month(month)
     mutate_params = random_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
-    mutate_params['sort_strategy'] = 1
+    mutate_params['sort_strategy'] = None
 
     evo = Evolution(
         pool_size=pool_size,
