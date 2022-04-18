@@ -7,6 +7,7 @@ from pandas import NaT
 
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
+from evolutionary_algorithm import runnable_main
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
@@ -729,14 +730,16 @@ if __name__ == '__main__':
     # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
     ####################################################################
 
-    print(solarvation_dumb_discharging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl))
-    print(super_naive_baseline(verbose_lvl))
-    print(baseline(verbose_lvl))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
+    runnable_main.main()
+
+    # print(solarvation_dumb_discharging(verbose_lvl))
+    # print(wombat_solarvation_limited_charging(verbose_lvl))
+    # print(super_naive_baseline(verbose_lvl))
+    # print(baseline(verbose_lvl))
+    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
+    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
+    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
 
     # Good performing seeds:
     #   660352027716011711
