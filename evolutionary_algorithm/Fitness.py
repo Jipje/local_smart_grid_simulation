@@ -30,11 +30,18 @@ class Fitness(object):
         self.congestion_kw = congestion_kw
         self.congestion_safety_margin = congestion_safety_margin
 
-        self.scenario = '..{0}data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+        self.data_folder = '..{0}data{0}'.format(os.path.sep)
+        self.scenario = self.data_folder + 'environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+        try:
+            res_df = pd.read_csv(self.scenario)
+        except FileNotFoundError:
+            self.data_folder = f'data{os.path.sep}'
+            self.scenario = self.data_folder + 'environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+            res_df = pd.read_csv(self.scenario)
+
 
         if 'lelystad_1' in self.scenario:
             self.scenario_name = 'Lelystad 1 - 19 MW Solar Farm, 14MW connection'
-        res_df = pd.read_csv(self.scenario)
         self.scenario_df = res_df.to_dict('records')
         self.congestion_df = get_month_congestion_timings(solarvation_identifier='..{0}data{0}environments{0}lelystad_1_2021.csv'.format(os.path.sep), strategy=1)
 
