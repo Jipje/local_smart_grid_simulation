@@ -43,9 +43,17 @@ class PureMoneyFitness(Fitness):
                                                   dict_of_df=self.scenario_df)
         return res_dict
 
+    def fitness(self, individual):
+        res_dict = self.run_simulation(individual)
+
+        fitness_value = res_dict['wombat_battery_revenue']
+        individual.set_fitness(fitness_value)
+
+        return fitness_value
+
 
 if __name__ == '__main__':
     random_individual = StrategyIndividual(init_params={'number_of_points': 4})
     fitness = PureMoneyFitness(verbose_lvl=1)
-    fitness.set_month(7)
+    fitness.set_month(4)
     print(fitness.fitness(random_individual))
