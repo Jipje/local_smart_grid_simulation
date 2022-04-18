@@ -42,10 +42,10 @@ big_mutation_with_overshoot = {
 }
 
 random_mutation = {
-    'soc_lower': -2,
-    'soc_upper': 2,
-    'charge_price_lower': -2,
-    'charge_price_upper': 2,
-    'discharge_price_lower': -2,
-    'discharge_price_upper': 2
+    'soc_lower': -3,
+    'soc_upper': 3,
+    'charge_price_lower': -3,
+    'charge_price_upper': 3,
+    'discharge_price_lower': -3,
+    'discharge_price_upper': 3
 }
