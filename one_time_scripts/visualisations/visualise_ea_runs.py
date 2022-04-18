@@ -228,7 +228,8 @@ def visualise_month_ea_runs(source_folder='../../data/random_init_first_runs/',
     plt.show()
 
 
-def visualise_single_month_ea_run(source_folder='../../data/random_init_first_runs/', month=None):
+def visualise_single_month_ea_run(source_folder='../../data/random_init_first_runs/', month=None, suffix=None,
+                                  extra_title=None):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
     month_optimized = (0.75, 0.26, 0.62, 0.85)
@@ -242,7 +243,10 @@ def visualise_single_month_ea_run(source_folder='../../data/random_init_first_ru
 
     for month in months:
         month_name = month_filenames[month - 1]
-        filename = source_folder + month_name + '.csv'
+        if suffix is not None:
+            filename = source_folder + month_name + suffix + '.csv'
+        else:
+            filename = source_folder + month_name + '.csv'
         month_dict, num_of_runs = convert_file_into_dict(filename)
 
         max_generations = -1
@@ -258,7 +262,10 @@ def visualise_single_month_ea_run(source_folder='../../data/random_init_first_ru
 
         plt.xlabel('Generation')
         plt.ylabel('Fitness (Total EUR)')
-        plt.title(f'First EA runs for {month_name}')
+        title = f'EA runs for {month_name}'
+        if extra_title is not None:
+            title = title + '\n' + extra_title
+        plt.title(title)
 
         own_lines = [
             Line2D([0], [0], color=baseline_color, ls=':', lw=2),
@@ -310,4 +317,11 @@ if __name__ == '__main__':
         visualise_ea_runs(filenames, title)
     visualise_month_ea_runs()
     visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
-    # visualise_single_month_ea_run()
+
+    # GIGA BASELINE RUNS
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=3, extra_title='Pure money 100 Pop')
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=3, suffix='_30', extra_title='Pure money 30 Pop')
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=4, extra_title='Pure money 100 Pop')
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=4, suffix='_30', extra_title='Pure money 30 Pop')
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=12, extra_title='Pure money 100 Pop')
+    visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=12, suffix='_30', extra_title='Pure money 30 Pop')
