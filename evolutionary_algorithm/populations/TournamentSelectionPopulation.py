@@ -13,7 +13,6 @@ class TournamentSelectionPopulation(Population):
         selection = []
 
         while len(selection) < 2 * n_offsprings:
-
             best = self.individuals[random.randint(0, pop_max_index)]
             for _ in range(self.tournament_size - 1):
                 contestant = self.individuals[random.randint(0, pop_max_index)]

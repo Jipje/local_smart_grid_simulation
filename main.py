@@ -7,7 +7,6 @@ from pandas import NaT
 
 from environment.NetworkEnvironment import NetworkEnvironment
 from environment.TotalNetworkCapacityTracker import TotalNetworkCapacityTracker
-from evolutionary_algorithm import runnable_main
 from helper_objects.congestion_helper.month_congestion_size_and_timer import get_month_congestion_timings
 from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
