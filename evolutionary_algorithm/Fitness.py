@@ -36,9 +36,14 @@ class Fitness(object):
         try:
             res_df = pd.read_csv(self.scenario)
         except FileNotFoundError:
-            self.data_folder = f'data{os.path.sep}'
-            self.scenario = self.data_folder + 'environments{0}lelystad_1_2021.csv'.format(os.path.sep)
-            res_df = pd.read_csv(self.scenario)
+            try:
+                self.data_folder = f'data{os.path.sep}'
+                self.scenario = self.data_folder + 'environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+                res_df = pd.read_csv(self.scenario)
+            except FileNotFoundError:
+                self.data_folder = '..{0}..{0}data{0}'.format(os.path.sep)
+                self.scenario = self.data_folder + 'environments{0}lelystad_1_2021.csv'.format(os.path.sep)
+                res_df = pd.read_csv(self.scenario)
 
 
         if 'lelystad_1' in self.scenario:
