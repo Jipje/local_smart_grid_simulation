@@ -12,14 +12,15 @@ import pandas as pd
 import dateutil.tz
 import datetime as dt
 
-utc = dateutil.tz.tzutc()
-
 from network_objects.Battery import Battery
 from network_objects.RenewableEnergyGenerator import RenewableEnergyGenerator
 from network_objects.control_strategies.ModesOfOperationController import ModesOfOperationController
 from network_objects.control_strategies.MonthOfModesOfOperationController import MonthOfModesOfOperationController
 from network_objects.control_strategies.SolveCongestionAndLimitedChargeControlTower import \
     SolveCongestionAndLimitedChargeControlTower
+
+utc = dateutil.tz.tzutc()
+
 
 class Fitness(object):
     def __init__(self, verbose_lvl=-1, transportation_kw=2000, congestion_kw=14000, congestion_safety_margin=0.99):
@@ -34,14 +35,16 @@ class Fitness(object):
             self.scenario_name = 'Lelystad 1 - 19 MW Solar Farm, 14MW connection'
         res_df = pd.read_csv(self.scenario)
         self.scenario_df = res_df.to_dict('records')
-        self.congestion_df = get_month_congestion_timings(solarvation_identifier='../data/environments/lelystad_1_2021.csv', strategy=1)
+        self.congestion_df = get_month_congestion_timings(
+            solarvation_identifier='../data/environments/lelystad_1_2021.csv', strategy=1)
 
         self.starting_timestep = 0
         with open(self.scenario) as file:
             self.number_of_steps = len(file.readlines()) + 1
 
     def set_month(self, month):
-        starting_timesteps = [0, 60, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595, 480795, 525376]
+        starting_timesteps = [0, 60, 44700, 85020, 129600, 172800, 217440, 260475, 305115, 349755, 392955, 437595,
+                              480795, 525376]
         assert 13 > month > 0
 
         dt_month = dt.datetime(2021, month, 1)
@@ -50,8 +53,7 @@ class Fitness(object):
         self.starting_timestep = starting_timesteps[month]
         self.number_of_steps = starting_timesteps[month + 1] - self.starting_timestep
 
-
-    def fitness(self, individual):
+    def run_simulation(self, individual):
         if individual.fitness is not None:
             return individual.fitness
         # Initialise environment
@@ -62,11 +64,13 @@ class Fitness(object):
         # Initialise solar farm
         solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=self.verbose_lvl)
         # Initialise battery
-        battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=self.verbose_lvl)
+        battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600,
+                          verbose_lvl=self.verbose_lvl)
 
         # Initialise random strategy
         random_point_based_strategy = individual.value
-        greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='../data/strategies/greedy_discharge_60.csv')
+        greedy_discharge_strat = CsvStrategy('Greedy discharge',
+                                             strategy_csv='../data/strategies/greedy_discharge_60.csv')
         always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='../data/strategies/always_discharge.csv')
 
         solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
@@ -128,15 +132,22 @@ class Fitness(object):
         imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
 
         # print('\nRunning scenario {}'.format(self.scenario_name))
-        res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario, verbose_lvl=self.verbose_lvl,
-                                       simulation_environment=imbalance_environment, dict_of_df=self.scenario_df)
+        res_dict = run_simulation_from_dict_of_df(self.starting_timestep, self.number_of_steps, scenario=self.scenario,
+                                                  verbose_lvl=self.verbose_lvl,
+                                                  simulation_environment=imbalance_environment,
+                                                  dict_of_df=self.scenario_df)
+        return res_dict
+
+    def fitness(self, individual):
+        res_dict = self.run_simulation(individual)
 
         penalty = 1
         if res_dict['time_steps_with_congestion'] > 0:
             penalty = 0.5
-        fitness = res_dict['wombat_battery_revenue'] * penalty
-        individual.set_fitness(fitness)
-        return fitness
+
+        fitness_value = res_dict['wombat_battery_revenue'] * penalty
+        individual.set_fitness(fitness_value)
+        return fitness_value
 
 
 if __name__ == '__main__':
