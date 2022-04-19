@@ -772,17 +772,20 @@ if __name__ == '__main__':
     # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
     ####################################################################
 
-    # print(solarvation_dumb_discharging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
-    # print(super_naive_baseline(verbose_lvl))
-    # print(baseline(verbose_lvl))
-    # print(baseline(verbose_lvl, base_money_strat=False))
+    print(solarvation_dumb_discharging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
+    print(super_naive_baseline(verbose_lvl))
+    print(baseline(verbose_lvl))
+    print(baseline(verbose_lvl, base_money_strat=False))
     print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
     print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2, base_money_strat=False))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1, base_money_strat=False))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5, base_money_strat=False))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6, base_money_strat=False))
 
     # Good performing seeds:
     #   660352027716011711
