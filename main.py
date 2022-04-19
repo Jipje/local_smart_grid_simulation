@@ -533,6 +533,16 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
         moo = ModesOfOperationController(name=f'Wombat controller month {month}',
                                          network_object=battery,
                                          verbose_lvl=verbose_lvl)
+        if not base_money_strat:
+            month_num = month + 1
+            money_earning_strat = get_month_strategy(month_num)
+            earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name=f"GIGA Baseline Month {month_num}",
+                                                                         network_object=battery,
+                                                                         congestion_kw=congestion_kw,
+                                                                         congestion_safety_margin=congestion_safety_margin,
+                                                                         strategy=money_earning_strat,
+                                                                         verbose_lvl=verbose_lvl,
+                                                                         transportation_kw=transportation_kw)
         if earning_money_until[month] is not NaT:
             moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
 
@@ -766,9 +776,10 @@ if __name__ == '__main__':
     # print(wombat_solarvation_limited_charging(verbose_lvl))
     # print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
     # print(super_naive_baseline(verbose_lvl))
-    print(baseline(verbose_lvl))
-    print(baseline(verbose_lvl, base_money_strat=False))
-    # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    # print(baseline(verbose_lvl))
+    # print(baseline(verbose_lvl, base_money_strat=False))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
+    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2, base_money_strat=False))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
