@@ -12,6 +12,7 @@ from helper_objects.strategies.CsvStrategy import CsvStrategy
 from helper_objects.strategies.DischargeUntilStrategy import DischargeUntilStrategy
 from helper_objects.strategies.PointBasedStrategy import PointBasedStrategy
 from helper_objects.strategies.RandomStrategyGenerator import generate_random_discharge_relative_strategy
+from helper_objects.strategies.giga_baseline_strategies import get_month_strategy
 from network_objects.Battery import Battery
 from network_objects.control_strategies.ModesOfOperationController import ModesOfOperationController
 from network_objects.control_strategies.MonthOfModesOfOperationController import MonthOfModesOfOperationController
@@ -271,23 +272,35 @@ def rhino_windnet_limited_charging(verbose_lvl=1):
                       simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
 
-def wombat_solarvation_limited_charging(verbose_lvl=1):
+def wombat_solarvation_limited_charging(verbose_lvl=1, base_money_strat=True):
     # Wombat with limited charging simulation
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
     ImbalanceEnvironment(imbalance_environment, mid_price_index=2, max_price_index=1, min_price_index=3)
     TotalNetworkCapacityTracker(imbalance_environment, 14000)
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
-
-    csv_strategy = CsvStrategy('Rhino strategy 1',
-                               strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
-    wombat = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
-    strategy_limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(
-        name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl,
-        transportation_kw=2000)
-
     imbalance_environment.add_object(solarvation, [1, 3, 4])
-    imbalance_environment.add_object(strategy_limited_charge_controller, [1, 3, 4])
+
+    wombat = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
+
+    if base_money_strat:
+        csv_strategy = CsvStrategy('Rhino strategy 1',
+                                   strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
+
+        main_controller = StrategyWithLimitedChargeCapacityControlTower(
+            name="Wombat Battery Controller", network_object=wombat, strategy=csv_strategy, verbose_lvl=verbose_lvl,
+            transportation_kw=2000)
+        imbalance_environment.add_object(main_controller, [1, 3, 4])
+    else:
+        main_controller = MonthOfModesOfOperationController(name='Wombat main controller',
+                                                            network_object=wombat, verbose_lvl=verbose_lvl)
+        for month_num in range(1, 13):
+            money_earn_strat_month = get_month_strategy(month_num)
+            limited_charge_controller = StrategyWithLimitedChargeCapacityControlTower(
+                name=f"Wombat Controller Month {month_num}", network_object=wombat, strategy=money_earn_strat_month,
+                verbose_lvl=verbose_lvl, transportation_kw=2000)
+            main_controller.add_controller(limited_charge_controller)
+        imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
 
     return run_full_scenario(simulation_environment=imbalance_environment, verbose_lvl=verbose_lvl)
 
@@ -390,7 +403,7 @@ def super_naive_baseline(verbose_lvl=1):
     return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def baseline(verbose_lvl=1):
+def baseline(verbose_lvl=1, base_money_strat=True):
     congestion_kw = 14000
     congestion_safety_margin = 0.99
     transportation_kw = 2000
@@ -450,7 +463,7 @@ def baseline(verbose_lvl=1):
     return run_full_scenario(scenario='data/environments/lelystad_1_2021.csv', verbose_lvl=verbose_lvl, simulation_environment=imbalance_environment)
 
 
-def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000, congestion_strategy=1):
+def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion_kw=14000, congestion_strategy=1, base_money_strat=True):
     congestion_safety_margin = 0.99
 
     imbalance_environment = NetworkEnvironment(verbose_lvl=verbose_lvl)
@@ -729,10 +742,9 @@ if __name__ == '__main__':
     # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
     ####################################################################
 
-    runnable_main.main()
-
     # print(solarvation_dumb_discharging(verbose_lvl))
-    # print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl))
+    print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
     # print(super_naive_baseline(verbose_lvl))
     # print(baseline(verbose_lvl))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
