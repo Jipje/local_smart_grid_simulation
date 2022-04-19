@@ -413,6 +413,7 @@ def baseline(verbose_lvl=1, base_money_strat=True):
     TotalNetworkCapacityTracker(imbalance_environment, congestion_kw)
 
     solarvation = RenewableEnergyGenerator('Solarvation solar farm', 19000, verbose_lvl=verbose_lvl)
+    imbalance_environment.add_object(solarvation, [1, 3, 4])
 
     battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
 
@@ -439,17 +440,36 @@ def baseline(verbose_lvl=1, base_money_strat=True):
                                                                  strategy=csv_strategy,
                                                                  verbose_lvl=verbose_lvl,
                                                                  transportation_kw=transportation_kw)
+    if base_money_strat:
+        main_controller = ModesOfOperationController(name='Wombat main controller',
+                                         network_object=battery,
+                                         verbose_lvl=verbose_lvl)
+        main_controller.add_mode_of_operation(dt.time(4, 30, tzinfo=utc), earn_money_mod)
+        main_controller.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
+        main_controller.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), solve_congestion_mod)
+        main_controller.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+    else:
+        main_controller = MonthOfModesOfOperationController(name='Wombat main controller',
+                                                            network_object=battery, verbose_lvl=verbose_lvl)
+        for month_num in range(1, 13):
+            money_earn_strat_month = get_month_strategy(month_num)
+            earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name=f"GIGA Baseline Month {month_num}",
+                                                                         network_object=battery,
+                                                                         congestion_kw=congestion_kw,
+                                                                         congestion_safety_margin=congestion_safety_margin,
+                                                                         strategy=money_earn_strat_month,
+                                                                         verbose_lvl=verbose_lvl,
+                                                                         transportation_kw=transportation_kw)
+            single_month_controller = ModesOfOperationController(name='Wombat month controller',
+                                                         network_object=battery,
+                                                         verbose_lvl=verbose_lvl)
+            single_month_controller.add_mode_of_operation(dt.time(4, 30, tzinfo=utc), earn_money_mod)
+            single_month_controller.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
+            single_month_controller.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), solve_congestion_mod)
+            single_month_controller.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
+            main_controller.add_controller(single_month_controller)
 
-    moo = ModesOfOperationController(name='Wombat main controller',
-                                     network_object=battery,
-                                     verbose_lvl=verbose_lvl)
-    moo.add_mode_of_operation(dt.time(4, 30, tzinfo=utc), earn_money_mod)
-    moo.add_mode_of_operation(dt.time(6, 45, tzinfo=utc), prepare_congestion_mod)
-    moo.add_mode_of_operation(dt.time(16, 45, tzinfo=utc), solve_congestion_mod)
-    moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
-
-    imbalance_environment.add_object(solarvation, [1, 3, 4])
-    imbalance_environment.add_object(moo, [1, 3, 4, 0])
+    imbalance_environment.add_object(main_controller, [1, 3, 4, 0])
 
     # Run single day
     # starting_timestep = 270555
@@ -743,10 +763,11 @@ if __name__ == '__main__':
     ####################################################################
 
     # print(solarvation_dumb_discharging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
+    # print(wombat_solarvation_limited_charging(verbose_lvl))
+    # print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
     # print(super_naive_baseline(verbose_lvl))
-    # print(baseline(verbose_lvl))
+    print(baseline(verbose_lvl))
+    print(baseline(verbose_lvl, base_money_strat=False))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
     # print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
