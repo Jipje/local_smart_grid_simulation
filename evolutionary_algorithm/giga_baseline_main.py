@@ -45,11 +45,10 @@ def do_single_run(month=1, filename=None, pool_size=100, n_offsprings=50):
         if evo.early_end():
             break
 
-    print(f'Best performing individual:\tElite fitness: {evo.pool.individuals[-1].fitness}')
+    print(f'Best performing individual {filename}:\tElite fitness: {evo.pool.individuals[-1].fitness}')
     print(evo.pool.individuals[-1])
 
 
 if __name__ == '__main__':
-    for month_index in [3, 4, 12]:
-        for _ in range(5):
-            do_single_run(month=month_index)
+    for month_index in range(1, 13):
+        do_single_run(month=month_index)
