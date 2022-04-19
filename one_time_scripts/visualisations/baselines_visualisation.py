@@ -19,7 +19,8 @@ def make_list_of_monthly_earnings(single_run):
 if __name__ == '__main__':
     print(baseline_df.name)
     # label_indexes = [6, 8, 10, 12]
-    label_indexes = [7, 9, 11, 13]
+    # label_indexes = [7, 9, 11, 13]
+    label_indexes = [2, 5, 7, 9, 13]
     num_of_items = len(label_indexes)
 
     x_axis = np.array(list(range(10, 130, 10)))
@@ -41,7 +42,12 @@ if __name__ == '__main__':
     for i in range(num_of_items):
         single_run = baseline_df.loc[label_indexes[i]]
         single_run_y = make_list_of_monthly_earnings(single_run)
-        plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'])
+
+        alpha = 1
+        if single_run['time_steps_with_congestion'] > 1:
+            alpha = 0.5
+
+        plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'], alpha=alpha)
 
     plt.xticks(x_axis, month_shorts)
     plt.xlabel('Month')
