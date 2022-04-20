@@ -12,7 +12,20 @@ month_long = ['january', 'february', 'march', 'april',
                 'september', 'october', 'november', 'december']
 baseline_df = pd.read_csv('../../data/baseline_earnings/overview.csv', delimiter=';')
 
-
+# 0                          Solarvation only discharging
+# 1     Wombat disregard congestion (with base money s...
+# 2             Wombat disregard congestion GIGA Baseline
+# 3                          Wombat only solve congestion
+# 4          Wombat yearly timing (with base money strat)
+# 5                    Wombat yearly timing GIGA Baseline
+# 6     Wombat conservative monthly timed (with base m...
+# 7       Wombat conservative monthly timed GIGA Baseline
+# 8     Wombat smart monthly timed (with base money st...
+# 9              Wombat smart monthly timed GIGA Baseline
+# 10    Wombat max smart monthly timed (with base mone...
+# 11         Wombat max smart monthly timed GIGA Baseline
+# 12    Wombat avg smart monthly timed (with base mone...
+# 13         Wombat avg smart monthly timed GIGA Baseline
 def make_list_of_monthly_earnings(single_run):
     res = []
     for i in range(12):
@@ -37,35 +50,25 @@ def make_list_of_monthly_earnings_from_ea_run_folder(source_folder='../../data/e
     return res_mean, res_error
 
 
-if __name__ == '__main__':
-    print(baseline_df.name)
-    # label_indexes = [6, 8, 10, 12]
-    # label_indexes = [7, 9, 11, 13]
-    # label_indexes = [2, 7, 9, 11, 13]
-    label_indexes = [13]
-
-    source_folder='../../data/ea_runs/giga_baseline/'
-    y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder)
-    num_of_items = len(label_indexes) + 1
-
+def make_bar_graph(baseline_indices, source_folders):
+    num_of_items = len(baseline_indices) + len(source_folders)
     x_axis = np.array(list(range(10, 130, 10)))
     offsets = []
-    width = 0
     if num_of_items == 2:
         offsets = [-2, 2]
-        width = 4
     elif num_of_items == 3:
         offsets = [-2, 0, 2]
-        width = 2
     elif num_of_items == 4:
         offsets = [-3, -1, 1, 3]
-        width = 2
     elif num_of_items == 5:
         offsets = [-3, -1.5, 0, 1.5, 3]
-        width = 1.5
+    elif num_of_items == 6:
+        offsets = [-3.125, -1.875, -0.625, 0.625, 1.875, 3.125]
+    width = offsets[-1] - offsets[-2]
 
-    for i in range(num_of_items - 1):
-        single_run = baseline_df.loc[label_indexes[i]]
+    offset_tracker = 0
+    for i in range(len(baseline_indices)):
+        single_run = baseline_df.loc[baseline_indices[i]]
         single_run_y = make_list_of_monthly_earnings(single_run)
 
         hatch = ''
@@ -76,14 +79,24 @@ if __name__ == '__main__':
 
         plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'],
                 hatch=hatch, alpha=alpha)
+        offset_tracker = i
 
-    plt.bar(x_axis + offsets[-1], y_values, width, label=source_folder)
-    plt.errorbar(x_axis + offsets[-1], y_values, yerr=y_errors,
+    for source_folder in source_folders:
+        offset_tracker = offset_tracker + 1
+        y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder)
+        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder)
+        plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                  fmt='o', markersize=width, elinewidth=width*0.5)
 
     plt.xticks(x_axis, month_shorts)
-    plt.xlabel('Month')
+    plt.xlabel('Month (2021)')
     plt.ylabel('Total EUR')
     plt.title('Comparing monthly performance')
-    plt.legend()
+    plt.legend(fontsize=6)
     plt.show()
+
+
+if __name__ == '__main__':
+    label_indexes = [6, 7, 12, 13]
+    source_folder = '../../data/ea_runs/random_init_first_runs/'
+    make_bar_graph(label_indexes, source_folders=[source_folder])
