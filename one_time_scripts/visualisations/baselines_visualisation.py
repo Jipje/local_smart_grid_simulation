@@ -97,6 +97,7 @@ def make_bar_graph(baseline_indices, source_folders):
 
 
 if __name__ == '__main__':
-    label_indexes = [6, 7, 12, 13]
-    source_folder = '../../data/ea_runs/random_init_first_runs/'
-    make_bar_graph(label_indexes, source_folders=[source_folder])
+    label_indexes = [8, 9, 13]
+    source_folder_1 = '../../data/ea_runs/giga_baseline_with_congestion/'
+    source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
+    make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
