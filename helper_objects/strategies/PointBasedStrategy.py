@@ -160,8 +160,7 @@ class PointBasedStrategy(Strategy):
                     new_current_point = (self.charge_points[i][0], current_charge_price, self.charge_points[i][2])
                     self.charge_points[i - 1] = new_last_point
                     self.charge_points[i] = new_current_point
-                else:
-                    last_charge_price = current_charge_price
+                last_charge_price = current_charge_price
 
                 if last_discharge_price < current_discharge_price:
                     new_last_point = (self.discharge_points[i-1][0], last_discharge_price, self.discharge_points[i-1][2])
