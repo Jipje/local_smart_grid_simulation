@@ -84,8 +84,8 @@ def do_single_run(month=1, filename=None, mutate_params=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}mutation_investigation{os.path.sep}{filename}.csv')
-        # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
+        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}mutation_investigation{os.path.sep}{filename}.csv')
+        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}mutation_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
