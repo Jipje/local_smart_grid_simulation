@@ -39,8 +39,8 @@ def do_single_run(month=1, filename=None, sort_strategy=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
-        # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
+        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
+        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
@@ -49,6 +49,6 @@ def do_single_run(month=1, filename=None, sort_strategy=None):
 
 
 if __name__ == '__main__':
-    for _ in range(5):
+    for _ in range(2):
         for month_index in [3, 4, 11]:
-            do_single_run(month=month_index)
+            do_single_run(month=month_index, sort_strategy=1)
