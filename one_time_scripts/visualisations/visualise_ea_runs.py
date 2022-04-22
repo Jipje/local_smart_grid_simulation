@@ -171,7 +171,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
     plt.show()
 
 
-def visualise_month_ea_runs(source_folder='../../data/random_init_first_runs/',
+def visualise_month_ea_runs(source_folder='../../data/ea_runs/random_init_first_runs/',
                             title='Random initialized Evolutionary Algorithm runs'):
     baseline_color = (0.64, 0.26, 0.75, 0.85)
     run_color = (0.26, 0.62, 0.75, 0.65)
@@ -282,41 +282,65 @@ def visualise_single_month_ea_run(source_folder='../../data/random_init_first_ru
 
 if __name__ == '__main__':
     # visualise_ea_run(filename='../../data/first_ea_runs/april.csv')
-    filenames_0 = ['../../data/different_mutations/RandomNormalDistBigMutationWithSort.csv',
-                 '../../data/different_mutations/RandomNormalDistBigMutation.csv',
-                 '../../data/different_mutations/RandomNormalDistSmallMutation.csv']
-    filenames_1 = ['../../data/different_mutations/FixedNormalDistBigMutationWithSort.csv',
-                 '../../data/different_mutations/FixedNormalDistBigMutation.csv',
-                 '../../data/different_mutations/FixedNormalDistSmallMutation.csv']
-    filenames_2 = ['../../data/different_mutations/MiddleBigMutationWithSort.csv',
-                 '../../data/different_mutations/MiddleBigMutation.csv',
-                 '../../data/different_mutations/MiddleSmallMutation.csv']
-    filenames_3 = ['../../data/different_mutations/IndividualMutateNormalDistBigMutationWithSort.csv',
-                   '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv',
-                   '../../data/different_mutations/IndividualMutateNormalDistSmallMutation.csv']
-    filenames_4 = ['../../data/different_mutations/RandomNormalDistBigMutation.csv',
-                   '../../data/different_mutations/FixedNormalDistBigMutation.csv',
-                   '../../data/different_mutations/MiddleBigMutation.csv',
-                   '../../data/different_mutations/IndividualMutateNormalDistBigMutation.csv']
-    filenames_5 = ['../../data/fixed_normal_dist/FixedUniformDistBigMutation.csv',
-                   '../../data/fixed_normal_dist/MiddleBigMutation.csv',
-                   '../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
-                   '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv']
-    filesnames_6 = ['../../data/fixed_normal_dist/MutateNormalDistBigMutation.csv',
-                    '../../data/fixed_normal_dist/MutateNormalDistSmallMutation.csv',
-                    '../../data/fixed_normal_dist/RandomNormalDistBigMutation.csv',
-                    '../../data/fixed_normal_dist/RandomNormalDistSmallMutation.csv']
-    filenames_all = [filenames_0, filenames_1, filenames_2, filenames_3, filenames_4, filenames_5, filesnames_6]
-    titles = [None, None, None, None,
+    filenames_0 = ['../../data/ea_runs/different_mutations/RandomNormalDistBigMutationWithSort.csv',
+                 '../../data/ea_runs/different_mutations/RandomNormalDistBigMutation.csv',
+                 '../../data/ea_runs/different_mutations/RandomNormalDistSmallMutation.csv']
+    filenames_1 = ['../../data/ea_runs/different_mutations/FixedNormalDistBigMutationWithSort.csv',
+                 '../../data/ea_runs/different_mutations/FixedNormalDistBigMutation.csv',
+                 '../../data/ea_runs/different_mutations/FixedNormalDistSmallMutation.csv']
+    filenames_2 = ['../../data/ea_runs/different_mutations/MiddleBigMutationWithSort.csv',
+                 '../../data/ea_runs/different_mutations/MiddleBigMutation.csv',
+                 '../../data/ea_runs/different_mutations/MiddleSmallMutation.csv']
+    filenames_3 = ['../../data/ea_runs/different_mutations/IndividualMutateNormalDistBigMutationWithSort.csv',
+                   '../../data/ea_runs/different_mutations/IndividualMutateNormalDistBigMutation.csv',
+                   '../../data/ea_runs/different_mutations/IndividualMutateNormalDistSmallMutation.csv']
+    filenames_4 = ['../../data/ea_runs/different_mutations/RandomNormalDistBigMutation.csv',
+                   '../../data/ea_runs/different_mutations/FixedNormalDistBigMutation.csv',
+                   '../../data/ea_runs/different_mutations/MiddleBigMutation.csv',
+                   '../../data/ea_runs/different_mutations/IndividualMutateNormalDistBigMutation.csv']
+    filenames_5 = ['../../data/ea_runs/fixed_normal_dist/FixedUniformDistBigMutation.csv',
+                   '../../data/ea_runs/fixed_normal_dist/MiddleBigMutation.csv',
+                   '../../data/ea_runs/fixed_normal_dist/MutateNormalDistBigMutation.csv',
+                   '../../data/ea_runs/fixed_normal_dist/RandomNormalDistBigMutation.csv']
+    filesnames_6 = ['../../data/ea_runs/fixed_normal_dist/MutateNormalDistBigMutation.csv',
+                    '../../data/ea_runs/fixed_normal_dist/MutateNormalDistSmallMutation.csv',
+                    '../../data/ea_runs/fixed_normal_dist/RandomNormalDistBigMutation.csv',
+                    '../../data/ea_runs/fixed_normal_dist/RandomNormalDistSmallMutation.csv']
+    filenames_7 = ['../../data/ea_runs/offspring_ratio/april_10off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/april_25off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/april_40off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/april_75off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/april_90off_100pop.csv']
+    filenames_8 = ['../../data/ea_runs/offspring_ratio/november_10off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/november_25off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/november_40off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/november_75off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/november_90off_100pop.csv']
+    filenames_9 = ['../../data/ea_runs/offspring_ratio/march_10off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_25off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_40off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_50off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_75off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_90off_100pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_100off_1000pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_250off_1000pop.csv',
+                   '../../data/ea_runs/offspring_ratio/march_400off_1000pop.csv']
+    filenames_all = [filenames_0, filenames_1, filenames_2,
+                     filenames_3, filenames_4, filenames_5,
+                     filesnames_6, filenames_7, filenames_8,
+                     filenames_9]
+    titles = [None, None, None,
+              None,
               'Guided Initialisation. Uniform Dist. Big Mutation.\nDifferent (Uniform dist based) pairing methods',
-              'Random Initialisation Different Pairing Methods',
-              None]
+              'Random Initialisation Different Pairing Methods', None,
+              'Offspring ratio investigation April', 'Offspring ratio investigation November',
+              'Offspring ratio investigation March']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
         title = titles[i]
         visualise_ea_runs(filenames, title)
     visualise_month_ea_runs()
-    visualise_month_ea_runs(source_folder='../../data/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
+    visualise_month_ea_runs(source_folder='../../data/ea_runs/first_ea_runs/', title='Initial Evolutionary Algorithm Runs')
 
     # GIGA BASELINE RUNS
     visualise_single_month_ea_run(source_folder='../../data/ea_runs/giga_baseline/', month=3, extra_title='Pure money 100 Pop')
