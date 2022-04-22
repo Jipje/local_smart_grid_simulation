@@ -9,7 +9,7 @@ class Evolution:
         self.pool = TournamentSelectionPopulation(pool_size, fitness, individual_class, init_params, tournament_size=4)
         self.n_offsprings = n_offsprings
 
-        assert pool_size >= (2 * n_offsprings)
+        # assert pool_size >= (2 * n_offsprings)
 
         self.previous_average = None
         self.total_steps = 0
