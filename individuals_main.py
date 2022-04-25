@@ -41,13 +41,13 @@ def do_single_run(individual_class, month=1, filename=None, label='RandomNormalD
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
-        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}sorting_investigation{os.path.sep}{filename}.csv')
+        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}individual_investigation{os.path.sep}{filename}.csv')
+        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}individual_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
     print(f'Best performing individual {filename}:\tElite fitness: {evo.pool.individuals[-1].fitness}\n')
-    # print(evo.pool.individuals[-1])
+    print(evo.pool.individuals[-1])
 
 
 if __name__ == '__main__':
