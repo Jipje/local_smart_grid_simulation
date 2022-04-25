@@ -3,6 +3,7 @@ import os
 import random
 import datetime as dt
 import dateutil.tz
+import pandas as pd
 from pandas import NaT
 
 from environment.NetworkEnvironment import NetworkEnvironment
@@ -772,20 +773,68 @@ if __name__ == '__main__':
     # print(run_single_month_set_strategy(verbose_lvl, strategy=congestion_causing_strategy, month=4))
     ####################################################################
 
-    print(solarvation_dumb_discharging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl))
-    print(wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False))
-    print(super_naive_baseline(verbose_lvl))
-    print(baseline(verbose_lvl))
-    print(baseline(verbose_lvl, base_money_strat=False))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2, base_money_strat=False))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1, base_money_strat=False))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5, base_money_strat=False))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6))
-    print(run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6, base_money_strat=False))
+    res_arr = []
+
+    temp_dict = solarvation_dumb_discharging(verbose_lvl)
+    temp_dict['name'] = 'Solarvation only discharging'
+    res_arr.append(temp_dict)
+
+    temp_dict = wombat_solarvation_limited_charging(verbose_lvl)
+    temp_dict['name'] = 'Wombat disregard congestion (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = wombat_solarvation_limited_charging(verbose_lvl, base_money_strat=False)
+    temp_dict['name'] = 'Wombat disregard congestion GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    temp_dict = super_naive_baseline(verbose_lvl)
+    temp_dict['name'] = 'Wombat only solve congestion'
+    res_arr.append(temp_dict)
+
+    temp_dict = baseline(verbose_lvl)
+    temp_dict['name'] = 'Wombat yearly timing (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = baseline(verbose_lvl, base_money_strat=False)
+    temp_dict['name'] = 'Wombat yearly timing GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2)
+    temp_dict['name'] = 'Wombat conservative monthly timed (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2, base_money_strat=False)
+    temp_dict['name'] = 'Wombat conservative monthly timed GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1)
+    temp_dict['name'] = 'Wombat smart monthly timed (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1, base_money_strat=False)
+    temp_dict['name'] = 'Wombat smart monthly timed GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5)
+    temp_dict['name'] = 'Wombat max smart monthly timed (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5, base_money_strat=False)
+    temp_dict['name'] = 'Wombat max smart monthly timed GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6)
+    temp_dict['name'] = 'Wombat avg smart monthly timed (with base money strat)'
+    res_arr.append(temp_dict)
+
+    temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6, base_money_strat=False)
+    temp_dict['name'] = 'Wombat avg smart monthly timed GIGA Baseline'
+    res_arr.append(temp_dict)
+
+    print(res_arr)
+    res_df = pd.DataFrame(res_arr)
+    print(res_df)
+    res_df.to_csv('data/baseline_earnings/auto_overview.csv')
 
     # Good performing seeds:
     #   660352027716011711

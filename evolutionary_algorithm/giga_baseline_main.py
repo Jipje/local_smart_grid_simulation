@@ -1,6 +1,7 @@
 import os
 
 from evolutionary_algorithm.Evolution import Evolution
+from evolutionary_algorithm.Fitness import Fitness
 from evolutionary_algorithm.fitness_functions.PureMoneyFitnessNoCongestion import PureMoneyFitnessNoCongestion
 from evolutionary_algorithm.individuals.guided_initialisation.GuidedInitRandomNormalDist import \
     GuidedInitRandomNormalDist
@@ -11,7 +12,7 @@ def do_single_run(month=1, filename=None, pool_size=100, n_offsprings=50):
     number_of_points = 4
     price_step_size = 2
 
-    fitness_class = PureMoneyFitnessNoCongestion()
+    fitness_class = Fitness()
     fitness_class.set_month(month)
     mutate_params = big_mutation_with_overshoot
     mutate_params['strategy_price_step_size'] = price_step_size
@@ -40,13 +41,13 @@ def do_single_run(month=1, filename=None, pool_size=100, n_offsprings=50):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}giga_baseline{os.path.sep}{filename}.csv')
+        evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}giga_baseline_with_congestion{os.path.sep}{filename}.csv')
         # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
     print(f'Best performing individual {filename}:\tElite fitness: {evo.pool.individuals[-1].fitness}\n')
-    # print(evo.pool.individuals[-1])
+    print(evo.pool.individuals[-1])
 
 
 if __name__ == '__main__':
