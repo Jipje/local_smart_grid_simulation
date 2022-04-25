@@ -166,7 +166,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
     own_lines = []
     for i in range(len(all_dicts)):
         own_lines.append(Line2D([0], [0], color=colors[i], lw=2))
-    plt.legend(own_lines, legend_names)
+    plt.legend(own_lines, legend_names, fontsize=8)
 
     plt.show()
 
@@ -325,16 +325,23 @@ if __name__ == '__main__':
                    '../../data/ea_runs/offspring_ratio/march_100off_1000pop.csv',
                    '../../data/ea_runs/offspring_ratio/march_250off_1000pop.csv',
                    '../../data/ea_runs/offspring_ratio/march_400off_1000pop.csv']
+    filenames_10 = ['../../data/ea_runs/mutation_investigation/march_big_mutation.csv',
+                   '../../data/ea_runs/mutation_investigation/march_big_mutation_with_overshoot.csv',
+                   '../../data/ea_runs/mutation_investigation/april_big_mutation.csv',
+                   '../../data/ea_runs/mutation_investigation/april_big_mutation_with_overshoot.csv',
+                   '../../data/ea_runs/mutation_investigation/november_big_mutation.csv',
+                   '../../data/ea_runs/mutation_investigation/november_big_mutation_with_overshoot.csv']
     filenames_all = [filenames_0, filenames_1, filenames_2,
                      filenames_3, filenames_4, filenames_5,
                      filesnames_6, filenames_7, filenames_8,
-                     filenames_9]
+                     filenames_9, filenames_10]
     titles = [None, None, None,
               None,
               'Guided Initialisation. Uniform Dist. Big Mutation.\nDifferent (Uniform dist based) pairing methods',
               'Random Initialisation Different Pairing Methods', None,
               'Offspring ratio investigation April', 'Offspring ratio investigation November',
-              'Offspring ratio investigation March']
+              'Offspring ratio investigation March',
+              'Mutation investigation different months']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
         title = titles[i]
