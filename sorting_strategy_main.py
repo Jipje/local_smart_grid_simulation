@@ -51,4 +51,4 @@ def do_single_run(month=1, filename=None, sort_strategy=None):
 if __name__ == '__main__':
     for _ in range(2):
         for month_index in [3, 4, 11]:
-            do_single_run(month=month_index, sort_strategy=1)
+            do_single_run(month=month_index, sort_strategy=2)
