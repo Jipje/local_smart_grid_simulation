@@ -51,6 +51,6 @@ def do_single_run(month=1, filename=None, pool_size=100, n_offsprings=50):
 
 
 if __name__ == '__main__':
-    for month_index in range(1, 13):
-        for _ in range(2):
+    for _ in range(6):
+        for month_index in range(1, 13):
             do_single_run(month=month_index)
