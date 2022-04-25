@@ -159,7 +159,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
         plt.plot(avg_best_individual, color=color, ls='-')
         plt.plot(avg_avg_individual, color=color, ls='--')
 
-    plt.title(f'Performance runs with {title_file}')
+    plt.title(title_file)
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
 
