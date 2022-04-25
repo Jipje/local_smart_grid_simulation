@@ -59,16 +59,16 @@ def make_list_of_monthly_earnings_from_ea_run_folder(source_folder='../../data/e
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None):
     month_labels = []
     if few_months is None:
-        x_axis = np.array(list(range(10, 130, 10)))
+        max_x = 130
         for month in month_shorts:
             month_labels.append(month.capitalize())
     else:
         max_x = 10 + len(few_months) * 10
-        x_axis = np.array(list(range(10, max_x, 10)))
         for month_index in few_months:
             month = month_long[month_index]
             month_labels.append(month.capitalize())
 
+    x_axis = np.array(list(range(10, max_x, 10)))
     num_of_items = len(baseline_indices) + len(source_folders)
     offsets = []
     if num_of_items == 2:
@@ -109,7 +109,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         offset_tracker = offset_tracker + 1
         y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder, suffix=suffix,
                                                                               few_months=few_months)
-        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder)
+        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix)
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
 
