@@ -83,7 +83,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         offsets = [-3.125, -1.875, -0.625, 0.625, 1.875, 3.125]
     width = offsets[-1] - offsets[-2]
 
-    offset_tracker = 0
+    offset_tracker = -1
     for i in range(len(baseline_indices)):
         single_run = baseline_df.loc[baseline_indices[i]]
         single_run_y = make_list_of_monthly_earnings(single_run, few_months)
@@ -127,11 +127,11 @@ if __name__ == '__main__':
     # source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     # make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = [8, 13]
+    label_indexes = []
     source_folder_1 = '../../data/ea_runs/giga_baseline_with_congestion/'
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     source_folder_3 = '../../data/ea_runs/sorting_investigation/'
-    source_folders = [source_folder_1, source_folder_2, source_folder_3]
-    all_suffix = ['', '', '_sort_1']
+    source_folders = [source_folder_1, source_folder_2, source_folder_3, source_folder_3]
+    all_suffix = ['', '', '_sort_1', '_sort_none']
     only_april = [3]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=only_april)
