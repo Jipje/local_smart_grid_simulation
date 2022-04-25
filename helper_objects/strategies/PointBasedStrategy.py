@@ -76,6 +76,8 @@ class PointBasedStrategy(Strategy):
         else:
             sort_strategy = int(sort_strategy)
 
+        self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
+        self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
         if sort_strategy == 1:
             self.sort_strategy_one_flip_prices()
         elif sort_strategy == 2:
@@ -85,95 +87,92 @@ class PointBasedStrategy(Strategy):
         else:
             pass
 
-    def sort_strategy_one_flip_prices(self):
-        self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
-        self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
-        last_charge_price = None
-        last_discharge_price = None
-        for i in range(len(self.charge_points)):
-            if i != 0:
-                current_charge_price = self.charge_points[i][1]
-                current_discharge_price = self.discharge_points[i][1]
+    def sort_strategy_one_flip_prices(self, left_index=None, right_index=None):
+        if left_index is None and right_index is None:
+            return self.sort_strategy_one_flip_prices(left_index=0, right_index=1)
 
-                if last_charge_price < current_charge_price:
-                    new_last_point = (self.charge_points[i-1][0], current_charge_price, self.charge_points[i-1][2])
-                    new_current_point = (self.charge_points[i][0], last_charge_price, self.charge_points[i][2])
-                    self.charge_points[i - 1] = new_last_point
-                    self.charge_points[i] = new_current_point
-                else:
-                    last_charge_price = current_charge_price
+        flag_flipped = False
 
-                if last_discharge_price < current_discharge_price:
-                    new_last_point = (self.discharge_points[i-1][0], current_discharge_price, self.discharge_points[i-1][2])
-                    new_current_point = (self.discharge_points[i][0], last_discharge_price, self.discharge_points[i][2])
-                    self.discharge_points[i - 1] = new_last_point
-                    self.discharge_points[i] = new_current_point
-                else:
-                    last_discharge_price = current_discharge_price
+        left_charge_price = self.charge_points[left_index][1]
+        right_charge_price = self.charge_points[right_index][1]
+        if left_charge_price < right_charge_price:
+            self.charge_points[left_index] = (self.charge_points[left_index][0], right_charge_price, 'CHARGE')
+            self.charge_points[right_index] = (self.charge_points[right_index][0], left_charge_price, 'CHARGE')
+            flag_flipped = True
 
-            else:
-                last_charge_price = self.charge_points[i][1]
-                last_discharge_price = self.discharge_points[i][1]
+        left_discharge_price = self.discharge_points[left_index][1]
+        right_discharge_price = self.discharge_points[right_index][1]
+        if left_discharge_price < right_discharge_price:
+            self.discharge_points[left_index] = (self.discharge_points[left_index][0], right_discharge_price, 'DISCHARGE')
+            self.discharge_points[right_index] = (self.discharge_points[right_index][0], left_discharge_price, 'DISCHARGE')
+            flag_flipped = True
 
-    def sort_strategy_two_take_high_price(self):
-        self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
-        self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
-        last_charge_price = None
-        last_discharge_price = None
-        for i in range(len(self.charge_points)):
-            if i != 0:
-                current_charge_price = self.charge_points[i][1]
-                current_discharge_price = self.discharge_points[i][1]
+        if flag_flipped and left_index != 0 and right_index != 1:
+            return self.sort_strategy_one_flip_prices(left_index=0, right_index=1)
 
-                if last_charge_price < current_charge_price:
-                    new_last_point = (self.charge_points[i-1][0], last_charge_price, self.charge_points[i-1][2])
-                    new_current_point = (self.charge_points[i][0], last_charge_price, self.charge_points[i][2])
-                    self.charge_points[i - 1] = new_last_point
-                    self.charge_points[i] = new_current_point
-                else:
-                    last_charge_price = current_charge_price
+        if left_index == len(self.charge_points) - 2 and right_index == len(self.charge_points) - 1:
+            # Base case end of the list
+            return
 
-                if last_discharge_price < current_discharge_price:
-                    new_last_point = (self.discharge_points[i-1][0], current_discharge_price, self.discharge_points[i-1][2])
-                    new_current_point = (self.discharge_points[i][0], current_discharge_price, self.discharge_points[i][2])
-                    self.discharge_points[i - 1] = new_last_point
-                    self.discharge_points[i] = new_current_point
-                else:
-                    last_discharge_price = current_discharge_price
+        return self.sort_strategy_one_flip_prices(left_index + 1, right_index + 1)
 
-            else:
-                last_charge_price = self.charge_points[i][1]
-                last_discharge_price = self.discharge_points[i][1]
+    def sort_strategy_two_take_high_price(self, left_index=None, right_index=None):
+        if left_index is None and right_index is None:
+            return self.sort_strategy_two_take_high_price(left_index=0, right_index=1)
 
-    def sort_strategy_three_take_low_price(self):
-        self.charge_points = sorted(self.charge_points, key=lambda tup: tup[0])
-        self.discharge_points = sorted(self.discharge_points, key=lambda tup: tup[0])
-        last_charge_price = None
-        last_discharge_price = None
-        for i in range(len(self.charge_points)):
-            if i != 0:
-                current_charge_price = self.charge_points[i][1]
-                current_discharge_price = self.discharge_points[i][1]
+        flag_flipped = False
 
-                if last_charge_price < current_charge_price:
-                    new_last_point = (self.charge_points[i-1][0], current_charge_price, self.charge_points[i-1][2])
-                    new_current_point = (self.charge_points[i][0], current_charge_price, self.charge_points[i][2])
-                    self.charge_points[i - 1] = new_last_point
-                    self.charge_points[i] = new_current_point
-                else:
-                    last_charge_price = current_charge_price
+        left_charge_price = self.charge_points[left_index][1]
+        right_charge_price = self.charge_points[right_index][1]
+        if left_charge_price < right_charge_price:
+            self.charge_points[left_index] = (self.charge_points[left_index][0], left_charge_price, 'CHARGE')
+            self.charge_points[right_index] = (self.charge_points[right_index][0], left_charge_price, 'CHARGE')
+            flag_flipped = True
 
-                if last_discharge_price < current_discharge_price:
-                    new_last_point = (self.discharge_points[i-1][0], last_discharge_price, self.discharge_points[i-1][2])
-                    new_current_point = (self.discharge_points[i][0], last_discharge_price, self.discharge_points[i][2])
-                    self.discharge_points[i - 1] = new_last_point
-                    self.discharge_points[i] = new_current_point
-                else:
-                    last_discharge_price = current_discharge_price
+        left_discharge_price = self.discharge_points[left_index][1]
+        right_discharge_price = self.discharge_points[right_index][1]
+        if left_discharge_price < right_discharge_price:
+            self.discharge_points[left_index] = (self.discharge_points[left_index][0], right_discharge_price, 'DISCHARGE')
+            self.discharge_points[right_index] = (self.discharge_points[right_index][0], right_discharge_price, 'DISCHARGE')
+            flag_flipped = True
 
-            else:
-                last_charge_price = self.charge_points[i][1]
-                last_discharge_price = self.discharge_points[i][1]
+        if flag_flipped and left_index != 0 and right_index != 1:
+            return self.sort_strategy_two_take_high_price(left_index=0, right_index=1)
+
+        if left_index == len(self.charge_points) - 2 and right_index == len(self.charge_points) - 1:
+            # Base case end of the list
+            return
+
+        return self.sort_strategy_two_take_high_price(left_index + 1, right_index + 1)
+
+    def sort_strategy_three_take_low_price(self, left_index=None, right_index=None):
+        if left_index is None and right_index is None:
+            return self.sort_strategy_three_take_low_price(left_index=0, right_index=1)
+
+        flag_flipped = False
+
+        left_charge_price = self.charge_points[left_index][1]
+        right_charge_price = self.charge_points[right_index][1]
+        if left_charge_price < right_charge_price:
+            self.charge_points[left_index] = (self.charge_points[left_index][0], right_charge_price, 'CHARGE')
+            self.charge_points[right_index] = (self.charge_points[right_index][0], right_charge_price, 'CHARGE')
+            flag_flipped = True
+
+        left_discharge_price = self.discharge_points[left_index][1]
+        right_discharge_price = self.discharge_points[right_index][1]
+        if left_discharge_price < right_discharge_price:
+            self.discharge_points[left_index] = (self.discharge_points[left_index][0], left_discharge_price, 'DISCHARGE')
+            self.discharge_points[right_index] = (self.discharge_points[right_index][0], left_discharge_price, 'DISCHARGE')
+            flag_flipped = True
+
+        if flag_flipped and left_index != 0 and right_index != 1:
+            return self.sort_strategy_three_take_low_price(left_index=0, right_index=1)
+
+        if left_index == len(self.charge_points) - 2 and right_index == len(self.charge_points) - 1:
+            # Base case end of the list
+            return
+
+        return self.sort_strategy_three_take_low_price(left_index + 1, right_index + 1)
 
 
 if __name__ == '__main__':
