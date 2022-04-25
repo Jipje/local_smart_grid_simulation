@@ -57,11 +57,17 @@ def make_list_of_monthly_earnings_from_ea_run_folder(source_folder='../../data/e
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None):
+    month_labels = []
     if few_months is None:
         x_axis = np.array(list(range(10, 130, 10)))
+        for month in month_shorts:
+            month_labels.append(month.capitalize())
     else:
         max_x = 10 + len(few_months) * 10
         x_axis = np.array(list(range(10, max_x, 10)))
+        for month_index in few_months:
+            month = month_long[month_index]
+            month_labels.append(month.capitalize())
 
     num_of_items = len(baseline_indices) + len(source_folders)
     offsets = []
@@ -107,7 +113,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
 
-    # plt.xticks(x_axis, month_shorts)
+    plt.xticks(x_axis, month_labels)
     plt.xlabel('Month (2021)')
     plt.ylabel('Total EUR')
     plt.title('Comparing monthly performance')
