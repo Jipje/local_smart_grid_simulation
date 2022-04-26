@@ -1,3 +1,4 @@
+from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph
 from one_time_scripts.visualisations.visualise_ea_runs import visualise_ea_runs
 
 if __name__ == '__main__':
@@ -17,3 +18,10 @@ if __name__ == '__main__':
         filenames = filenames_all[i]
         title = titles[i]
         visualise_ea_runs(filenames, title)
+
+    label_indexes = [13]
+    source_folder = '../../../data/ea_runs/mutation_investigation/'
+    source_folders = [source_folder, source_folder, source_folder]
+    all_suffix = ['_random_mutation', '_big_mutation', '_big_mutation_with_overshoot']
+    few_months = [2, 3, 10]
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)

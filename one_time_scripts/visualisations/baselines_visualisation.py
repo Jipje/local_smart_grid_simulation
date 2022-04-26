@@ -10,7 +10,10 @@ month_shorts = ['jan', 'feb', 'mar', 'apr',
 month_long = ['january', 'february', 'march', 'april',
                 'may', 'june', 'july', 'august',
                 'september', 'october', 'november', 'december']
-baseline_df = pd.read_csv('../../data/baseline_earnings/overview.csv', delimiter=';')
+try:
+    baseline_df = pd.read_csv('../../data/baseline_earnings/overview.csv', delimiter=';')
+except FileNotFoundError:
+    baseline_df = pd.read_csv('../../../data/baseline_earnings/overview.csv', delimiter=';')
 
 
 # 0                          Solarvation only discharging
@@ -122,14 +125,14 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
 
 
 if __name__ == '__main__':
-    label_indexes = [8, 9, 13]
+    label_indexes = [8, 13]
     source_folder_1 = '../../data/ea_runs/giga_baseline_with_congestion/'
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
     label_indexes = []
     source_folder_3 = '../../data/ea_runs/sorting_investigation/'
-    source_folders = [source_folder_1, source_folder_2, source_folder_3, source_folder_3]
-    all_suffix = ['', '', '_sort_1', '_sort_none']
-    only_april = [3]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=only_april)
+    source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
+    all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
+    few_months = [2, 3, 10]
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)

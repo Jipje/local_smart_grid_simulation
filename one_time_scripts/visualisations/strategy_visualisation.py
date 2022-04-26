@@ -85,7 +85,7 @@ def visualize_strategy(strategy: Strategy):
 
 if __name__ == '__main__':
     csv_strategy_path = '..{0}..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
-    csv_strategy = CsvStrategy(name='CSV Strategy', strategy_csv=csv_strategy_path, price_step_size=1)
+    csv_strategy = CsvStrategy(name='Rhino Strategy 1', strategy_csv=csv_strategy_path, price_step_size=1)
     visualize_strategy(csv_strategy)
 
     point_based_strat = PointBasedStrategy('200k december strategy', price_step_size=2)
