@@ -59,12 +59,12 @@ if __name__ == '__main__':
     if runnable_int == 1:
         print('Running setting 1')
         for _ in range(3):
-            for month_index in [3, 4, 11]:
-                other_evolution = Evolution
-                do_single_run(evolution_class=other_evolution, month=month_index, label='avg_incr')
+            for month_index in [4]:
+                other_evolution = NoAvgIncrEvolution
+                do_single_run(evolution_class=other_evolution, month=month_index, label='no_avg_incr')
     else:
         print('Running setting other')
         for _ in range(3):
-            for month_index in [3, 4, 11]:
+            for month_index in [11]:
                 other_evolution = NoAvgIncrEvolution
                 do_single_run(evolution_class=other_evolution, month=month_index, label='no_avg_incr')
