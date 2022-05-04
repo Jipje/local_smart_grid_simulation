@@ -32,7 +32,7 @@ class Evolution:
 
         best_performing = self.pool.individuals[-1].fitness
         worst_performing = self.pool.individuals[0].fitness
-        if worst_performing / best_performing * 100 >= 95:
+        if worst_performing / best_performing * 100 >= 90:
             print('\tToo little variation in population')
             res = True
 

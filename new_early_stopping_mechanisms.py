@@ -3,7 +3,9 @@ import sys
 
 from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
+from evolutionary_algorithm.evolutions import SmallerAvgIncrEvolution
 from evolutionary_algorithm.evolutions.NoAvgIncrEvolution import NoAvgIncrEvolution
+from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
 from evolutionary_algorithm.individuals.mutation_params import random_mutation
 
@@ -59,12 +61,12 @@ if __name__ == '__main__':
     if runnable_int == 1:
         print('Running setting 1')
         for _ in range(3):
-            for month_index in [4]:
+            for month_index in [3]:
                 other_evolution = NoAvgIncrEvolution
                 do_single_run(evolution_class=other_evolution, month=month_index, label='no_avg_incr')
     else:
         print('Running setting other')
         for _ in range(3):
-            for month_index in [11]:
-                other_evolution = NoAvgIncrEvolution
-                do_single_run(evolution_class=other_evolution, month=month_index, label='no_avg_incr')
+            for month_index in [3, 4, 11]:
+                other_evolution = SmallerAvgIncrEvolution
+                do_single_run(evolution_class=other_evolution, month=month_index, label='small_avg_incr')
