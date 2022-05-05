@@ -41,7 +41,7 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     mutate_params['strategy_price_step_size'] = price_step_size
     mutate_params['sort_strategy'] = ea_runnable_settings['sort_strategy']
     mutation_possibility = ea_runnable_settings['mutation_possibility']
-    individual_class = ea_runnable_settings['mutation_possibility']
+    individual_class = ea_runnable_settings['individual_class']
 
     evo = NoAvgIncrEvolution(
         pool_size=population_size,

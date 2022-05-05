@@ -48,6 +48,7 @@ if __name__ == '__main__':
                 do_an_ea_run(run_settings_2, month=month_index, filename=custom_filename, folder='offspring_ratio')
     else:
         print('Running setting other')
+        print(run_settings_3)
         for _ in range(5):
             for month_index in [3, 4, 11]:
                 month_filename = month_filenames[month_index - 1]
