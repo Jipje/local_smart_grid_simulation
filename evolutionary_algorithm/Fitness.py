@@ -81,25 +81,7 @@ class Fitness(object):
 
         # Initialise random strategy
         random_point_based_strategy = individual.value
-        greedy_discharge_strat = CsvStrategy('Greedy discharge',
-                                             strategy_csv='{1}strategies{0}greedy_discharge_60.csv'.format(os.path.sep, self.data_folder))
-        always_discharge_strat = CsvStrategy('Always discharge',
-                                             strategy_csv='{1}strategies{0}always_discharge.csv'.format(os.path.sep, self.data_folder))
 
-        solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
-                                                                           network_object=battery,
-                                                                           congestion_kw=self.congestion_kw,
-                                                                           congestion_safety_margin=self.congestion_safety_margin,
-                                                                           strategy=greedy_discharge_strat,
-                                                                           verbose_lvl=self.verbose_lvl,
-                                                                           transportation_kw=self.transportation_kw)
-        prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
-                                                                             network_object=battery,
-                                                                             congestion_kw=self.congestion_kw,
-                                                                             congestion_safety_margin=self.congestion_safety_margin,
-                                                                             strategy=always_discharge_strat,
-                                                                             verbose_lvl=self.verbose_lvl,
-                                                                             transportation_kw=self.transportation_kw)
         earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
                                                                      network_object=battery,
                                                                      congestion_kw=self.congestion_kw,
@@ -129,15 +111,15 @@ class Fitness(object):
                                                                   name='Discharge Money Earner',
                                                                   discharge_until_soc_perc=max_soc_perc_in_prep
                                                                   )
-                prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+                prepare_and_solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name=f"Earn money but discharge until {max_soc_perc_in_prep}",
                                                                                      network_object=battery,
                                                                                      congestion_kw=self.congestion_kw,
                                                                                      congestion_safety_margin=self.congestion_safety_margin,
                                                                                      strategy=discharge_until_strategy,
                                                                                      verbose_lvl=self.verbose_lvl)
 
-                moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
-                moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
+                moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_and_solve_congestion_mod)
+                moo.add_mode_of_operation(solving_congestion_until[month], prepare_and_solve_congestion_mod)
             moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
             main_controller.add_controller(moo)
 
@@ -160,6 +142,11 @@ class Fitness(object):
         penalty = 1
         if res_dict['time_steps_with_congestion'] > 0:
             penalty = 0.5
+
+        if res_dict['wombat_battery_cycles'] > 50:
+            num_of_cycles = res_dict['wombat_battery_cycles']
+            print(f'Yowza! This strategy made a lot of cycles! {num_of_cycles}')
+            print(individual)
 
         fitness_value = res_dict['wombat_battery_revenue'] * penalty
         individual.set_fitness(fitness_value)
