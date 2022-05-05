@@ -16,19 +16,36 @@ import sys
 
 utc = dateutil.tz.tzutc()
 
+default_ea_runnable_settings = {
+    'mutation_possibility': 0.2,
+    'mutate_params': random_mutation,
+    'sort_strategy': 1,
+    'sigma_decay': True,
+    'pop_size': 20,
+    'n_offsprings': 16,
+    'individual_class': IndividualRandomNormalDist,
+    'evo_class': NoAvgIncrEvolution,
+}
 
-def do_default_run(month=1, filename=None, pool_size=20, n_offsprings=16):
+
+def do_default_run(ea_runnable_settings, month=1, filename=None):
     number_of_points = 4
     price_step_size = 2
     fitness_class = Fitness()
-
     fitness_class.set_month(month)
-    mutate_params = random_mutation
+
+    if ea_runnable_settings is None:
+        ea_runnable_settings = default_ea_runnable_settings
+
+    population_size = ea_runnable_settings['pop_size']
+    n_offsprings = ea_runnable_settings['n_offsprings']
+    mutate_params = ea_runnable_settings['mutate_params']
     mutate_params['strategy_price_step_size'] = price_step_size
-    mutate_params['sort_strategy'] = 1
+    mutate_params['sort_strategy'] = ea_runnable_settings['sort_strategy']
+    mutation_possibility = ea_runnable_settings['mutation_possibility']
 
     evo = NoAvgIncrEvolution(
-        pool_size=pool_size,
+        pool_size=population_size,
         fitness=fitness_class.fitness,
         individual_class=IndividualRandomNormalDist,
         n_offsprings=n_offsprings,
@@ -38,7 +55,8 @@ def do_default_run(month=1, filename=None, pool_size=20, n_offsprings=16):
             'number_of_points': number_of_points,
             'strategy_price_step_size': price_step_size
         },
-        offspring_per_couple=4
+        offspring_per_couple=4,
+        mutation_possibility=mutation_possibility
     )
     n_epochs = 200
 
@@ -94,7 +112,7 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     # for _ in range(5):
-    do_default_run(4)
+    do_default_run(None, month=4)
     #####################################
     # month = 1
     # number_of_points = 4
