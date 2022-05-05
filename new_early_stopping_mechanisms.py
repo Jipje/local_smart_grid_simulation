@@ -3,7 +3,7 @@ import sys
 
 from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
-from evolutionary_algorithm.evolutions import SmallerAvgIncrEvolution
+from evolutionary_algorithm.evolutions.SmallerAvgIncrEvolution import SmallerAvgIncrEvolution
 from evolutionary_algorithm.evolutions.NoAvgIncrEvolution import NoAvgIncrEvolution
 from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist

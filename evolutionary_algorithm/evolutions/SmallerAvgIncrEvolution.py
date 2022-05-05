@@ -1,7 +1,7 @@
 from evolutionary_algorithm.Evolution import Evolution
 
 
-class NoAvgIncrEvolution(Evolution):
+class SmallerAvgIncrEvolution(Evolution):
     def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params):
         super().__init__(pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params)
 
