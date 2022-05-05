@@ -2,8 +2,10 @@ from evolutionary_algorithm.Evolution import Evolution
 
 
 class NoAvgIncrEvolution(Evolution):
-    def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params):
-        super().__init__(pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params)
+    def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params,
+                 offspring_per_couple=1, mutation_possibility=0.2):
+        super().__init__(pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params,
+                         offspring_per_couple, mutation_possibility)
 
     def early_end(self):
         res = False

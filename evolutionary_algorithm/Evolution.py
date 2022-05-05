@@ -20,7 +20,7 @@ class Evolution:
         self.strike_one = False
 
     def step(self):
-        num_of_partners = self.n_offsprings / self.offspring_per_couple
+        num_of_partners = int(self.n_offsprings / self.offspring_per_couple)
         mothers, fathers = self.pool.get_parents(num_of_partners)
         offsprings = []
 
