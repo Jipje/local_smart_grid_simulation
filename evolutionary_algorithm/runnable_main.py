@@ -26,7 +26,7 @@ default_ea_runnable_settings = {
 }
 
 
-def do_default_run(ea_runnable_settings, month=1, filename=None):
+def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     number_of_points = 4
     price_step_size = 2
     fitness_class = Fitness()
@@ -68,8 +68,9 @@ def do_default_run(ea_runnable_settings, month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
-        # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
+        if folder is not None:
+            # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
+            evo.write_to_csv(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
@@ -87,4 +88,4 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     # for _ in range(5):
-    do_default_run(None, month=4)
+    do_an_ea_run(None, month=4)

@@ -8,7 +8,7 @@ from evolutionary_algorithm.individuals.guided_initialisation.GuidedInitRandomNo
     GuidedInitRandomNormalDist
 from evolutionary_algorithm.individuals.mutation_params import big_mutation_with_overshoot, random_mutation, \
     big_mutation
-from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, do_default_run
+from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, do_an_ea_run
 
 month_filenames = ['january', 'february', 'march', 'april',
                            'may', 'june', 'july', 'august',
@@ -38,18 +38,18 @@ if __name__ == '__main__':
             for month_index in [3, 4, 11]:
                 month_filename = month_filenames[month_index - 1]
                 custom_filename = month_filename + '_40_over_100'
-                do_default_run(run_settings_1, month=month_index, filename=custom_filename, folder='offspring_ratio')
+                do_an_ea_run(run_settings_1, month=month_index, filename=custom_filename, folder='offspring_ratio')
     elif runnable_int == 2:
         print('Running setting 2')
         for _ in range(5):
             for month_index in [3, 4, 11]:
                 month_filename = month_filenames[month_index - 1]
                 custom_filename = month_filename + '_160_over_100'
-                do_default_run(run_settings_2, month=month_index, filename=custom_filename, folder='offspring_ratio')
+                do_an_ea_run(run_settings_2, month=month_index, filename=custom_filename, folder='offspring_ratio')
     else:
         print('Running setting other')
         for _ in range(5):
             for month_index in [3, 4, 11]:
                 month_filename = month_filenames[month_index - 1]
                 custom_filename = month_filename + '_80_over_100'
-                do_default_run(run_settings_3, month=month_index, filename=custom_filename, folder='offspring_ratio')
+                do_an_ea_run(run_settings_3, month=month_index, filename=custom_filename, folder='offspring_ratio')
