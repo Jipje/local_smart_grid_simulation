@@ -4,6 +4,7 @@ import dateutil.tz
 
 from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
+from evolutionary_algorithm.evolutions.NoAvgIncrEvolution import NoAvgIncrEvolution
 from evolutionary_algorithm.individuals.IndividualFixedUniformDist import IndividualFixedUniformDist
 from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
 from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
@@ -16,17 +17,17 @@ import sys
 utc = dateutil.tz.tzutc()
 
 
-def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
+def do_default_run(month=1, filename=None, pool_size=20, n_offsprings=16):
     number_of_points = 4
     price_step_size = 2
-
     fitness_class = Fitness()
+
     fitness_class.set_month(month)
     mutate_params = random_mutation
     mutate_params['strategy_price_step_size'] = price_step_size
-    mutate_params['sort_strategy'] = None
+    mutate_params['sort_strategy'] = 1
 
-    evo = Evolution(
+    evo = NoAvgIncrEvolution(
         pool_size=pool_size,
         fitness=fitness_class.fitness,
         individual_class=IndividualRandomNormalDist,
@@ -36,9 +37,10 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
         init_params={
             'number_of_points': number_of_points,
             'strategy_price_step_size': price_step_size
-        }
+        },
+        offspring_per_couple=4
     )
-    n_epochs = 50
+    n_epochs = 200
 
     if filename is None:
         month_filenames = ['january', 'february', 'march', 'april',
@@ -56,10 +58,8 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
 
     # print('BEST PERFORMING INDIVIDUALS')
     print('Best performing individual for run:\n'
-          f'\tPop size: {pool_size}\n'
           f'\tElite fitness: {evo.pool.individuals[-1].fitness}')
-    # print(evo.pool.individuals[-1].fitness)
-    # print(evo.pool.individuals[-1])
+    print(evo.pool.individuals[-1])
     # print(evo.pool.individuals[-2].fitness)
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)
@@ -78,14 +78,14 @@ def main():
             offspring_ratio = 0.5
             offspring_size = int(pop_size * offspring_ratio)
             filename = f'pop_size_{pop_size}'
-            do_single_run(4, filename, pop_size, offspring_size)
+            do_default_run(4, filename, pop_size, offspring_size)
     else:
         print('Running settings other')
         for pop_size in [64, 256, 512, 2048, 4096]:
             offspring_ratio = 0.5
             offspring_size = int(pop_size * offspring_ratio)
             filename = f'pop_size_{pop_size}'
-            do_single_run(4, filename, pop_size, offspring_size)
+            do_default_run(4, filename, pop_size, offspring_size)
 
 
 if __name__ == '__main__':
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     # for _ in range(5):
-    do_single_run(4)
+    do_default_run(4)
     #####################################
     # month = 1
     # number_of_points = 4
