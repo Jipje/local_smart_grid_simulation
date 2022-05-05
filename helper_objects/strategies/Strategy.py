@@ -15,7 +15,7 @@ class Strategy(object):
         price = self.clean_price(price)
         price = price - self.min_price
         price_index = price / self.price_step_size
-        price_index = int(price_index)
+        price_index = int(round(price_index, 0))
         return price_index
 
     def clean_price(self, price, discharge_price=True) -> int:
