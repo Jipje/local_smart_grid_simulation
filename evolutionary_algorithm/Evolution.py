@@ -1,14 +1,17 @@
+import random
+
 from evolutionary_algorithm.populations.TournamentSelectionPopulation import TournamentSelectionPopulation
 
 
 class Evolution:
     def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params,
-                 offspring_per_couple=1):
+                 offspring_per_couple=1, mutation_possibility=0.2):
         self.pair_params = pair_params
         self.mutate_params = mutate_params
         self.pool = TournamentSelectionPopulation(pool_size, fitness, individual_class, init_params, tournament_size=4)
         self.n_offsprings = n_offsprings
         self.offspring_per_couple = offspring_per_couple
+        self.mutation_possibility = mutation_possibility
 
         assert n_offsprings % offspring_per_couple == 0, 'Offsprings per couple and n_offspring should be divisible'
 
@@ -24,8 +27,14 @@ class Evolution:
         for mother, father in zip(mothers, fathers):
             for _ in range(self.offspring_per_couple):
                 offspring = mother.pair(father, self.pair_params)
-                offspring = offspring.mutate(self.mutate_params)
+                if random.random() > self.mutation_possibility:
+                    offspring = offspring.mutate(self.mutate_params)
                 offsprings.append(offspring)
+
+        for individual in self.pool.individuals:
+            if random.random() > self.mutation_possibility:
+                mutated_individual = individual.mutate(self.mutate_params)
+                offsprings.append(mutated_individual)
 
         self.pool.replace(offsprings)
         self.total_steps += 1
