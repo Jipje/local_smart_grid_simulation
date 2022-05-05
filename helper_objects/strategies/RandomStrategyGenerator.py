@@ -32,11 +32,11 @@ def generate_fully_random_strategy(seed=None, name=None, strategy_price_step_siz
 
     for _ in range(number_of_points):
         state_of_charge_perc = random.randint(6, 95)
-        imbalance_price = random.randrange(-100, 200, price_step_size)
+        imbalance_price = random.randrange(-100, 400, price_step_size)
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'CHARGE'))
 
         state_of_charge_perc = random.randint(6, 95)
-        imbalance_price = random.randrange(-100, 200, price_step_size)
+        imbalance_price = random.randrange(-100, 400, price_step_size)
         point_based_strat.add_point((state_of_charge_perc, imbalance_price, 'DISCHARGE'))
 
     point_based_strat.upload_strategy()
