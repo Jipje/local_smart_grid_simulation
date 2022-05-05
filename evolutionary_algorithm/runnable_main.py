@@ -16,12 +16,6 @@ import sys
 utc = dateutil.tz.tzutc()
 
 
-def run_all_months():
-    for month in range(1, 13):
-        for _ in range(5):
-            do_single_run(month)
-
-
 def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
     number_of_points = 4
     price_step_size = 2
@@ -56,7 +50,7 @@ def do_single_run(month=1, filename=None, pool_size=30, n_offsprings=15):
         evo.step()
         evo.report()
         # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
-        evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
+        # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
@@ -95,12 +89,12 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
     #####################################
     # run_all_months()
     #####################################
     # for _ in range(5):
-    #     do_single_run(4, filename='RandomNormalDistSmallMutation')
+    do_single_run(4)
     #####################################
     # month = 1
     # number_of_points = 4

@@ -11,14 +11,14 @@ class Strategy(object):
 
         self.dayahead_tracker = False
 
-    def price_index(self, price):
+    def price_index(self, price) -> int:
         price = self.clean_price(price)
         price = price - self.min_price
         price_index = price / self.price_step_size
         price_index = int(price_index)
         return price_index
 
-    def clean_price(self, price, discharge_price=True):
+    def clean_price(self, price, discharge_price=True) -> int:
         if price % self.price_step_size == 0:
             res = price
         else:
@@ -31,6 +31,7 @@ class Strategy(object):
             res = self.max_price
         elif price < self.min_price:
             res = self.min_price
+        res = int(round(res, 0))
         return res
 
     def initialize_strategy_matrix(self):

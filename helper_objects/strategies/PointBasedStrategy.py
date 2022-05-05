@@ -15,13 +15,9 @@ class PointBasedStrategy(Strategy):
 
             if point[1] > self.max_price:
                 bonus = self.price_step_size
-                if point[2] == 'CHARGE':
-                    bonus = bonus * 2
                 self.max_price = point[1] + bonus
             elif point[1] < self.min_price:
                 bonus = self.price_step_size
-                if point[2] == 'DISCHARGE':
-                    bonus = bonus * 2
                 self.min_price = point[1] - bonus
 
             if point[2] == 'CHARGE':
