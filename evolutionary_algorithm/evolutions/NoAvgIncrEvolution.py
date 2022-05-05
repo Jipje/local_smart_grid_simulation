@@ -16,6 +16,18 @@ class NoAvgIncrEvolution(Evolution):
             print('\tToo little variation in population')
             res = True
 
+        total_fitness = 0
+        for individual in self.pool.individuals:
+            total_fitness += individual.fitness
+        avg_fitness = total_fitness / len(self.pool.individuals)
+
+        if self.previous_average is not None:
+            if self.previous_average / avg_fitness * 100 >= 99.9:
+                print('\tToo little average improvement in population')
+                res = True
+
+        self.previous_average = avg_fitness
+
         if res:
             self.strike_counter += 1
             if not self.strike_counter > self.strike_out:
