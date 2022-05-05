@@ -11,7 +11,6 @@ class Population:
         self.individuals = self.individuals[-size:]
 
     def get_parents(self, num_of_partners):
-
         mothers = self.individuals[-2 * num_of_partners::2]
         fathers = self.individuals[-2 * num_of_partners + 1::2]
 
