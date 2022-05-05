@@ -28,8 +28,7 @@ class Evolution:
         for mother, father in zip(mothers, fathers):
             for _ in range(self.offspring_per_couple):
                 offspring = mother.pair(father, self.pair_params)
-                if random.random() > self.mutation_possibility:
-                    offspring = offspring.mutate(self.mutate_params)
+                offspring = offspring.mutate(self.mutate_params)
                 offsprings.append(offspring)
 
         for individual in self.pool.individuals:

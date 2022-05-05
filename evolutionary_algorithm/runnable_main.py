@@ -20,11 +20,8 @@ default_ea_runnable_settings = {
     'mutation_possibility': 0.2,
     'mutate_params': random_mutation,
     'sort_strategy': 1,
-    'sigma_decay': True,
     'pop_size': 20,
-    'n_offsprings': 16,
-    'individual_class': IndividualRandomNormalDist,
-    'evo_class': NoAvgIncrEvolution,
+    'n_offsprings': 16
 }
 
 
@@ -84,77 +81,8 @@ def do_default_run(ea_runnable_settings, month=1, filename=None):
     # print(evo.pool.individuals[-3])
 
 
-def main():
-    try:
-        runnable_int = int(sys.argv[1])
-    except IndexError:
-        runnable_int = 0
-
-    if runnable_int == 1:
-        print('Running settings 1')
-        for pop_size in [32, 128, 512, 2048, 8192]:
-            offspring_ratio = 0.5
-            offspring_size = int(pop_size * offspring_ratio)
-            filename = f'pop_size_{pop_size}'
-            do_default_run(4, filename, pop_size, offspring_size)
-    else:
-        print('Running settings other')
-        for pop_size in [64, 256, 512, 2048, 4096]:
-            offspring_ratio = 0.5
-            offspring_size = int(pop_size * offspring_ratio)
-            filename = f'pop_size_{pop_size}'
-            do_default_run(4, filename, pop_size, offspring_size)
-
-
 if __name__ == '__main__':
-    # main()
-    #####################################
     # run_all_months()
     #####################################
     # for _ in range(5):
     do_default_run(None, month=4)
-    #####################################
-    # month = 1
-    # number_of_points = 4
-    # price_step_size = 2
-    #
-    # fitness_class = Fitness()
-    # fitness_class.set_month(month)
-    # mutate_params = aggressive_mutation
-    # mutate_params['strategy_price_step_size'] = price_step_size
-    # mutate_params['soc_lower'] = -2
-    # mutate_params['soc_upper'] = 2
-    #
-    # evo = Evolution(
-    #     pool_size=30,
-    #     fitness=fitness_class.fitness,
-    #     individual_class=IndividualRandomNormalDist,
-    #     n_offsprings=15,
-    #     pair_params={'strategy_price_step_size': price_step_size},
-    #     mutate_params=mutate_params,
-    #     init_params={
-    #         'number_of_points': number_of_points,
-    #         'strategy_price_step_size': price_step_size
-    #     }
-    # )
-    # n_epochs = 20
-    #
-    # month_filenames = ['january', 'february', 'march', 'april',
-    #                    'may', 'june', 'july', 'august',
-    #                    'september', 'october', 'november', 'december']
-    # month_filename = month_filenames[month - 1]
-    #
-    # for _ in range(n_epochs):
-    #     evo.step()
-    #     evo.report()
-    #     evo.write_to_csv(f'../data/aggressive_ea_runs/{month_filename}.csv')
-    #     if evo.early_end():
-    #         break
-    #
-    # print('BEST PERFORMING INDIVIDUALS')
-    # print(evo.pool.individuals[-1].fitness)
-    # print(evo.pool.individuals[-1])
-    # print(evo.pool.individuals[-2].fitness)
-    # print(evo.pool.individuals[-2])
-    # print(evo.pool.individuals[-3].fitness)
-    # print(evo.pool.individuals[-3])
