@@ -3,6 +3,7 @@ import unittest
 from evolutionary_algorithm.Population import Population
 from evolutionary_algorithm.fitness_functions.TestFitness import TestFitness
 from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
+from evolutionary_algorithm.populations.TournamentSelectionPopulation import TournamentSelectionPopulation
 
 
 class TestPopulations(unittest.TestCase):
@@ -61,6 +62,30 @@ class TestPopulations(unittest.TestCase):
 
         current_worst = pop.individuals[0].fitness
         self.assertTrue(current_worst >= org_worst or current_worst >= new_worst)
+
+    def test_normal_tournament_population(self):
+        fit_class = TestFitness()
+        ind_class = IndividualMiddleAndMutate
+        pop_size = 5
+
+        pop = TournamentSelectionPopulation(pop_size, fit_class.fitness, ind_class, {'number_of_points': 4}, tournament_size=2)
+        self.assertEqual(pop_size, len(pop.individuals))
+
+    def test_tournament_population_new_parents(self):
+        fit_class = TestFitness()
+        ind_class = IndividualMiddleAndMutate
+        pop_size = 5
+
+        pop = TournamentSelectionPopulation(pop_size, fit_class.fitness, ind_class, {'number_of_points': 4}, tournament_size=2)
+
+        num_of_partners = 2
+        mums, dads = pop.get_parents(num_of_partners)
+        self.assertEqual(num_of_partners, len(mums))
+        self.assertEqual(num_of_partners, len(dads))
+
+        worst_individual = pop.individuals[0]
+        self.assertTrue(mums[-1].fitness >= worst_individual.fitness)
+        self.assertTrue(dads[-1].fitness >= worst_individual.fitness)
 
 
 if __name__ == '__main__':
