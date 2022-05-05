@@ -32,7 +32,7 @@ class Evolution:
                 offsprings.append(offspring)
 
         for individual in self.pool.individuals:
-            if random.random() > self.mutation_possibility:
+            if random.random() < self.mutation_possibility:
                 mutated_individual = individual.mutate(self.mutate_params)
                 offsprings.append(mutated_individual)
 
