@@ -1,28 +1,31 @@
-from evolutionary_algorithm.Population import Population
 from evolutionary_algorithm.populations.TournamentSelectionPopulation import TournamentSelectionPopulation
 
 
 class Evolution:
-    def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params):
+    def __init__(self, pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params,
+                 offspring_per_couple=1):
         self.pair_params = pair_params
         self.mutate_params = mutate_params
         self.pool = TournamentSelectionPopulation(pool_size, fitness, individual_class, init_params, tournament_size=4)
         self.n_offsprings = n_offsprings
+        self.offspring_per_couple = offspring_per_couple
 
-        # assert pool_size >= (2 * n_offsprings)
+        assert n_offsprings % offspring_per_couple == 0, 'Offsprings per couple and n_offspring should be divisible'
 
         self.previous_average = None
         self.total_steps = 0
         self.strike_one = False
 
     def step(self):
-        mothers, fathers = self.pool.get_parents(self.n_offsprings)
+        num_of_partners = self.n_offsprings / self.offspring_per_couple
+        mothers, fathers = self.pool.get_parents(num_of_partners)
         offsprings = []
 
         for mother, father in zip(mothers, fathers):
-            offspring = mother.pair(father, self.pair_params)
-            offspring = offspring.mutate(self.mutate_params)
-            offsprings.append(offspring)
+            for _ in range(self.offspring_per_couple):
+                offspring = mother.pair(father, self.pair_params)
+                offspring = offspring.mutate(self.mutate_params)
+                offsprings.append(offspring)
 
         self.pool.replace(offsprings)
         self.total_steps += 1
