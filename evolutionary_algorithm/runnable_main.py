@@ -21,7 +21,8 @@ default_ea_runnable_settings = {
     'mutate_params': random_mutation,
     'sort_strategy': 1,
     'pop_size': 20,
-    'n_offsprings': 16
+    'n_offsprings': 16,
+    'individual_class': IndividualRandomNormalDist
 }
 
 
@@ -40,11 +41,12 @@ def do_default_run(ea_runnable_settings, month=1, filename=None):
     mutate_params['strategy_price_step_size'] = price_step_size
     mutate_params['sort_strategy'] = ea_runnable_settings['sort_strategy']
     mutation_possibility = ea_runnable_settings['mutation_possibility']
+    individual_class = ea_runnable_settings['mutation_possibility']
 
     evo = NoAvgIncrEvolution(
         pool_size=population_size,
         fitness=fitness_class.fitness,
-        individual_class=IndividualRandomNormalDist,
+        individual_class=individual_class,
         n_offsprings=n_offsprings,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
