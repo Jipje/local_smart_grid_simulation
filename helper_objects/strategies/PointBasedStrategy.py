@@ -1,5 +1,4 @@
 from helper_objects.strategies.Strategy import Strategy
-import random
 
 
 class PointBasedStrategy(Strategy):
@@ -15,9 +14,15 @@ class PointBasedStrategy(Strategy):
             assert point[2] in ['CHARGE', 'DISCHARGE']
 
             if point[1] > self.max_price:
-                self.max_price = point[1] + self.price_step_size
+                bonus = self.price_step_size
+                if point[2] == 'CHARGE':
+                    bonus = bonus * 2
+                self.max_price = point[1] + bonus
             elif point[1] < self.min_price:
-                self.min_price = point[1] - self.price_step_size
+                bonus = self.price_step_size
+                if point[2] == 'DISCHARGE':
+                    bonus = bonus * 2
+                self.min_price = point[1] - bonus
 
             if point[2] == 'CHARGE':
                 self.charge_points.append(point)
