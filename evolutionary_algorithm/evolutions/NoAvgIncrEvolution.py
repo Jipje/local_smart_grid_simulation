@@ -6,31 +6,6 @@ class NoAvgIncrEvolution(Evolution):
                  offspring_per_couple=1, mutation_possibility=0.2):
         super().__init__(pool_size, fitness, individual_class, n_offsprings, pair_params, mutate_params, init_params,
                          offspring_per_couple, mutation_possibility)
-
-    def early_end(self):
-        res = False
-
-        best_performing = self.pool.individuals[-1].fitness
-        worst_performing = self.pool.individuals[0].fitness
-        if worst_performing / best_performing * 100 >= 99:
-            print('\tToo little variation in population')
-            res = True
-
-        total_fitness = 0
-        for individual in self.pool.individuals:
-            total_fitness += individual.fitness
-        avg_fitness = total_fitness / len(self.pool.individuals)
-
-        if self.previous_average is not None:
-            if self.previous_average / avg_fitness * 100 >= 99.9:
-                print('\tToo little average improvement in population')
-                res = True
-
-        self.previous_average = avg_fitness
-
-        if res:
-            self.strike_counter += 1
-            if not self.strike_counter > self.strike_out:
-                res = False
-
-        return res
+        self.variation = 99
+        self.avg_improvement = 99.99
+        self.strike_out = 10
