@@ -12,25 +12,13 @@ class NoAvgIncrEvolution(Evolution):
 
         best_performing = self.pool.individuals[-1].fitness
         worst_performing = self.pool.individuals[0].fitness
-        if worst_performing / best_performing * 100 >= 95:
+        if worst_performing / best_performing * 100 >= 99:
             print('\tToo little variation in population')
             res = True
 
-        total_fitness = 0
-        for individual in self.pool.individuals:
-            total_fitness += individual.fitness
-        avg_fitness = total_fitness / len(self.pool.individuals)
-
-        if self.previous_average is not None:
-            if self.previous_average / avg_fitness * 100 >= 99:
-                print('\tToo little average improvement in population')
-                # res = True
-
-        self.previous_average = avg_fitness
-
         if res:
-            if not self.strike_one:
-                self.strike_one = res
+            self.strike_counter += 1
+            if not self.strike_counter > self.strike_out:
                 res = False
 
         return res

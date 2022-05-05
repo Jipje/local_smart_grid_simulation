@@ -17,7 +17,8 @@ class Evolution:
 
         self.previous_average = None
         self.total_steps = 0
-        self.strike_one = False
+        self.strike_counter = 0
+        self.strike_out = 1
 
     def step(self):
         num_of_partners = int(self.n_offsprings / self.offspring_per_couple)
@@ -61,8 +62,8 @@ class Evolution:
         self.previous_average = avg_fitness
 
         if res:
-            if not self.strike_one:
-                self.strike_one = res
+            self.strike_counter += 1
+            if not self.strike_counter > self.strike_out:
                 res = False
 
         return res
