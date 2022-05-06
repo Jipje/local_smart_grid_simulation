@@ -17,15 +17,16 @@ import sys
 utc = dateutil.tz.tzutc()
 
 default_ea_runnable_settings = {
-    'mutation_possibility': 0.2,
+    'mutation_possibility': 0.5,
     'mutate_params': random_mutation,
     'sort_strategy': 1,
     'pop_size': 20,
-    'n_offsprings': 16
+    'n_offsprings': 16,
+    'individual_class': IndividualRandomNormalDist
 }
 
 
-def do_default_run(ea_runnable_settings, month=1, filename=None):
+def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     number_of_points = 4
     price_step_size = 2
     fitness_class = Fitness()
@@ -40,11 +41,12 @@ def do_default_run(ea_runnable_settings, month=1, filename=None):
     mutate_params['strategy_price_step_size'] = price_step_size
     mutate_params['sort_strategy'] = ea_runnable_settings['sort_strategy']
     mutation_possibility = ea_runnable_settings['mutation_possibility']
+    individual_class = ea_runnable_settings['individual_class']
 
     evo = NoAvgIncrEvolution(
         pool_size=population_size,
         fitness=fitness_class.fitness,
-        individual_class=IndividualRandomNormalDist,
+        individual_class=individual_class,
         n_offsprings=n_offsprings,
         pair_params={'strategy_price_step_size': price_step_size},
         mutate_params=mutate_params,
@@ -66,8 +68,9 @@ def do_default_run(ea_runnable_settings, month=1, filename=None):
     for _ in range(n_epochs):
         evo.step()
         evo.report()
-        # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
-        # evo.write_to_csv(f'data{os.path.sep}ea_runs{os.path.sep}population_investigation{os.path.sep}{filename}.csv')
+        if folder is not None:
+            # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
+            evo.write_to_csv(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
         if evo.early_end():
             break
 
@@ -85,4 +88,4 @@ if __name__ == '__main__':
     # run_all_months()
     #####################################
     # for _ in range(5):
-    do_default_run(None, month=4)
+    do_an_ea_run(None, month=4)

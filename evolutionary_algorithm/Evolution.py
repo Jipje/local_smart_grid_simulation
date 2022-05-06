@@ -20,6 +20,9 @@ class Evolution:
         self.strike_counter = 0
         self.strike_out = 1
 
+        self.variation = 95
+        self.avg_improvement = 99
+
     def step(self):
         num_of_partners = int(self.n_offsprings / self.offspring_per_couple)
         mothers, fathers = self.pool.get_parents(num_of_partners)
@@ -32,7 +35,7 @@ class Evolution:
                 offsprings.append(offspring)
 
         for individual in self.pool.individuals:
-            if random.random() < self.mutation_possibility:
+            if random.random() <= self.mutation_possibility:
                 mutated_individual = individual.mutate(self.mutate_params)
                 offsprings.append(mutated_individual)
 
@@ -44,7 +47,7 @@ class Evolution:
 
         best_performing = self.pool.individuals[-1].fitness
         worst_performing = self.pool.individuals[0].fitness
-        if worst_performing / best_performing * 100 >= 95:
+        if worst_performing / best_performing * 100 >= self.variation:
             print('\tToo little variation in population')
             res = True
 
@@ -54,7 +57,7 @@ class Evolution:
         avg_fitness = total_fitness / len(self.pool.individuals)
 
         if self.previous_average is not None:
-            if self.previous_average / avg_fitness * 100 >= 99:
+            if self.previous_average / avg_fitness * 100 >= self.avg_improvement:
                 print('\tToo little average improvement in population')
                 res = True
 

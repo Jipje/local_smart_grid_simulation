@@ -143,7 +143,7 @@ class Fitness(object):
         if res_dict['time_steps_with_congestion'] > 0:
             penalty = 0.5
 
-        if res_dict['wombat_battery_cycles'] > 50:
+        if res_dict['wombat_battery_cycles'] > 54:
             num_of_cycles = res_dict['wombat_battery_cycles']
             print(f'Yowza! This strategy made a lot of cycles! {num_of_cycles}')
             print(individual)
