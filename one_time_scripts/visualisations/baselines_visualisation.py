@@ -130,9 +130,5 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = []
-    source_folder_3 = '../../data/ea_runs/sorting_investigation/'
-    source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
-    all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
-    few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    label_indexes = [2, 13]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[])
