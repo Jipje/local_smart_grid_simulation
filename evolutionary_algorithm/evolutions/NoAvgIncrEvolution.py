@@ -8,4 +8,4 @@ class NoAvgIncrEvolution(Evolution):
                          offspring_per_couple, mutation_possibility)
         self.variation = 99
         self.avg_improvement = 99.99
-        self.strike_out = 20
+        self.strike_out = 5
