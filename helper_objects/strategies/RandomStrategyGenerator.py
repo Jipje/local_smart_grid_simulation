@@ -71,16 +71,16 @@ def generate_random_discharge_relative_strategy(seed=None, name=None, number_of_
     point_based_strat = PointBasedStrategy(name, price_step_size=strategy_price_step_size)
 
     soc_step_size = int(89/number_of_points)
-    price_step_size = int(300/number_of_points)
+    price_step_size = int(500/number_of_points)
     if price_step_size % strategy_price_step_size != 0:
         price_step_size = price_step_size - (price_step_size % strategy_price_step_size)
     charge_soc = 5
-    charge_price = 201
+    charge_price = 401
     charge_price = charge_price + (strategy_price_step_size - charge_price % strategy_price_step_size)
     max_charge_price = charge_price
     discharge_soc = 0
     discharge_price = charge_price
-    for i in range(1, number_of_points + 1):
+    for i in range(1, number_of_points):
         charge_soc = random.randint(charge_soc + 1, i * soc_step_size)
         charge_price = random.randrange(max_charge_price - i * price_step_size, charge_price - 1, strategy_price_step_size)
         point_based_strat.add_point((charge_soc, charge_price, 'CHARGE'))
