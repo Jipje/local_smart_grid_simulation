@@ -1,13 +1,4 @@
-import os
 import sys
-
-from evolutionary_algorithm.Evolution import Evolution
-from evolutionary_algorithm.Fitness import Fitness
-from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
-from evolutionary_algorithm.individuals.guided_initialisation.GuidedInitRandomNormalDist import \
-    GuidedInitRandomNormalDist
-from evolutionary_algorithm.individuals.mutation_params import big_mutation_with_overshoot, random_mutation, \
-    big_mutation
 from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, do_an_ea_run
 
 month_filenames = ['january', 'february', 'march', 'april',
