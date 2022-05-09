@@ -162,6 +162,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
     plt.title(title_file)
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
+    plt.gca().set_ylim(bottom=0)
 
     own_lines = []
     for i in range(len(all_dicts)):
