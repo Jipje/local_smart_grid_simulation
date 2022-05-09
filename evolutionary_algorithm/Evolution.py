@@ -85,7 +85,7 @@ class Evolution:
               f'Average fitness: {average_fitness}'
 
         print(msg)
-        print(best_performing_individual)
+        # print(best_performing_individual)
         # print(median_performing_individual)
         return msg
 
