@@ -10,6 +10,10 @@ month_shorts = ['jan', 'feb', 'mar', 'apr',
 month_long = ['january', 'february', 'march', 'april',
                 'may', 'june', 'july', 'august',
                 'september', 'october', 'november', 'december']
+
+pretty_colours = [(1, 0.24, 0.22), (0.52, 0.86, 0.39), (0.87, 0.34, 0.74),
+                  (0.11, 0.47, 0.76), (1, 0.69, 0), (0.15, 0.81, 0.82)]
+
 try:
     baseline_df = pd.read_csv('../../data/baseline_earnings/overview.csv', delimiter=';')
 except FileNotFoundError:
@@ -98,7 +102,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
             hatch = '///'
 
         plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'],
-                hatch=hatch, alpha=alpha)
+                hatch=hatch, alpha=alpha, color=pretty_colours[i])
         offset_tracker = i
 
     for source_folder_index in range(len(source_folders)):
@@ -112,7 +116,8 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         offset_tracker = offset_tracker + 1
         y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder, suffix=suffix,
                                                                               few_months=few_months)
-        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix)
+        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix,
+                color=pretty_colours[offset_tracker])
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
 
