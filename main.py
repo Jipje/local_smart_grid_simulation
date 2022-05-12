@@ -496,21 +496,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
     battery = Battery('Wombat', 30000, 14000, battery_efficiency=0.9, starting_soc_kwh=1600, verbose_lvl=verbose_lvl)
 
     csv_strategy = CsvStrategy('Rhino strategy 1', strategy_csv='data/strategies/cleaner_simplified_passive_imbalance_1.csv')
-    greedy_discharge_strat = CsvStrategy('Greedy discharge', strategy_csv='data/strategies/greedy_discharge_60.csv')
-    always_discharge_strat = CsvStrategy('Always discharge', strategy_csv='data/strategies/always_discharge.csv')
 
-    solve_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Solve Congestion Controller",
-                                                                       network_object=battery,
-                                                                       congestion_kw=congestion_kw,
-                                                                       congestion_safety_margin=congestion_safety_margin,
-                                                                       strategy=greedy_discharge_strat,
-                                                                       verbose_lvl=verbose_lvl)
-    prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
-                                                                         network_object=battery,
-                                                                         congestion_kw=congestion_kw,
-                                                                         congestion_safety_margin=congestion_safety_margin,
-                                                                         strategy=always_discharge_strat,
-                                                                         verbose_lvl=verbose_lvl)
     earn_money_mod = SolveCongestionAndLimitedChargeControlTower(name="Rhino strategy 1",
                                                                  network_object=battery,
                                                                  congestion_kw=congestion_kw,
@@ -553,7 +539,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                               name='Discharge Money Earner',
                                                               discharge_until_soc_perc=max_soc_perc_in_prep
                                                               )
-            prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name="Prepare Congestion",
+            prepare_congestion_mod = SolveCongestionAndLimitedChargeControlTower(name=f"Earn money but discharge until {max_soc_perc_in_prep}",
                                                                                  network_object=battery,
                                                                                  congestion_kw=congestion_kw,
                                                                                  congestion_safety_margin=congestion_safety_margin,
@@ -561,7 +547,7 @@ def run_monthly_timed_baseline(verbose_lvl=2, transportation_kw=2000, congestion
                                                                                  verbose_lvl=verbose_lvl)
 
             moo.add_mode_of_operation(preparing_for_congestion_until[month], prepare_congestion_mod)
-            moo.add_mode_of_operation(solving_congestion_until[month], solve_congestion_mod)
+            moo.add_mode_of_operation(solving_congestion_until[month], prepare_congestion_mod)
         moo.add_mode_of_operation(dt.time(23, 59, tzinfo=utc), earn_money_mod)
         main_controller.add_controller(moo)
 
@@ -800,34 +786,42 @@ if __name__ == '__main__':
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat conservative monthly timed (with base money strat)'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=2, base_money_strat=False)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat conservative monthly timed GIGA Baseline'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat smart monthly timed (with base money strat)'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=1, base_money_strat=False)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat smart monthly timed GIGA Baseline'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat max smart monthly timed (with base money strat)'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=5, base_money_strat=False)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat max smart monthly timed GIGA Baseline'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat avg smart monthly timed (with base money strat)'
     res_arr.append(temp_dict)
 
     temp_dict = run_monthly_timed_baseline(verbose_lvl, congestion_strategy=6, base_money_strat=False)
+    print(temp_dict)
     temp_dict['name'] = 'Wombat avg smart monthly timed GIGA Baseline'
     res_arr.append(temp_dict)
 
@@ -835,17 +829,3 @@ if __name__ == '__main__':
     res_df = pd.DataFrame(res_arr)
     print(res_df)
     res_df.to_csv('data/baseline_earnings/auto_overview.csv')
-
-    # Good performing seeds:
-    #   660352027716011711
-    #   8582482338119250238
-    #   964853903656661948
-    #   454813819652852503
-    #   6618115003047519509
-    # Bad performing seeds:
-    #   4803163394865071306
-    #   6874272345382431524
-    # print(run_random_strategy_with_monthly_times(verbose_lvl=verbose_lvl, seed=2700745881053767637))
-    # Good peforming seeds:
-    #   8: 2700745881053767637
-    # print(run_single_month_random_strategy(verbose_lvl=verbose_lvl, month=8, seed=2700745881053767637))

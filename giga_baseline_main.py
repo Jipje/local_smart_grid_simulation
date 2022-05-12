@@ -10,6 +10,4 @@ if __name__ == '__main__':
     default_ea_runnable_settings['individual_class'] = GuidedInitRandomNormalDist
     default_ea_runnable_settings['mutate_params'] = big_mutation
     for month_index in range(1, 13):
-        # month_index = 9
         do_an_ea_run(ea_runnable_settings=run_settings_1, month=month_index, folder='giga_baseline_with_congestion')
-    print(dt.datetime.now())
