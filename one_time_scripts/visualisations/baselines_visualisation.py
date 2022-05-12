@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,8 +13,9 @@ month_long = ['january', 'february', 'march', 'april',
                 'may', 'june', 'july', 'august',
                 'september', 'october', 'november', 'december']
 
-pretty_colours = [(1, 0.24, 0.22), (0.52, 0.86, 0.39), (0.87, 0.34, 0.74),
-                  (0.11, 0.47, 0.76), (1, 0.69, 0), (0.15, 0.81, 0.82)]
+pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
+                  (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0),
+                  (0.29, 0.21, 0.28)]
 
 try:
     baseline_df = pd.read_csv('../../data/baseline_earnings/overview.csv', delimiter=';')
@@ -63,7 +66,11 @@ def make_list_of_monthly_earnings_from_ea_run_folder(source_folder='../../data/e
     return res_mean, res_error
 
 
-def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None):
+def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None,
+                   num_of_source_folder_baselines=0):
+    for _ in range(len(baseline_indices) + num_of_source_folder_baselines):
+        pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
+
     month_labels = []
     if few_months is None:
         max_x = 130
@@ -91,6 +98,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
     width = offsets[-1] - offsets[-2]
 
     offset_tracker = -1
+    colour_index = len(source_folders) - num_of_source_folder_baselines + 1
     for i in range(len(baseline_indices)):
         single_run = baseline_df.loc[baseline_indices[i]]
         single_run_y = make_list_of_monthly_earnings(single_run, few_months)
@@ -102,10 +110,17 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
             hatch = '///'
 
         plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'],
-                hatch=hatch, alpha=alpha, color=pretty_colours[i])
+                hatch=hatch, alpha=alpha, color=pretty_colours[colour_index + i])
         offset_tracker = i
 
+    colour_index = colour_index + num_of_source_folder_baselines
+    flag_colour_index_reset = False
     for source_folder_index in range(len(source_folders)):
+        if num_of_source_folder_baselines == 0 and not flag_colour_index_reset:
+            print('Reset now')
+            colour_index = 0
+            flag_colour_index_reset = True
+
         source_folder = source_folders[source_folder_index]
         if suffixes is not None:
             assert len(suffixes) == len(source_folders), 'Please supply as many suffixes as folders'
@@ -117,9 +132,11 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder, suffix=suffix,
                                                                               few_months=few_months)
         plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix,
-                color=pretty_colours[offset_tracker])
+                color=pretty_colours[colour_index])
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
+        num_of_source_folder_baselines = num_of_source_folder_baselines - 1
+        colour_index = colour_index + 1
 
     plt.xticks(x_axis, month_labels)
     plt.xlabel('Month (2021)')
@@ -140,4 +157,5 @@ if __name__ == '__main__':
     source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
     all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   num_of_source_folder_baselines=1)

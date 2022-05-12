@@ -115,13 +115,9 @@ def visualise_ea_runs(filenames=None, title_file=None):
 
     all_dicts = []
 
-    baseline_color = (0.11, 0.91, 0.99, 1)
-    month_optimized = (0.43, 0.92, 0.51, 1)
-    month_conservative = (0.07, 0.66, 0.91, 1)
-    color_4 = (0.99, 0.35, 0.39, 1)
-
     pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
-                      (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0)]
+                      (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0),
+                      (0.29, 0.21, 0.28)]
 
     for filename in filenames:
         res_dict, num_of_runs = convert_file_into_dict(filename)
@@ -163,7 +159,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
     plt.title(title_file)
     plt.xlabel('Generation')
     plt.ylabel('Performance (Total EUR)')
-    plt.gca().set_ylim(bottom=0)
+    # plt.gca().set_ylim(bottom=0)
 
     own_lines = []
     for i in range(len(all_dicts)):
