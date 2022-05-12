@@ -23,8 +23,10 @@ if __name__ == '__main__':
         visualise_ea_runs(filenames, title)
 
     label_indexes = [13]
+    source_folder_1 = '../../../data/ea_runs/giga_baseline_with_congestion/'
     source_folder_3 = '../../../data/ea_runs/sorting_investigation/'
-    source_folders = [source_folder_3, source_folder_3, source_folder_3, source_folder_3]
-    all_suffix = ['_sort_none', '_sort_1', '_sort_2', '_sort_3']
+    source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
+    all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   num_of_source_folder_baselines=1)
