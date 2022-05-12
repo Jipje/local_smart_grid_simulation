@@ -12,7 +12,7 @@ run_settings_1 = default_ea_runnable_settings
 run_settings_1['individual_class'] = IndividualRandomNormalDist
 
 run_settings_2 = default_ea_runnable_settings
-run_settings_1['individual_class'] = IndividualMutateNormalDist
+run_settings_2['individual_class'] = IndividualMutateNormalDist
 
 if __name__ == '__main__':
     try:
