@@ -2,17 +2,10 @@ import os
 
 import dateutil.tz
 
-from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
 from evolutionary_algorithm.evolutions.NoAvgIncrEvolution import NoAvgIncrEvolution
-from evolutionary_algorithm.individuals.IndividualFixedUniformDist import IndividualFixedUniformDist
-from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
-from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
-from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation, \
-    big_mutation_with_overshoot, random_mutation
-import sys
+from evolutionary_algorithm.individuals.mutation_params import random_mutation
 
 utc = dateutil.tz.tzutc()
 
@@ -20,10 +13,14 @@ default_ea_runnable_settings = {
     'mutation_possibility': 0.5,
     'mutate_params': random_mutation,
     'sort_strategy': 1,
-    'pop_size': 20,
-    'n_offsprings': 16,
+    'pop_size': 100,
+    'n_offsprings': 80,
     'individual_class': IndividualRandomNormalDist
 }
+
+month_filenames = ['january', 'february', 'march', 'april',
+                   'may', 'june', 'july', 'august',
+                   'september', 'october', 'november', 'december']
 
 
 def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
@@ -82,6 +79,17 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)
     # print(evo.pool.individuals[-3])
+
+
+def execute_ea_runs(suffix, run_settings, folder, month_indexes=None, num_of_runs=3):
+    if month_indexes is None:
+        month_indexes = [3, 4, 11]
+
+    for _ in range(num_of_runs):
+        for month_index in month_indexes:
+            month_filename = month_filenames[month_index - 1]
+            custom_filename = month_filename + suffix
+            do_an_ea_run(run_settings, month=month_index, filename=custom_filename, folder=folder)
 
 
 if __name__ == '__main__':
