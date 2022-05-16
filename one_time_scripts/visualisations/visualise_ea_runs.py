@@ -115,21 +115,18 @@ def visualise_ea_runs(filenames=None, title_file=None):
 
     all_dicts = []
 
-    baseline_color = (0.11, 0.91, 0.99, 1)
-    month_optimized = (0.43, 0.92, 0.51, 1)
-    month_conservative = (0.07, 0.66, 0.91, 1)
-    color_4 = (0.99, 0.35, 0.39, 1)
-
-    colors = [baseline_color, month_optimized, month_conservative, color_4]
+    pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
+                      (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0),
+                      (0.29, 0.21, 0.28)]
 
     for filename in filenames:
         res_dict, num_of_runs = convert_file_into_dict(filename)
         all_dicts.append((res_dict, num_of_runs))
 
-        colors.append('#%06X' % random.randint(0, 0xFFFFFF))
+        pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
 
     for i in range(len(all_dicts)):
-        color = colors[i]
+        color = pretty_colours[i]
         res_dict = all_dicts[i][0]
 
         avg_best_individual = []
@@ -166,7 +163,7 @@ def visualise_ea_runs(filenames=None, title_file=None):
 
     own_lines = []
     for i in range(len(all_dicts)):
-        own_lines.append(Line2D([0], [0], color=colors[i], lw=2))
+        own_lines.append(Line2D([0], [0], color=pretty_colours[i], lw=2))
     plt.legend(own_lines, legend_names, fontsize=8)
 
     plt.show()
