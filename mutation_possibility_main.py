@@ -1,9 +1,5 @@
 import sys
-from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, do_an_ea_run, execute_ea_runs
-
-month_filenames = ['january', 'february', 'march', 'april',
-                   'may', 'june', 'july', 'august',
-                   'september', 'october', 'november', 'december']
+from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, execute_ea_runs
 
 run_settings_1 = default_ea_runnable_settings
 run_settings_1['mutation_possibility'] = 0.25
