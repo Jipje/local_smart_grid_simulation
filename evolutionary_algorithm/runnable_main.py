@@ -20,8 +20,8 @@ default_ea_runnable_settings = {
     'mutation_possibility': 0.5,
     'mutate_params': random_mutation,
     'sort_strategy': 1,
-    'pop_size': 20,
-    'n_offsprings': 16,
+    'pop_size': 100,
+    'n_offsprings': 80,
     'individual_class': IndividualRandomNormalDist
 }
 
