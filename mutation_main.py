@@ -1,12 +1,7 @@
 import sys
-
 from evolutionary_algorithm.individuals.mutation_params import random_mutation, big_random_mutation, \
     big_mutation_with_overshoot
-from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, do_an_ea_run, execute_ea_runs
-
-month_filenames = ['january', 'february', 'march', 'april',
-                   'may', 'june', 'july', 'august',
-                   'september', 'october', 'november', 'december']
+from evolutionary_algorithm.runnable_main import default_ea_runnable_settings, execute_ea_runs
 
 run_settings_1 = default_ea_runnable_settings
 run_settings_1['mutate_params'] = big_mutation_with_overshoot
