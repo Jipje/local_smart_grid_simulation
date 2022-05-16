@@ -2,17 +2,10 @@ import os
 
 import dateutil.tz
 
-from evolutionary_algorithm.Evolution import Evolution
 from evolutionary_algorithm.Fitness import Fitness
 from evolutionary_algorithm.evolutions.NoAvgIncrEvolution import NoAvgIncrEvolution
-from evolutionary_algorithm.individuals.IndividualFixedUniformDist import IndividualFixedUniformDist
-from evolutionary_algorithm.individuals.IndividualMiddleAndMutate import IndividualMiddleAndMutate
-from evolutionary_algorithm.individuals.IndividualMutateNormalDist import IndividualMutateNormalDist
 from evolutionary_algorithm.individuals.IndividualRandomNormalDist import IndividualRandomNormalDist
-from evolutionary_algorithm.individuals.StrategyIndividual import StrategyIndividual
-from evolutionary_algorithm.individuals.mutation_params import aggressive_mutation, small_mutation, big_mutation, \
-    big_mutation_with_overshoot, random_mutation
-import sys
+from evolutionary_algorithm.individuals.mutation_params import random_mutation
 
 utc = dateutil.tz.tzutc()
 
