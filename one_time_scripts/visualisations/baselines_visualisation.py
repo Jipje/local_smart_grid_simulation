@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import stats
 
 from one_time_scripts.visualisations.visualise_ea_runs import convert_file_into_dict
 
@@ -57,6 +58,57 @@ def make_mean_and_std_per_month_from_folder(source_folder='../../data/ea_runs/gi
         res_mean.append(np.mean(arr_of_best_individuals))
         res_error.append(np.std(arr_of_best_individuals))
     return res_mean, res_error
+
+
+def make_arr_of_best_individuals_per_month_from_folder(source_folder='../../data/ea_runs/giga_baseline/',
+                                                       suffix='', few_months=None):
+    if few_months is None:
+        few_months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    res = []
+    for i in few_months:
+        month_filename = source_folder + month_long[i] + suffix + '.csv'
+        dict_of_runs, num_of_runs = convert_file_into_dict(month_filename)
+        arr_of_best_individuals = []
+        for run_num in range(num_of_runs):
+            run_label = f'run_{run_num}_best_individual'
+            arr_of_best_individuals.append(dict_of_runs[run_label][-1])
+        arr_of_best_individuals = np.array(arr_of_best_individuals)
+        res.append(arr_of_best_individuals)
+    return res
+
+
+def statistic_tests(baseline_indices, source_folders, few_months=None, suffixes=None):
+    res_dict = {}
+    for source_folder_index in range(len(source_folders)):
+        source_folder = source_folders[source_folder_index]
+        if suffixes is not None:
+            assert len(suffixes) == len(source_folders), 'Please supply as many suffixes as folders'
+            suffix = suffixes[source_folder_index]
+        else:
+            suffix = ''
+
+        arr_of_arr_of_best_individuals = make_arr_of_best_individuals_per_month_from_folder(source_folder,
+                                                                                            suffix=suffix,
+                                                                                            few_months=few_months)
+        res_dict[source_folder_index] = arr_of_arr_of_best_individuals
+
+    for source_folder_index in range(len(source_folders) - 1):
+        suffix_one = suffixes[source_folder_index]
+        suffix_other = suffixes[source_folder_index + 1]
+        print(f'Comparing performance of {suffix_one} with {suffix_other} with T-Test')
+        for month in range(len(few_months)):
+            one = res_dict[source_folder_index][month]
+            other = res_dict[source_folder_index + 1][month]
+            t_value, p_value = stats.ttest_ind(one, other)
+
+            print(f'Running test for month {few_months[month] + 1}')
+            print('\tTest statistic is %f'%float("{:.6f}".format(t_value)))
+            print('\tp-value for two tailed test is %f'%p_value)
+            alpha = 0.05
+            if p_value <= alpha:
+                print('\tConclusion','n','Since p-value(=%f)'%p_value,'<','alpha(=%.2f)'%alpha,'''We reject the null hypothesis H0.\n\t\tSo we conclude that the effect of the tested parameter are not equal i.e., μ1 = μ2 at %.2f level of significance.'''%alpha)
+            else:
+                print('\tConclusion','n','Since p-value(=%f)'%p_value,'>','alpha(=%.2f)'%alpha,'''We do not reject the null hypothesis H0.''')
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None):
@@ -136,3 +188,6 @@ if __name__ == '__main__':
     all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+
+    statistic_tests([], [source_folder_3, source_folder_3], few_months=[2, 3, 10],
+                    suffixes=['_sort_none', '_sort_1'])
