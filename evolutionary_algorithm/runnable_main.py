@@ -25,6 +25,10 @@ default_ea_runnable_settings = {
     'individual_class': IndividualRandomNormalDist
 }
 
+month_filenames = ['january', 'february', 'march', 'april',
+                   'may', 'june', 'july', 'august',
+                   'september', 'october', 'november', 'december']
+
 
 def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     number_of_points = 4
@@ -82,6 +86,17 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)
     # print(evo.pool.individuals[-3])
+
+
+def execute_ea_runs(suffix, run_settings, folder, month_indexes=None, num_of_runs=3):
+    if month_indexes is None:
+        month_indexes = [3, 4, 11]
+
+    for _ in range(num_of_runs):
+        for month_index in month_indexes:
+            month_filename = month_filenames[month_index - 1]
+            custom_filename = month_filename + suffix
+            do_an_ea_run(run_settings, month=month_index, filename=custom_filename, folder=folder)
 
 
 if __name__ == '__main__':
