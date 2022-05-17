@@ -88,6 +88,10 @@ if __name__ == '__main__':
     csv_strategy = CsvStrategy(name='Rhino Strategy 1', strategy_csv=csv_strategy_path, price_step_size=1)
     visualize_strategy(csv_strategy)
 
+    csv_strategy_path = '..{0}..{0}data{0}strategies{0}always_discharge.csv'.format(os.path.sep)
+    csv_strategy = CsvStrategy(name='Always discharge strategy', strategy_csv=csv_strategy_path, price_step_size=1)
+    visualize_strategy(csv_strategy)
+
     point_based_strat = PointBasedStrategy('200k december strategy', price_step_size=2)
 
     point_based_strat.add_point((47, 280, 'CHARGE'))
