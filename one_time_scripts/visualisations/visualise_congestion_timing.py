@@ -166,7 +166,11 @@ if __name__ == '__main__':
 
     strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times',
                        'Preparation timed on MAX profile', 'Preparation timed on AVG profile']
-    for strategy_num in range(1, 7):
+    # for strategy_num in range(1, 7):
+    #     congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
+    #     visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
+
+    for strategy_num in [4, 3, 1]:
         congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
         visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
 
