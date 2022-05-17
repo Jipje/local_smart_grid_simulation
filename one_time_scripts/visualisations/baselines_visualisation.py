@@ -47,8 +47,8 @@ def make_list_of_monthly_earnings(single_run, few_months=None):
     return res
 
 
-def make_list_of_monthly_earnings_from_ea_run_folder(source_folder='../../data/ea_runs/giga_baseline/',
-                                                     suffix='', few_months=None):
+def make_mean_and_std_per_month_from_folder(source_folder='../../data/ea_runs/giga_baseline/',
+                                            suffix='', few_months=None):
     if few_months is None:
         few_months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     res_mean = []
@@ -117,7 +117,6 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
     flag_colour_index_reset = False
     for source_folder_index in range(len(source_folders)):
         if num_of_source_folder_baselines == 0 and not flag_colour_index_reset:
-            print('Reset now')
             colour_index = 0
             flag_colour_index_reset = True
 
@@ -129,8 +128,8 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
             suffix = ''
 
         offset_tracker = offset_tracker + 1
-        y_values, y_errors = make_list_of_monthly_earnings_from_ea_run_folder(source_folder, suffix=suffix,
-                                                                              few_months=few_months)
+        y_values, y_errors = make_mean_and_std_per_month_from_folder(source_folder, suffix=suffix,
+                                                                     few_months=few_months)
         plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix,
                 color=pretty_colours[colour_index])
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
