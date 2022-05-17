@@ -62,11 +62,12 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
                        'september', 'october', 'november', 'december']
         filename = month_filenames[month - 1]
 
+    evo.report()
+    evo.write_to_csv(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
     for _ in range(n_epochs):
         evo.step()
         evo.report()
         if folder is not None:
-            # evo.write_to_csv(f'..{os.path.sep}data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
             evo.write_to_csv(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{filename}.csv')
         if evo.early_end():
             break

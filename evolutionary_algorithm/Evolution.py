@@ -16,7 +16,7 @@ class Evolution:
         assert n_offsprings % offspring_per_couple == 0, 'Offsprings per couple and n_offspring should be divisible'
 
         self.previous_average = None
-        self.total_steps = 0
+        self.generation_tracker = 1
         self.strike_counter = 0
         self.strike_out = 1
 
@@ -40,7 +40,7 @@ class Evolution:
                 offsprings.append(mutated_individual)
 
         self.pool.replace(offsprings)
-        self.total_steps += 1
+        self.generation_tracker += 1
 
     def early_end(self):
         res = False
@@ -80,7 +80,7 @@ class Evolution:
             total_fitness += individual.fitness
         average_fitness = total_fitness / len(self.pool.individuals)
 
-        msg = f'Generation {self.total_steps}: ' \
+        msg = f'Generation {self.generation_tracker}: ' \
               f'Best individual {best_performing_individual.fitness}. ' \
               f'Average fitness: {average_fitness}'
 
@@ -99,7 +99,7 @@ class Evolution:
             total_fitness += individual.fitness
         average_fitness = total_fitness / len(self.pool.individuals)
 
-        csv_msg = f'{self.total_steps}, {best_performing_individual.fitness}, {average_fitness}'
+        csv_msg = f'{self.generation_tracker}, {best_performing_individual.fitness}, {average_fitness}'
         with open(filename, 'a+') as file:
             file.seek(0)
             data = file.read(100)
