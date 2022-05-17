@@ -30,5 +30,5 @@ if __name__ == '__main__':
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
 
-    statistic_tests([], [giga_baseline, source_folder_1], few_months=few_months,
-                    suffixes=['', '_80_over_100'])
+    statistic_tests([], [source_folder_1, source_folder_1], few_months=few_months,
+                    suffixes=['_32_over_40', '_80_over_100'])
