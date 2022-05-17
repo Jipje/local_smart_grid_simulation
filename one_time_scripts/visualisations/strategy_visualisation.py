@@ -50,22 +50,33 @@ def visualize_strategies(strategies):
     plt.show()
 
 
-def visualize_strategy(strategy: Strategy):
+def visualize_strategy(strategy: Strategy, discharge_perc=None):
     strategy_matrix = [row[:] for row in strategy.strategy_matrix]
     red = (0.934, 0.277, 0.434)
     blue = (0.129, 0.535, 0.492)
     white = (1, 1, 1)
+
+    covered_red = (0.596, 0.447, 0.490)
+    covered_blue = (0.29, 0.533, 0.506)
+    covered_white = (0.713, 0.769, 0.769)
 
     for row_index in range(len(strategy_matrix)):
         row = strategy_matrix[row_index]
         for column_index in range(len(row)):
             item = row[column_index]
 
-            new_item = white
-            if item == 'CHARGE':
-                new_item = red
-            elif item == 'DISCHARGE':
-                new_item = blue
+            if discharge_perc is not None and row_index >= discharge_perc:
+                new_item = covered_white
+                if item == 'CHARGE':
+                    new_item = covered_red
+                elif item == 'DISCHARGE':
+                    new_item = covered_blue
+            else:
+                new_item = white
+                if item == 'CHARGE':
+                    new_item = red
+                elif item == 'DISCHARGE':
+                    new_item = blue
 
             strategy_matrix[row_index][column_index] = new_item
 
@@ -91,6 +102,10 @@ if __name__ == '__main__':
     csv_strategy_path = '..{0}..{0}data{0}strategies{0}always_discharge.csv'.format(os.path.sep)
     csv_strategy = CsvStrategy(name='Always discharge strategy', strategy_csv=csv_strategy_path, price_step_size=5)
     visualize_strategy(csv_strategy)
+
+    csv_strategy_path = '..{0}..{0}data{0}strategies{0}cleaner_simplified_passive_imbalance_1.csv'.format(os.path.sep)
+    csv_strategy = CsvStrategy(name='Rhino Strategy 1 - Prepare and solve congestion with 50% SoC', strategy_csv=csv_strategy_path, price_step_size=1)
+    visualize_strategy(csv_strategy, discharge_perc=50)
 
     point_based_strat = PointBasedStrategy('200k december strategy', price_step_size=2)
 
