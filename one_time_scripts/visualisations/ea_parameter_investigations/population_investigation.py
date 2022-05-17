@@ -1,4 +1,4 @@
-from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph
+from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph, statistic_tests
 from one_time_scripts.visualisations.visualise_ea_runs import visualise_ea_runs
 
 if __name__ == '__main__':
@@ -29,3 +29,6 @@ if __name__ == '__main__':
     all_suffix = ['', '_16_over_20', '_32_over_40', '_80_over_100', '_160_over_200']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+
+    statistic_tests([], [source_folder_1, source_folder_1], few_months=few_months,
+                    suffixes=['_32_over_40', '_80_over_100'])
