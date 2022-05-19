@@ -16,6 +16,11 @@ from one_time_scripts.helper_objects.solarvation_loader import load_solarvation_
 ams = dateutil.tz.gettz('Europe/Amsterdam')
 utc = dateutil.tz.tzutc()
 
+standard_month_colors = [(0.0, 0.486, 0.737), (0.0, 0.6, 0.824), (0.0, 0.616, 0.314),
+                         (0.455, 0.682, 0.212), (0.675, 0.776, 0.102), (0.922, 0.667, 0.071),
+                         (0.91, 0.533, 0.063), (0.914, 0.208, 0.063), (0.882, 0.169, 0.318),
+                         (0.702, 0.208, 0.49), (0.427, 0.247, 0.592), (0.275, 0.251, 0.596)]
+
 
 def visualise_congestion_time_and_sizes(res_df, title=None):
     prep_starts = res_df.loc['prep_start'].array
@@ -26,7 +31,7 @@ def visualise_congestion_time_and_sizes(res_df, title=None):
     prep_starts_y_min = []
     prep_starts_y_max = []
     y_ticks = []
-    colors = []
+    colors = standard_month_colors
     largest_prep_kwh = -1
     for i in range(len(prep_starts)):
         if prep_starts[i] is NaT:
@@ -166,9 +171,10 @@ if __name__ == '__main__':
 
     strategy_titles = ['', 'Smart sizing and monthly times', 'Monthly times rounded', 'Monthly times', 'Yearly times',
                        'Preparation timed on MAX profile', 'Preparation timed on AVG profile']
-    for strategy_num in range(1, 7):
+    # for strategy_num in range(1, 7):
+    #     congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
+    #     visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
+
+    for strategy_num in [4, 3, 1, 6]:
         congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=strategy_num)
         visualise_congestion_time_and_sizes(congestion_df, title=strategy_titles[strategy_num])
-
-    # print(congestion_df.to_string())
-    # visualise_daily_profile_per_month(solarvation_df, max_kw=20000)
