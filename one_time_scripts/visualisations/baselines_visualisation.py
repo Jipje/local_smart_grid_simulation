@@ -120,7 +120,7 @@ def statistic_tests(baseline_indices, source_folders, few_months=None, suffixes=
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None,
-                   num_of_source_folder_baselines=0):
+                   num_of_source_folder_baselines=0, title='Comparing monthly performance'):
     for _ in range(len(baseline_indices) + num_of_source_folder_baselines):
         pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
 
@@ -193,7 +193,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
     plt.xticks(x_axis, month_labels)
     plt.xlabel('Month (2021)')
     plt.ylabel('Total EUR')
-    plt.title('Comparing monthly performance')
+    plt.title(title)
     plt.legend(fontsize=6)
     plt.show()
 
@@ -204,8 +204,13 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = [2, 13]
-    make_bar_graph(label_indexes, source_folders=[], suffixes=[])
+    label_indexes = [1, 4, 6, 8, 12]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[],
+                   title='Rhino Strategy 1 - Solving congestion')
+
+    label_indexes = [2, 5, 7, 9, 13]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[],
+                   title='GIGA Baseline - Solving congestion')
 
     label_indexes = []
     source_folder_3 = '../../data/ea_runs/sorting_investigation/'
