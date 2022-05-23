@@ -27,7 +27,7 @@ if __name__ == '__main__':
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
-                    suffixes=['_big_random_mutation', '_random_mutation'])
+                    suffixes=['_random_mutation', '_big_random_mutation'])
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_random_mutation', '_big_sided_mutation'])
