@@ -23,12 +23,17 @@ if __name__ == '__main__':
         visualise_ea_runs(filenames, title)
 
     label_indexes = [13]
-    giga_baseline = '../../../data/new_ea_runs/giga_baseline_with_congestion/'
-    source_folder_1 = '../../../data/new_ea_runs/population/'
-    source_folders = [giga_baseline, source_folder_1, source_folder_1, source_folder_1, source_folder_1]
-    all_suffix = ['', '_16_over_20', '_32_over_40', '_80_over_100', '_160_over_200']
+    source_folder = '../../../data/new_ea_runs/population/'
+    source_folders = [source_folder, source_folder, source_folder, source_folder]
+    all_suffix = ['_16_over_20', '_32_over_40', '_80_over_100', '_160_over_200']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
 
-    statistic_tests([], [source_folder_1, source_folder_1], few_months=few_months,
-                    suffixes=['_32_over_40', '_80_over_100'])
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_80_over_100', '_32_over_40'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_80_over_100', '_16_over_20'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_80_over_100', '_160_over_200'])

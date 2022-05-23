@@ -1,4 +1,4 @@
-from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph
+from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph, statistic_tests
 from one_time_scripts.visualisations.visualise_ea_runs import visualise_ea_runs
 
 if __name__ == '__main__':
@@ -20,9 +20,14 @@ if __name__ == '__main__':
         visualise_ea_runs(filenames, title)
 
     label_indexes = [13]
-    giga_baseline = '../../../data/new_ea_runs/giga_baseline_with_congestion/'
-    source_folder_1 = '../../../data/new_ea_runs/offspring_ratio/'
-    source_folders = [giga_baseline, source_folder_1, source_folder_1, source_folder_1]
-    all_suffix = ['', '_40_over_100', '_80_over_100', '_160_over_100']
+    source_folder = '../../../data/new_ea_runs/offspring_ratio/'
+    source_folders = [source_folder, source_folder, source_folder]
+    all_suffix = ['_40_over_100', '_80_over_100', '_160_over_100']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_80_over_100', '_40_over_100'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_80_over_100', '_160_over_100'])
