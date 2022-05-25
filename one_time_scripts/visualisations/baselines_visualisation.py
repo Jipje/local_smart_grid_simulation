@@ -67,6 +67,36 @@ def make_mean_and_std_per_month_from_folder(source_folder='../../data/ea_runs/gi
     return res_mean, res_error
 
 
+def analyse_length_of_run_per_month_from_folder(source_folder='../../data/ea_runs/giga_baseline/',
+                                                suffix='', few_months=None,
+                                                mutation_prob=50, population=100, offspring=80):
+    if few_months is None:
+        few_months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    res_mean = []
+    res_error = []
+    for i in few_months:
+        month_filename = source_folder + month_long[i] + suffix + '.csv'
+        dict_of_runs, num_of_runs = convert_file_into_dict(month_filename)
+        arr_of_fit_calcs = []
+        for run_num in range(num_of_runs):
+            run_label = f'run_{run_num}_best_individual'
+            number_of_generations = len(dict_of_runs[run_label])
+            num_of_fit_calcs = num_of_gens_to_fitness_calcs(number_of_generations, mutation_prob,
+                                                            population, offspring)
+            arr_of_fit_calcs.append(num_of_fit_calcs)
+        arr_of_fit_calcs = np.array(arr_of_fit_calcs)
+        res_mean.append(np.mean(arr_of_fit_calcs))
+        res_error.append(np.std(arr_of_fit_calcs))
+    return res_mean, res_error
+
+
+
+def num_of_gens_to_fitness_calcs(num_of_gens, mutation_prob=50, population=100, offspring=80):
+    offspring_fitness_calcs = num_of_gens * offspring
+    mutation_fitness_calcs = num_of_gens * (population * mutation_prob / 100)
+    initial_pop = population
+    return initial_pop + offspring_fitness_calcs + mutation_fitness_calcs
+
 
 def make_arr_of_best_individuals_per_month_from_folder(source_folder='../../data/ea_runs/giga_baseline/',
                                                        suffix='', few_months=None):
@@ -216,5 +246,5 @@ if __name__ == '__main__':
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
                    num_of_source_folder_baselines=1)
   
-    statistic_tests([], [source_folder_3, source_folder_3], few_months=[2, 3, 10],
-                    suffixes=['_sort_none', '_sort_1'])
+    print(make_mean_and_std_per_month_from_folder(source_folder='../../data/new_ea_runs/sorting/', few_months=[2, 3, 10], suffix='_sort_3'))
+    print(analyse_length_of_run_per_month_from_folder(source_folder='../../data/new_ea_runs/sorting/', few_months=[2, 3, 10], suffix='_sort_3'))
