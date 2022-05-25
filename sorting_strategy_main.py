@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     if runnable_int == 1:
         print('Running setting 1')
-        execute_ea_runs('_no_sort', run_settings_1, folder)
+        execute_ea_runs('_no_sort', run_settings_1, folder, num_of_runs=2)
     elif runnable_int == 2:
         print('Running setting 2')
         execute_ea_runs('_sort_3', run_settings_2, folder)
