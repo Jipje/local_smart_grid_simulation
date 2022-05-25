@@ -229,22 +229,25 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
 
 
 if __name__ == '__main__':
-    label_indexes = [8, 13]
-    source_folder_1 = '../../data/new_ea_runs/giga_baseline_with_congestion/'
-    source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
-    make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
+    # label_indexes = [8, 13]
+    # source_folder_1 = '../../data/new_ea_runs/giga_baseline_with_congestion/'
+    # source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
+    # make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
+    #
+    # label_indexes = [2, 13]
+    # make_bar_graph(label_indexes, source_folders=[], suffixes=[])
+    #
+    # label_indexes = []
+    # source_folder_3 = '../../data/ea_runs/sorting_investigation/'
+    # source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
+    # all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
+    # few_months = [2, 3, 10]
+    #
+    # make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+    #                num_of_source_folder_baselines=1)
+    #
+    # statistic_tests([], [source_folder_3, source_folder_3], few_months=[2, 3, 10],
+    #                 suffixes=['_sort_none', '_sort_1'])
 
-    label_indexes = [2, 13]
-    make_bar_graph(label_indexes, source_folders=[], suffixes=[])
-
-    label_indexes = []
-    source_folder_3 = '../../data/ea_runs/sorting_investigation/'
-    source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
-    all_suffix = ['', '_sort_none', '_sort_1', '_sort_2', '_sort_3']
-    few_months = [2, 3, 10]
-
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
-                   num_of_source_folder_baselines=1)
-  
     print(make_mean_and_std_per_month_from_folder(source_folder='../../data/new_ea_runs/sorting/', few_months=[2, 3, 10], suffix='_sort_3'))
     print(analyse_length_of_run_per_month_from_folder(source_folder='../../data/new_ea_runs/sorting/', few_months=[2, 3, 10], suffix='_sort_3'))
