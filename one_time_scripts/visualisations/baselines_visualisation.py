@@ -74,6 +74,7 @@ def analyse_length_of_run_per_month_from_folder(source_folder='../../data/ea_run
         few_months = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     res_mean = []
     res_error = []
+    res_run_lengths = []
     for i in few_months:
         month_filename = source_folder + month_long[i] + suffix + '.csv'
         dict_of_runs, num_of_runs = convert_file_into_dict(month_filename)
@@ -87,7 +88,8 @@ def analyse_length_of_run_per_month_from_folder(source_folder='../../data/ea_run
         arr_of_fit_calcs = np.array(arr_of_fit_calcs)
         res_mean.append(np.mean(arr_of_fit_calcs))
         res_error.append(np.std(arr_of_fit_calcs))
-    return res_mean, res_error
+        res_run_lengths.append(arr_of_fit_calcs)
+    return res_mean, res_error, res_run_lengths
 
 
 def num_of_gens_to_fitness_calcs(num_of_gens, mutation_prob=50, population=100, offspring=80):

@@ -2,7 +2,8 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-from one_time_scripts.visualisations.baselines_visualisation import analyse_length_of_run_per_month_from_folder
+from one_time_scripts.visualisations.baselines_visualisation import analyse_length_of_run_per_month_from_folder, \
+    two_sided_t_test, month_shorts, month_long
 
 pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
                   (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0),
@@ -47,18 +48,67 @@ def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
     plt.show()
 
 
-if __name__ == '__main__':
-    source_folder = '../../data/new_ea_runs/sorting/'
-    source_folders = [source_folder, source_folder, source_folder]
-    suffixes = ['_no_sort', '_sort_1', '_sort_3']
-    labels = ['No sort', 'Sort 1', 'Sort 3']
+def length_statistical_test(source_folders, few_months, suffixes):
+    res_dict = {}
+
+    for source_folder_index in range(len(source_folders)):
+        source_folder = source_folders[source_folder_index]
+        if suffixes is not None:
+            assert len(suffixes) == len(source_folders), 'Please supply as many suffixes as folders'
+            suffix = suffixes[source_folder_index]
+        else:
+            suffix = ''
+
+        _, _, run_lengths = analyse_length_of_run_per_month_from_folder(source_folder=source_folder,
+                                                                        few_months=few_months,
+                                                                        suffix=suffix)
+        res_dict[source_folder_index] = run_lengths
+
+    for source_folder_index in range(len(source_folders) - 1):
+        suffix_org = suffixes[0]
+        suffix_other = suffixes[source_folder_index + 1]
+        print(f'Comparing run length of {suffix_org} with {suffix_other} with T-Test')
+        for month in range(len(few_months)):
+            one = res_dict[source_folder_index][month]
+            other = res_dict[source_folder_index + 1][month]
+            print(f'Running test for month {few_months[month] + 1}')
+            two_sided_t_test(one, other)
+
+
+def make_length_bar_graphs(source_folders, few_months, suffixes, labels=None):
+    month_labels = []
+    if few_months is None:
+        for month in month_shorts:
+            month_labels.append(month.capitalize())
+    else:
+        for month_index in few_months:
+            month = month_long[month_index]
+            month_labels.append(month.capitalize())
+
+    if labels is None:
+        labels = []
+        for i in range(len(source_folders)):
+            label = source_folders[i] + suffixes[i]
+            labels.append(label)
 
     super_y_values = []
     super_y_errors = []
     for i in range(len(source_folders)):
         source_folder = source_folders[i]
         suffix = suffixes[i]
-        y_values, y_errors = analyse_length_of_run_per_month_from_folder(source_folder=source_folder, few_months=[2, 3, 10], suffix=suffix)
+        y_values, y_errors, _ = analyse_length_of_run_per_month_from_folder(source_folder=source_folder,
+                                                                            few_months=few_months, suffix=suffix)
         super_y_values.append(y_values)
         super_y_errors.append(y_errors)
-    make_grouped_bar_graph(super_y_values, super_y_errors, ['March', 'April', 'November'], labels)
+    make_grouped_bar_graph(super_y_values, super_y_errors, month_labels, labels)
+
+
+if __name__ == '__main__':
+    sf = '../../data/new_ea_runs/sorting/'
+    temp_source_folders = [sf, sf, sf, sf]
+    temp_suffixes = ['_no_sort', '_sort_1', '_sort_2', '_sort_3']
+    labels = ['No sort', 'Sort 1', 'Sort 2', 'Sort 3']
+
+    make_length_bar_graphs(temp_source_folders, few_months=[2, 3, 10], suffixes=temp_suffixes)
+
+    length_statistical_test(temp_source_folders, suffixes=temp_suffixes, few_months=[2, 3, 10])
