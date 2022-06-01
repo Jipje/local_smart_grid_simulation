@@ -1,4 +1,5 @@
 from one_time_scripts.visualisations.baselines_visualisation import make_bar_graph, statistic_tests
+from one_time_scripts.visualisations.run_length_analysis import make_length_bar_graphs, length_statistical_test
 from one_time_scripts.visualisations.visualise_ea_runs import visualise_ea_runs
 
 if __name__ == '__main__':
@@ -31,3 +32,6 @@ if __name__ == '__main__':
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_mutate_prob_50', '_mutate_prob_75'])
+
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    length_statistical_test(source_folders, few_months, all_suffix)
