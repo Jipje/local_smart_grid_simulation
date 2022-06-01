@@ -90,7 +90,6 @@ def analyse_length_of_run_per_month_from_folder(source_folder='../../data/ea_run
     return res_mean, res_error
 
 
-
 def num_of_gens_to_fitness_calcs(num_of_gens, mutation_prob=50, population=100, offspring=80):
     offspring_fitness_calcs = num_of_gens * offspring
     mutation_fitness_calcs = num_of_gens * (population * mutation_prob / 100)
@@ -137,16 +136,21 @@ def statistic_tests(baseline_indices, source_folders, few_months=None, suffixes=
         for month in range(len(few_months)):
             one = res_dict[source_folder_index][month]
             other = res_dict[source_folder_index + 1][month]
-            t_value, p_value = stats.ttest_ind(one, other)
-
             print(f'Running test for month {few_months[month] + 1}')
-            print('\tTest statistic is %f'%float("{:.6f}".format(t_value)))
-            print('\tp-value for two tailed test is %f'%p_value)
-            alpha = 0.05
-            if p_value <= alpha:
-                print('\tConclusion','n','Since p-value(=%f)'%p_value,'<','alpha(=%.2f)'%alpha,'''We reject the null hypothesis H0.\n\t\tSo we conclude that the effect of the tested parameter are not equal i.e., μ1 = μ2 at %.2f level of significance.'''%alpha)
-            else:
-                print('\tConclusion','n','Since p-value(=%f)'%p_value,'>','alpha(=%.2f)'%alpha,'''We do not reject the null hypothesis H0.''')
+            two_sided_t_test(one, other)
+
+
+def two_sided_t_test(one, other):
+    t_value, p_value = stats.ttest_ind(one, other)
+    print('\tTest statistic is %f' % float("{:.6f}".format(t_value)))
+    print('\tp-value for two tailed test is %f' % p_value)
+    alpha = 0.05
+    if p_value <= alpha:
+        print('\tConclusion', 'n', 'Since p-value(=%f)' % p_value, '<', 'alpha(=%.2f)' % alpha,
+              '''We reject the null hypothesis H0.\n\t\tSo we conclude that the effect of the tested parameter are not equal i.e., μ1 = μ2 at %.2f level of significance.''' % alpha)
+    else:
+        print('\tConclusion', 'n', 'Since p-value(=%f)' % p_value, '>', 'alpha(=%.2f)' % alpha,
+              '''We do not reject the null hypothesis H0.''')
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None,

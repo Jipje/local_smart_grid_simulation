@@ -33,8 +33,17 @@ if __name__ == '__main__':
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_sort_1', '_no_sort'])
 
-    # statistic_tests([], [source_folder, source_folder], few_months=few_months,
-    #                 suffixes=['_sort_1', '_sort_2'])
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_sort_1', '_sort_2'])
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_sort_1', '_sort_3'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_no_sort', '_sort_1'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_no_sort', '_sort_2'])
+
+    statistic_tests([], [source_folder, source_folder], few_months=few_months,
+                    suffixes=['_no_sort', '_sort_3'])
