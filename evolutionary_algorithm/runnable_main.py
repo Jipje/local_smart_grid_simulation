@@ -23,10 +23,10 @@ month_filenames = ['january', 'february', 'march', 'april',
                    'september', 'october', 'november', 'december']
 
 
-def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
+def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None, congestion_kw=14000):
     number_of_points = 4
     price_step_size = 2
-    fitness_class = Fitness()
+    fitness_class = Fitness(congestion_kw=congestion_kw)
     fitness_class.set_month(month)
 
     if ea_runnable_settings is None:
@@ -82,7 +82,7 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None):
     # print(evo.pool.individuals[-3])
 
 
-def execute_ea_runs(suffix, run_settings, folder, month_indexes=None, num_of_runs=3):
+def execute_ea_runs(suffix, run_settings, folder, month_indexes=None, num_of_runs=3, congestion_kw=14000):
     if month_indexes is None:
         month_indexes = [3, 4, 11]
 
@@ -90,7 +90,7 @@ def execute_ea_runs(suffix, run_settings, folder, month_indexes=None, num_of_run
         for month_index in month_indexes:
             month_filename = month_filenames[month_index - 1]
             custom_filename = month_filename + suffix
-            do_an_ea_run(run_settings, month=month_index, filename=custom_filename, folder=folder)
+            do_an_ea_run(run_settings, month=month_index, filename=custom_filename, folder=folder, congestion_kw=congestion_kw)
 
 
 if __name__ == '__main__':

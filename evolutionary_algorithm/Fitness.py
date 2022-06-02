@@ -50,7 +50,8 @@ class Fitness(object):
             self.scenario_name = 'Lelystad 1 - 19 MW Solar Farm, 14MW connection'
         self.scenario_df = res_df.to_dict('records')
         self.congestion_df = get_month_congestion_timings(
-            solarvation_identifier='{1}environments{0}lelystad_1_2021.csv'.format(os.path.sep, self.data_folder), strategy=1)
+            solarvation_identifier='{1}environments{0}lelystad_1_2021.csv'.format(os.path.sep, self.data_folder),
+            strategy=1, congestion_kw=congestion_kw)
 
         self.starting_timestep = 0
         with open(self.scenario) as file:
@@ -102,7 +103,7 @@ class Fitness(object):
             moo = ModesOfOperationController(name=f'Wombat controller month {month}',
                                              network_object=battery,
                                              verbose_lvl=self.verbose_lvl)
-            if earning_money_until[month] is not NaT:
+            if earning_money_until[month] is not NaT and earning_money_until[month] is not None:
                 moo.add_mode_of_operation(earning_money_until[month], earn_money_mod)
 
                 max_kwh_in_prep = float(preparing_max_kwh[month])
@@ -155,6 +156,6 @@ class Fitness(object):
 
 if __name__ == '__main__':
     random_individual = StrategyIndividual(init_params={'number_of_points': 4})
-    fitness = Fitness(verbose_lvl=1)
+    fitness = Fitness(verbose_lvl=1, congestion_kw=14000)
     fitness.set_month(7)
     print(fitness.fitness(random_individual))
