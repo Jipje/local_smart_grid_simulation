@@ -1,15 +1,15 @@
 ,time_steps_with_congestion,perc_of_congestion,solarvation_solar_farm_revenue,name,wombat_battery_revenue,wombat_battery_cycles
 0,29640,5.64,1572110.99,Solarvation only discharging,,
 1,40421,7.69,1572110.99,Wombat disregard congestion (with base money strat),1143900.5,186.29
-2,54223,10.32,1572110.99,Wombat disregard congestion GIGA Baseline,2007559.62,376.12
+2,53423,10.17,1572110.99,Wombat disregard congestion GIGA Baseline,2013845.38,362.86
 3,0,0.0,1572110.99,Wombat only solve congestion,113778.59,41.25
 4,0,0.0,1572110.99,Wombat yearly timing (with base money strat),265929.05,118.79
-5,55,0.01,1572110.99,Wombat yearly timing GIGA Baseline,474473.91,240.1
+5,39,0.01,1572110.99,Wombat yearly timing GIGA Baseline,468847.34,236.67
 6,0,0.0,1572110.99,Wombat conservative monthly timed (with base money strat),525471.45,145.72
-7,0,0.0,1572110.99,Wombat conservative monthly timed GIGA Baseline,1063824.42,317.18
+7,0,0.0,1572110.99,Wombat conservative monthly timed GIGA Baseline,1070172.05,305.72
 8,0,0.0,1572110.99,Wombat smart monthly timed (with base money strat),714940.68,150.56
-9,27,0.01,1572110.99,Wombat smart monthly timed GIGA Baseline,1277895.45,319.17
+9,0,0.0,1572110.99,Wombat smart monthly timed GIGA Baseline,1284941.53,308.26
 10,0,0.0,1572110.99,Wombat max smart monthly timed (with base money strat),693479.5,148.49
-11,0,0.0,1572110.99,Wombat max smart monthly timed GIGA Baseline,1214001.54,316.5
+11,0,0.0,1572110.99,Wombat max smart monthly timed GIGA Baseline,1219890.33,305.71
 12,0,0.0,1572110.99,Wombat avg smart monthly timed (with base money strat),707322.86,149.95
-13,0,0.0,1572110.99,Wombat avg smart monthly timed GIGA Baseline,1253531.91,318.21
+13,0,0.0,1572110.99,Wombat avg smart monthly timed GIGA Baseline,1261033.37,307.31

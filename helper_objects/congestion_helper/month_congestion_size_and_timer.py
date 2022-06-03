@@ -6,8 +6,7 @@ from one_time_scripts.helper_objects.solarvation_loader import load_solarvation_
 from one_time_scripts.helper_objects.date_helper import retrieve_months
 
 
-def get_month_congestion_timings(solarvation_identifier: str = '../../data/environments/lelystad_1_2021.csv', verbose_lvl=1, strategy=4):
-    congestion_kw = 14000
+def get_month_congestion_timings(solarvation_identifier: str = '../../data/environments/lelystad_1_2021.csv', verbose_lvl=1, strategy=4, congestion_kw=14000):
 
     solarvation_df = load_solarvation_data(solarvation_identifier)
     solarvation_df['congestion'], solarvation_df['excess_power'] = identify_congestion(solarvation_df, congestion_kw)

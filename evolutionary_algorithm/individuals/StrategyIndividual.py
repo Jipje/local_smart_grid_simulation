@@ -177,6 +177,16 @@ class StrategyIndividual(Individual):
             msg = msg + f'\t({point[0]}, {point[1]})\n'
         return msg
 
+    def to_csv(self):
+        adjusted_name = self.value.name.replace('\n', '-')
+        msg = f'{adjusted_name}\n = ['
+        for point in self.value.charge_points:
+            msg = msg + f"({point[0]}, {point[1]}, 'CHARGE'), "
+        for point in self.value.discharge_points:
+            msg = msg + f"({point[0]}, {point[1]}, 'DISCHARGE'), "
+        msg = msg[:-2] + ']'
+        return msg
+
 
 if __name__ == '__main__':
     price_step_size = 5
@@ -199,3 +209,5 @@ if __name__ == '__main__':
     print(baby)
     baby = baby.mutate(mutate_params={})
     print(baby)
+
+    print(baby.to_csv())
