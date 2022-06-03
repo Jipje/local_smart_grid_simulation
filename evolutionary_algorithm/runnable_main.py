@@ -78,7 +78,13 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None, cong
     print(evo.pool.individuals[-1])
     if 'default' in folder:
         strat_filename = filename + '_strats'
-        with open(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{strat_filename}.csv')
+        with open(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{strat_filename}.csv', 'a+') as file:
+            file.seek(0)
+            data = file.read(100)
+            if len(data) > 0:
+                file.write("\n")
+            file.write(evo.pool.individuals[-1].to_csv())
+
     # print(evo.pool.individuals[-2].fitness)
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)

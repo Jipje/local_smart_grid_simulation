@@ -178,7 +178,8 @@ class StrategyIndividual(Individual):
         return msg
 
     def to_csv(self):
-        msg = f'{self.value.name}\n = ['
+        adjusted_name = self.value.name.replace('\n', '-')
+        msg = f'{adjusted_name}\n = ['
         for point in self.value.charge_points:
             msg = msg + f"({point[0]}, {point[1]}, 'CHARGE'), "
         for point in self.value.discharge_points:
