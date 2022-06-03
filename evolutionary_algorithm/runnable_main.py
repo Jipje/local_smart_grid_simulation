@@ -76,6 +76,9 @@ def do_an_ea_run(ea_runnable_settings, month=1, filename=None, folder=None, cong
     print('Best performing individual for run:\n'
           f'\tElite fitness: {evo.pool.individuals[-1].fitness}')
     print(evo.pool.individuals[-1])
+    if 'default' in folder:
+        strat_filename = filename + '_strats'
+        with open(f'data{os.path.sep}new_ea_runs{os.path.sep}{folder}{os.path.sep}{strat_filename}.csv')
     # print(evo.pool.individuals[-2].fitness)
     # print(evo.pool.individuals[-2])
     # print(evo.pool.individuals[-3].fitness)
