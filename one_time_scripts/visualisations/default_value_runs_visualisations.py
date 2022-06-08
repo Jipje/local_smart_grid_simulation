@@ -2,7 +2,8 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-from one_time_scripts.visualisations.baselines_visualisation import baseline_df, make_list_of_monthly_earnings
+from one_time_scripts.visualisations.baselines_visualisation import baseline_df, make_list_of_monthly_earnings, \
+    make_mean_and_std_per_month_from_folder
 
 pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
                   (0.87, 0.34, 0.74), (0.11, 0.47, 0.76), (1, 0.69, 0),
@@ -57,13 +58,16 @@ if __name__ == '__main__':
     single_run = baseline_df.loc[13]
     single_run_y = make_list_of_monthly_earnings(single_run)
 
+    source_folder = '../../data/new_ea_runs/default_runs/'
+    default_y_values, default_y_errors = make_mean_and_std_per_month_from_folder(source_folder)
+
     filename_1 = '../../data/baseline_earnings/overview_default_runs_money_month_timings.csv'
     filename_2 = '../../data/baseline_earnings/overview_default_runs_money_smart_timings.csv'
     filename_3 = '../../data/baseline_earnings/overview_default_runs_money_avg_timings.csv'
     filenames = [filename_1, filename_2, filename_3]
 
-    super_y_values = [single_run_y]
-    super_y_errors = [[0]]
+    super_y_values = [single_run_y, default_y_values]
+    super_y_errors = [[0], default_y_errors]
 
     for filename in filenames:
         y_values = []
@@ -83,4 +87,5 @@ if __name__ == '__main__':
                     y_errors.append(np.std(month_earnings))
         super_y_values.append(y_values)
         super_y_errors.append(y_errors)
-    make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts, ['Baseline', 'Month', 'Smart', 'AVG'])
+    make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts, ['Baseline', 'Optimized with congestion',
+                                                                          'Month', 'Smart', 'AVG'])
