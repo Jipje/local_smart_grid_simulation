@@ -42,9 +42,10 @@ def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
 
     plt.xticks(x_axis, x_ticks)
     plt.xlabel('Month (2021)')
-    plt.ylabel('Number of fitness function calls')
+    plt.ylabel('Total EUR')
     plt.title('Comparing monthly performance')
     plt.legend(fontsize=6)
+    plt.ylim((0, 275000))
     plt.show()
 
 
@@ -52,8 +53,9 @@ if __name__ == '__main__':
     month_shorts = ['jan', 'feb', 'mar', 'apr',
                     'may', 'june', 'july', 'aug',
                     'sep', 'oct', 'nov', 'dec']
-    for month in month_shorts:
-        month.capitalize()
+    for i in range(len(month_shorts)):
+        month = month_shorts[i]
+        month_shorts[i] = month.capitalize()
 
     single_run = baseline_df.loc[13]
     single_run_y = make_list_of_monthly_earnings(single_run)
@@ -87,5 +89,6 @@ if __name__ == '__main__':
                     y_errors.append(np.std(month_earnings))
         super_y_values.append(y_values)
         super_y_errors.append(y_errors)
+
     make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts, ['Baseline', 'Optimized with congestion',
                                                                           'Month', 'Smart', 'AVG'])

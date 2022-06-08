@@ -212,7 +212,7 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = [2, 5, 9, 13]
+    label_indexes = [3, 5, 9, 13]
     make_bar_graph(label_indexes, source_folders=[], suffixes=[])
 
     label_indexes = [2]
