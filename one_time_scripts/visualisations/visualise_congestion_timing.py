@@ -34,23 +34,25 @@ def visualise_congestion_time_and_sizes(res_df, title=None):
     colors = standard_month_colors
     largest_prep_kwh = -1
     for i in range(len(prep_starts)):
+        prep_starts_y_min.append((i * 20) + 5)
+        prep_starts_y_max.append((i * 20) + 20)
+
         if prep_starts[i] is NaT:
             prep_starts[i] = dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc)
             congestion_starts[i] = dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc)
             solving_congestion_until[i] = dt.datetime(1970, 1, 1, 0, 0, tzinfo=utc)
             preparing_max_kwh[i] = 0
-            prep_starts_y_min.append(None)
-            prep_starts_y_max.append(None)
         else:
             prep_starts[i] = dt.datetime(1970, 1, 1, prep_starts[i].hour, prep_starts[i].minute, tzinfo=utc)
             congestion_starts[i] = dt.datetime(1970, 1, 1, congestion_starts[i].hour, congestion_starts[i].minute, tzinfo=utc)
             solving_congestion_until[i] = dt.datetime(1970, 1, 1, solving_congestion_until[i].hour, solving_congestion_until[i].minute, tzinfo=utc)
-            prep_starts_y_min.append((i * 20) + 5)
-            prep_starts_y_max.append((i * 20) + 20)
             if preparing_max_kwh[i] > largest_prep_kwh:
                 largest_prep_kwh = preparing_max_kwh[i]
         colors.append('#%06X' % randint(0, 0xFFFFFF))
         y_ticks.append((i * 20) + 12.5)
+
+    plt.hlines(prep_starts_y_min + prep_starts_y_max, xmin=dt.datetime(1970, 1, 1, 0, 1),
+               xmax=dt.datetime(1970, 1, 1, 23, 58), colors=(0.9, 0.9, 0.9, 0.5))
 
     for i in range(12):
         y_min = prep_starts_y_min[i]
