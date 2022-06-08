@@ -207,6 +207,10 @@ if __name__ == '__main__':
     label_indexes = [2, 13]
     make_bar_graph(label_indexes, source_folders=[], suffixes=[])
 
+    label_indexes = [2, 13]
+    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_money/',
+                                                  '../../data/new_ea_runs/default_runs/'])
+
     label_indexes = []
     source_folder_3 = '../../data/ea_runs/sorting_investigation/'
     source_folders = [source_folder_1, source_folder_3, source_folder_3, source_folder_3, source_folder_3]
