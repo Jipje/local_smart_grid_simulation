@@ -82,6 +82,7 @@ def visualise_congestion_time_and_sizes(res_df, title=None):
     plt.ylim(0, 250)
 
     plt.gca().xaxis.set_major_formatter(my_fmt)
+    plt.tick_params(axis='y', length=0)
 
     plt.yticks(y_ticks, ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
     plt.show()
