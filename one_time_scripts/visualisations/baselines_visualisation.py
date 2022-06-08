@@ -183,8 +183,15 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         offset_tracker = offset_tracker + 1
         y_values, y_errors = make_mean_and_std_per_month_from_folder(source_folder, suffix=suffix,
                                                                      few_months=few_months)
-        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=source_folder + suffix,
-                color=pretty_colours[colour_index])
+        folder_label = source_folder.split('/')[-2].replace('_', ' ').title()
+        suffix_label = suffix.replace('_', ' ').title()
+        if suffix_label != '':
+            label = folder_label + ' - ' + suffix_label
+        else:
+            label = folder_label
+        plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=label,
+                color=pretty_colours[colour_index]
+                )
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
         num_of_source_folder_baselines = num_of_source_folder_baselines - 1
@@ -194,6 +201,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
     plt.xlabel('Month (2021)')
     plt.ylabel('Total EUR')
     plt.title('Comparing monthly performance')
+    plt.ylim(0, 275000)
     plt.legend(fontsize=6)
     plt.show()
 
@@ -204,12 +212,16 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = [2, 13]
+    label_indexes = [2, 5, 9, 13]
     make_bar_graph(label_indexes, source_folders=[], suffixes=[])
 
-    label_indexes = [2, 13]
-    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_money/',
-                                                  '../../data/new_ea_runs/default_runs/'])
+    label_indexes = [2]
+    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_money/'],
+                   num_of_source_folder_baselines=1)
+
+    label_indexes = [13]
+    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs/'],
+                   num_of_source_folder_baselines=1)
 
     label_indexes = []
     source_folder_3 = '../../data/ea_runs/sorting_investigation/'
