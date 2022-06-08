@@ -131,6 +131,19 @@ if __name__ == '__main__':
     november_strategy= [(15, 262, 'CHARGE'), (48, 196, 'CHARGE'), (57, 192, 'CHARGE'), (95, 176, 'CHARGE'), (20, 320, 'DISCHARGE'), (48, 292, 'DISCHARGE'), (66, 230, 'DISCHARGE'), (95, -226, 'DISCHARGE')]
     december_strategy= [(44, 460, 'CHARGE'), (67, 364, 'CHARGE'), (83, 218, 'CHARGE'), (95, 180, 'CHARGE'), (11, 524, 'DISCHARGE'), (20, 92, 'DISCHARGE'), (51, -48, 'DISCHARGE'), (95, -58, 'DISCHARGE')]
 
+    january_strategy= [(13, 214, 'CHARGE'), (24, 162, 'CHARGE'), (51, 70, 'CHARGE'), (95, 44, 'CHARGE'), (8, 200, 'DISCHARGE'), (47, 68, 'DISCHARGE'), (82, 64, 'DISCHARGE'), (95, -86, 'DISCHARGE')]
+    february_strategy= [(4, 94, 'CHARGE'), (45, 76, 'CHARGE'), (78, 42, 'CHARGE'), (95, 10, 'CHARGE'), (2, 230, 'DISCHARGE'), (26, 114, 'DISCHARGE'), (60, 48, 'DISCHARGE'), (95, 28, 'DISCHARGE')]
+    march_strategy= [(23, 114, 'CHARGE'), (53, 70, 'CHARGE'), (85, 50, 'CHARGE'), (95, -34, 'CHARGE'), (6, 160, 'DISCHARGE'), (15, 124, 'DISCHARGE'), (75, 30, 'DISCHARGE'), (95, -108, 'DISCHARGE')]
+    april_strategy= [(8, 264, 'CHARGE'), (14, 240, 'CHARGE'), (73, 58, 'CHARGE'), (95, 18, 'CHARGE'), (19, 164, 'DISCHARGE'), (76, 68, 'DISCHARGE'), (82, -126, 'DISCHARGE'), (95, -306, 'DISCHARGE')]
+    may_strategy= [(11, 192, 'CHARGE'), (39, 70, 'CHARGE'), (79, 56, 'CHARGE'), (95, -8, 'CHARGE'), (34, 112, 'DISCHARGE'), (61, 70, 'DISCHARGE'), (95, 6, 'DISCHARGE'), (95, -326, 'DISCHARGE')]
+    june_strategy = [(21, 256, 'CHARGE'), (26, 128, 'CHARGE'), (77, 74, 'CHARGE'), (95, 12, 'CHARGE'), (16, 134, 'DISCHARGE'), (42, 120, 'DISCHARGE'), (79, 72, 'DISCHARGE'), (95, -16, 'DISCHARGE')]
+    july_strategy= [(19, 244, 'CHARGE'), (63, 82, 'CHARGE'), (76, 62, 'CHARGE'), (95, -22, 'CHARGE'), (13, 200, 'DISCHARGE'), (25, 106, 'DISCHARGE'), (64, 84, 'DISCHARGE'), (95, -104, 'DISCHARGE')]
+    august_strategy= [(19, 172, 'CHARGE'), (51, 102, 'CHARGE'), (87, 64, 'CHARGE'), (95, -8, 'CHARGE'), (17, 156, 'DISCHARGE'), (36, 108, 'DISCHARGE'), (82, 102, 'DISCHARGE'), (95, -228, 'DISCHARGE')]
+    september_strategy= [(11, 234, 'CHARGE'), (36, 176, 'CHARGE'), (83, 110, 'CHARGE'), (95, 48, 'CHARGE'), (4, 278, 'DISCHARGE'), (87, 150, 'DISCHARGE'), (88, 54, 'DISCHARGE'), (95, 12, 'DISCHARGE')]
+    october_strategy= [(20, 320, 'CHARGE'), (35, 260, 'CHARGE'), (80, 178, 'CHARGE'), (95, 132, 'CHARGE'), (7, 320, 'DISCHARGE'), (41, 252, 'DISCHARGE'), (93, 86, 'DISCHARGE'), (95, 64, 'DISCHARGE')]
+    november_strategy= [(31, 286, 'CHARGE'), (61, 224, 'CHARGE'), (95, 176, 'CHARGE'), (95, -292, 'CHARGE'), (17, 180, 'DISCHARGE'), (34, 26, 'DISCHARGE'), (65, -68, 'DISCHARGE'), (95, -196, 'DISCHARGE')]
+    december_strategy= [(22, 394, 'CHARGE'), (60, 352, 'CHARGE'), (88, 218, 'CHARGE'), (95, 120, 'CHARGE'), (39, 502, 'DISCHARGE'), (68, 364, 'DISCHARGE'), (95, 184, 'DISCHARGE'), (95, 178, 'DISCHARGE')]
+
     twelve_strategy_lines = [january_strategy, february_strategy, march_strategy,
                              april_strategy, may_strategy, june_strategy,
                              july_strategy, august_strategy, september_strategy,
