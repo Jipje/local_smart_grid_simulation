@@ -103,6 +103,10 @@ def time_and_size_year_worst_case(res_dict, earliest_start=None, latest_ending=N
         res_dict['congestion_end'] = latest_ending
     res_dict['prep_max_soc'] = 1500
     res_dict['prep_start'] = res_dict['congestion_start'] - dt.timedelta(hours=2.25)
+
+    res_dict['congestion_start'] = res_dict['congestion_start'].time().replace(tzinfo=utc)
+    res_dict['congestion_end'] = res_dict['congestion_end'].time().replace(tzinfo=utc)
+    res_dict['prep_start'] = res_dict['prep_start'].time().replace(tzinfo=utc)
     return res_dict
 
 

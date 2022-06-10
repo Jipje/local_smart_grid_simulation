@@ -131,6 +131,7 @@ if __name__ == '__main__':
     november_strategy= [(15, 262, 'CHARGE'), (48, 196, 'CHARGE'), (57, 192, 'CHARGE'), (95, 176, 'CHARGE'), (20, 320, 'DISCHARGE'), (48, 292, 'DISCHARGE'), (66, 230, 'DISCHARGE'), (95, -226, 'DISCHARGE')]
     december_strategy= [(44, 460, 'CHARGE'), (67, 364, 'CHARGE'), (83, 218, 'CHARGE'), (95, 180, 'CHARGE'), (11, 524, 'DISCHARGE'), (20, 92, 'DISCHARGE'), (51, -48, 'DISCHARGE'), (95, -58, 'DISCHARGE')]
 
+    # DEFAULT RUNS MONEY 2
     january_strategy= [(13, 214, 'CHARGE'), (24, 162, 'CHARGE'), (51, 70, 'CHARGE'), (95, 44, 'CHARGE'), (8, 200, 'DISCHARGE'), (47, 68, 'DISCHARGE'), (82, 64, 'DISCHARGE'), (95, -86, 'DISCHARGE')]
     february_strategy= [(4, 94, 'CHARGE'), (45, 76, 'CHARGE'), (78, 42, 'CHARGE'), (95, 10, 'CHARGE'), (2, 230, 'DISCHARGE'), (26, 114, 'DISCHARGE'), (60, 48, 'DISCHARGE'), (95, 28, 'DISCHARGE')]
     march_strategy= [(23, 114, 'CHARGE'), (53, 70, 'CHARGE'), (85, 50, 'CHARGE'), (95, -34, 'CHARGE'), (6, 160, 'DISCHARGE'), (15, 124, 'DISCHARGE'), (75, 30, 'DISCHARGE'), (95, -108, 'DISCHARGE')]
