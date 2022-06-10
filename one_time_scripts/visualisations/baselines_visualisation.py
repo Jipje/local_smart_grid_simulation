@@ -120,7 +120,10 @@ def statistic_tests(baseline_indices, source_folders, few_months=None, suffixes=
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None,
-                   num_of_source_folder_baselines=0):
+                   num_of_source_folder_baselines=0, title=None):
+    if title is None:
+        title = 'Comparing monthly performance'
+
     for _ in range(len(baseline_indices) + num_of_source_folder_baselines):
         pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
 
@@ -160,7 +163,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         alpha = 1
         if single_run['time_steps_with_congestion'] > 1:
             alpha = 0.75
-            hatch = '///'
+            hatch = '//'
 
         plt.bar(x_axis + offsets[i], single_run_y, width, label=single_run['name'],
                 hatch=hatch, alpha=alpha, color=pretty_colours[colour_index + i])
@@ -190,7 +193,8 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         else:
             label = folder_label
         plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=label,
-                color=pretty_colours[colour_index]
+                color=pretty_colours[colour_index],
+                alpha=0.75, hatch='//'
                 )
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
@@ -199,8 +203,8 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
 
     plt.xticks(x_axis, month_labels)
     plt.xlabel('Month (2021)')
-    plt.ylabel('Total EUR')
-    plt.title('Comparing monthly performance')
+    plt.ylabel('Total EUR', fontsize=8)
+    plt.title(title)
     plt.ylim(0, 275000)
     plt.legend(fontsize=6)
     plt.show()
@@ -212,12 +216,13 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
-    label_indexes = [3, 5, 9, 13]
-    make_bar_graph(label_indexes, source_folders=[], suffixes=[])
+    label_indexes = [3, 5, 7, 9, 13]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[],
+                   title='GIGA Baseline performance with different congestion heuristics')
 
     label_indexes = [2]
-    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_money/'],
-                   num_of_source_folder_baselines=1)
+    make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_disregard_congestion/'],
+                   num_of_source_folder_baselines=1, title='Disregard congestion evolutionary algorithm optimization')
 
     label_indexes = [13]
     make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs/'],

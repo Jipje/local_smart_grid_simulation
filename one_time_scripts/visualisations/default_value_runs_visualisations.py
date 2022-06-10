@@ -10,7 +10,10 @@ pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
                   (0.29, 0.21, 0.28)]
 
 
-def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
+def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels, title=None):
+    if title is None:
+        title = 'Comparing monthly performance'
+
     for _ in range(len(y_values)):
         pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
 
@@ -42,8 +45,8 @@ def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
 
     plt.xticks(x_axis, x_ticks)
     plt.xlabel('Month (2021)')
-    plt.ylabel('Total EUR')
-    plt.title('Comparing monthly performance')
+    plt.ylabel('Total EUR', fontsize=8)
+    plt.title(title)
     plt.legend(fontsize=6)
     plt.ylim((0, 275000))
     plt.show()
@@ -63,13 +66,14 @@ if __name__ == '__main__':
     source_folder = '../../data/new_ea_runs/default_runs/'
     default_y_values, default_y_errors = make_mean_and_std_per_month_from_folder(source_folder)
 
+    filename_0 = '../../data/baseline_earnings/overview_default_runs_money_year_timings.csv'
     filename_1 = '../../data/baseline_earnings/overview_default_runs_money_month_timings.csv'
     filename_2 = '../../data/baseline_earnings/overview_default_runs_money_smart_timings.csv'
     filename_3 = '../../data/baseline_earnings/overview_default_runs_money_avg_timings.csv'
-    filenames = [filename_1, filename_2, filename_3]
+    filenames = [filename_0, filename_1, filename_2, filename_3]
 
-    super_y_values = [single_run_y, default_y_values]
-    super_y_errors = [[0], default_y_errors]
+    super_y_values = [single_run_y]
+    super_y_errors = [[0]]
 
     for filename in filenames:
         y_values = []
@@ -90,5 +94,12 @@ if __name__ == '__main__':
         super_y_values.append(y_values)
         super_y_errors.append(y_errors)
 
-    make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts, ['Baseline', 'Optimized with congestion',
-                                                                          'Month', 'Smart', 'AVG'])
+    make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts,
+                           ['Average smart monthly timed GIGA Baseline', 'Yearly timing', 'Monthly timing', 'Smart monthly timing', 'Average smart monthly timing'],
+                           title='Disregard congestion evolutionary algorithm optimization\nwith different congestion heuristics')
+
+    super_y_values = [single_run_y, super_y_values[4], default_y_values]
+    super_y_errors = [[0], super_y_errors[4], default_y_errors]
+    make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts,
+                           ['Average smart monthly timed GIGA Baseline', 'Average smart monthly timing', 'Congestion evolutionary algorithm'],
+                           title='Congestion evolutionary algorithm optimization compared to\ndisregard congestion strategies applied to congestion heuristics')
