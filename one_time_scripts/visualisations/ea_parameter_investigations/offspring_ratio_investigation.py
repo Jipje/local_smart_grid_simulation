@@ -25,7 +25,8 @@ if __name__ == '__main__':
     source_folders = [source_folder, source_folder, source_folder]
     all_suffix = ['_40_over_100', '_80_over_100', '_160_over_100']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   title='Comparing performance of EA offspring ratio')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_80_over_100', '_40_over_100'])
@@ -33,6 +34,7 @@ if __name__ == '__main__':
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_80_over_100', '_160_over_100'])
 
-    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
+                           title='Comparing length of EA optimization of EA offspring ratio')
     all_suffix = ['_80_over_100', '_40_over_100', '_160_over_100']
     length_statistical_test(source_folders, few_months, all_suffix)

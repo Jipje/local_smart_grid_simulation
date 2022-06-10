@@ -25,7 +25,8 @@ if __name__ == '__main__':
     source_folders = [source_folder, source_folder, source_folder]
     all_suffix = ['_mutate_prob_50', '_mutate_prob_25', '_mutate_prob_75']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   title='Comparing performance of EA mutation possibility')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_mutate_prob_50', '_mutate_prob_25'])
@@ -33,5 +34,6 @@ if __name__ == '__main__':
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_mutate_prob_50', '_mutate_prob_75'])
 
-    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
+                           title='Comparing length of EA optimization of EA mutation possibility')
     length_statistical_test(source_folders, few_months, all_suffix)

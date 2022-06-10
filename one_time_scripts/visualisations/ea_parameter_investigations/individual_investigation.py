@@ -22,11 +22,13 @@ if __name__ == '__main__':
     source_folders = [source_folder, source_folder]
     all_suffix = ['_single_dist', '_double_dist']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   title='Comparing performance of EA individual definitions')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_double_dist', '_single_dist'])
 
-    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
+                           title='Comparing length of EA optimization of EA individual definitions')
     all_suffix = ['_double_dist', '_single_dist']
     length_statistical_test(source_folders, few_months, all_suffix)

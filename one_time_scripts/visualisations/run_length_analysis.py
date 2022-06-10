@@ -10,7 +10,7 @@ pretty_colours = [(0.15, 0.81, 0.82), (1, 0.24, 0.22), (0.52, 0.86, 0.39),
                   (0.29, 0.21, 0.28)]
 
 
-def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
+def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels, title=None):
     for _ in range(len(y_values)):
         pretty_colours.append('#%06X' % random.randint(0, 0xFFFFFF))
 
@@ -43,7 +43,7 @@ def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels):
     plt.xticks(x_axis, x_ticks)
     plt.xlabel('Month (2021)')
     plt.ylabel('Number of fitness function calls')
-    plt.title('Comparing monthly performance')
+    plt.title(title)
     plt.legend(fontsize=6)
     plt.show()
 
@@ -75,7 +75,11 @@ def length_statistical_test(source_folders, few_months, suffixes):
             two_sided_t_test(one, other)
 
 
-def make_length_bar_graphs(source_folders, few_months, suffixes, labels=None):
+def make_length_bar_graphs(source_folders, few_months, suffixes, labels=None,
+                           title=None):
+    if title is None:
+        title = 'Comparing monthly performance'
+
     month_labels = []
     if few_months is None:
         for month in month_shorts:
@@ -100,7 +104,7 @@ def make_length_bar_graphs(source_folders, few_months, suffixes, labels=None):
                                                                             few_months=few_months, suffix=suffix)
         super_y_values.append(y_values)
         super_y_errors.append(y_errors)
-    make_grouped_bar_graph(super_y_values, super_y_errors, month_labels, labels)
+    make_grouped_bar_graph(super_y_values, super_y_errors, month_labels, labels, title)
 
 
 if __name__ == '__main__':

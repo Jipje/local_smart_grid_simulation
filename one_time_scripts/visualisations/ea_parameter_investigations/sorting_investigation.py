@@ -29,7 +29,8 @@ if __name__ == '__main__':
     all_suffix = ['_no_sort', '_sort_1', '_sort_2', '_sort_3']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
-                   num_of_source_folder_baselines=0)
+                   num_of_source_folder_baselines=0,
+                   title='Comparing performance of EA sorting methods')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_sort_1', '_no_sort'])
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_no_sort', '_sort_3'])
 
-    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
+                           title='Comparing length of EA optimization of EA sorting methods')
     all_suffix = ['_sort_1', '_no_sort', '_sort_2', '_sort_3']
     length_statistical_test(source_folders, few_months, all_suffix)

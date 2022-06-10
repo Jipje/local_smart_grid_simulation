@@ -28,7 +28,8 @@ if __name__ == '__main__':
     source_folders = [source_folder, source_folder, source_folder, source_folder]
     all_suffix = ['_16_over_20', '_32_over_40', '_80_over_100', '_160_over_200']
     few_months = [2, 3, 10]
-    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months)
+    make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
+                   title='Comparing performance of EA population sizes')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_80_over_100', '_32_over_40'])
@@ -39,6 +40,7 @@ if __name__ == '__main__':
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_80_over_100', '_160_over_200'])
 
-    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix)
+    make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
+                           title='Comparing length of EA optimization of EA population sizes')
     all_suffix = ['_80_over_100', '_16_over_20', '_32_over_40', '_160_over_200']
     length_statistical_test(source_folders, few_months, all_suffix)
