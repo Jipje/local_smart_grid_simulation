@@ -194,7 +194,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
             label = folder_label
         plt.bar(x_axis + offsets[offset_tracker], y_values, width, label=label,
                 color=pretty_colours[colour_index],
-                alpha=0.75, hatch='//'
+                # alpha=0.75, hatch='//'
                 )
         plt.errorbar(x_axis + offsets[offset_tracker], y_values, yerr=y_errors,
                      fmt='o', markersize=width, elinewidth=width*0.5)
