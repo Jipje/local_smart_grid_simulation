@@ -126,4 +126,4 @@ dmypy.json
 lsgs_venv/
 
 .idea/
-data/new_ea_runs/default_runs_disregard_congestion
+data/new_ea_runs/default_runs_disregard_congestion/
