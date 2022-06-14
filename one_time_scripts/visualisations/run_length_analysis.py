@@ -92,7 +92,8 @@ def make_length_bar_graphs(source_folders, few_months, suffixes, labels=None,
     if labels is None:
         labels = []
         for i in range(len(source_folders)):
-            label = source_folders[i] + suffixes[i]
+            label = suffixes[i].replace('_', ' ').strip().title()
+            # label = source_folders[i] + suffixes[i]
             labels.append(label)
 
     super_y_values = []

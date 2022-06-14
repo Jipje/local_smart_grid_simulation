@@ -111,7 +111,8 @@ def visualise_ea_runs(filenames=None, title_file=None):
 
     legend_names = []
     for filename in filenames:
-        legend_names.append(filename.split('/')[-1])
+        label = filename.split('/')[-1].split('.')[0].replace('_', ' ').title()
+        legend_names.append(label)
 
     all_dicts = []
 

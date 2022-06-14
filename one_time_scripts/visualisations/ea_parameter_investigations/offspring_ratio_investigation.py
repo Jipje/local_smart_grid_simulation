@@ -13,7 +13,7 @@ if __name__ == '__main__':
                           '../../../data/new_ea_runs/offspring_ratio/november_80_over_100.csv',
                           '../../../data/new_ea_runs/offspring_ratio/november_160_over_100.csv']
     filenames_all = [filenames_march, filenames_april, filenames_november]
-    base_title = 'Offspring investigation '
+    base_title = 'Offspring ratio comparison '
     titles = [base_title + 'March', base_title + 'April', base_title + 'November']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
@@ -35,6 +35,6 @@ if __name__ == '__main__':
                     suffixes=['_80_over_100', '_160_over_100'])
 
     make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
-                           title='Comparing length of EA optimization of EA offspring ratio')
+                           title='Comparing length of EA optimization for EA offspring ratio')
     all_suffix = ['_80_over_100', '_40_over_100', '_160_over_100']
     length_statistical_test(source_folders, few_months, all_suffix)

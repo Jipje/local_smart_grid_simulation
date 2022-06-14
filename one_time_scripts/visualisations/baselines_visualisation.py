@@ -156,7 +156,7 @@ def two_sided_t_test(one, other):
 
 
 def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=None,
-                   num_of_source_folder_baselines=0, title=None):
+                   num_of_source_folder_baselines=0, title=None, folder_label=None):
     if title is None:
         title = 'Comparing monthly performance'
 
@@ -222,7 +222,8 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
         offset_tracker = offset_tracker + 1
         y_values, y_errors = make_mean_and_std_per_month_from_folder(source_folder, suffix=suffix,
                                                                      few_months=few_months)
-        folder_label = source_folder.split('/')[-2].replace('_', ' ').title()
+        if folder_label is None:
+            folder_label = source_folder.split('/')[-2].replace('_', ' ').title()
         suffix_label = suffix.replace('_', ' ').title()
         if suffix_label != '':
             label = folder_label + ' - ' + suffix_label
