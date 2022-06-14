@@ -38,6 +38,7 @@ def make_grouped_bar_graph(y_values, y_errors, x_ticks, y_labels, title=None):
         y_value = y_values[bar_index]
         y_err = y_errors[bar_index]
         plt.bar(x_axis + offsets[bar_index], y_value, width,
+                # hatch='//', alpha=0.75,
                 label=y_labels[bar_index], color=pretty_colours[bar_index])
         if sum(y_err) != 0:
             plt.errorbar(x_axis + offsets[bar_index], y_value, yerr=y_err,
@@ -95,11 +96,11 @@ if __name__ == '__main__':
         super_y_errors.append(y_errors)
 
     make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts,
-                           ['Average smart monthly timed GIGA Baseline', 'Yearly timing', 'Monthly timing', 'Smart monthly timing', 'Average smart monthly timing'],
-                           title='Disregard congestion evolutionary algorithm optimization\nwith different congestion heuristics')
+                           ['AVG generation considered GIGA Baseline', 'Yearly times', 'Monthly times', 'Smart sizing', 'AVG generation considered'],
+                           title='Disregard congestion evolutionary algorithm optimization\napplied to different congestion heuristics')
 
     super_y_values = [single_run_y, super_y_values[4], default_y_values]
     super_y_errors = [[0], super_y_errors[4], default_y_errors]
     make_grouped_bar_graph(super_y_values, super_y_errors, month_shorts,
-                           ['Average smart monthly timed GIGA Baseline', 'Average smart monthly timing', 'Congestion evolutionary algorithm'],
-                           title='Congestion evolutionary algorithm optimization compared to\ndisregard congestion strategies applied to congestion heuristics')
+                           ['AVG generation considered GIGA Baseline', 'AVG generation considered disregard congestion optimization', 'Evolutionary algorithm congestion optimization'],
+                           title='Evolutionary algorithm optimizing with congestion compared to\nbest performing congestion heuristics')
