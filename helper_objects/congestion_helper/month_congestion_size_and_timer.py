@@ -17,8 +17,7 @@ def get_month_congestion_timings(solarvation_identifier: str = '../../data/envir
     return time_and_size_multiple_congestion_events(solarvation_df, starting_times, ending_times, verbose_lvl=verbose_lvl, strategy=strategy)
 
 
-def get_month_congestion_timings_with_df(solarvation_identifier: DataFrame,  verbose_lvl=1, strategy=4):
-    congestion_kw = 14000
+def get_month_congestion_timings_with_df(solarvation_identifier: DataFrame,  verbose_lvl=1, strategy=4, congestion_kw=14000):
     solarvation_identifier['congestion'], solarvation_identifier['excess_power'] = identify_congestion(solarvation_identifier, congestion_kw)
 
     starting_times, ending_times = retrieve_months(2021)

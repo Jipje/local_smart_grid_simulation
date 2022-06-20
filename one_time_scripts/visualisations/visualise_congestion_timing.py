@@ -82,11 +82,11 @@ def visualise_congestion_time_and_sizes(res_df, title=None):
 
 def visualise_daily_profile_per_month(solarvation_df, max_kw, congestion_kw=None, solar_farm_name=''):
     fig, axs = plt.subplots(4, 3, figsize=(12, 9))
-    congestion_df = get_month_congestion_timings_with_df(solarvation_df, verbose_lvl=1, strategy=3)
+    congestion_df = get_month_congestion_timings_with_df(solarvation_df, congestion_kw=congestion_kw, verbose_lvl=1, strategy=3)
     print(congestion_df.to_string())
-    early_start_color = (0.64, 0.26, 0.75, 0.85)
-    late_end_color = (0.75, 0.26, 0.62, 0.85)
-    max_cap_color = (0.75, 0.26, 0.37, 0.85)
+    early_start_color = (0.37, 0.0, 0.73, 0.85)
+    late_end_color = (0.0, 0.51, 0.28, 0.85)
+    max_cap_color = (0.70, 0.22, 0.32, 0.85)
     base_color = (0.26, 0.62, 0.75, 0.2)
 
     for month in range(1, 13):
@@ -151,9 +151,9 @@ def visualise_daily_profile_per_month(solarvation_df, max_kw, congestion_kw=None
         ax.label_outer()
     own_lines = [
         Line2D([0], [0], color=(0.26, 0.62, 0.75, 1), lw=2),
-        Line2D([0], [0], color=(0.64, 0.26, 0.75, 1), lw=2),
-        Line2D([0], [0], color=(0.75, 0.26, 0.62, 1), lw=2),
-        Line2D([0], [0], color=(0.75, 0.26, 0.37, 1), lw=2)
+        Line2D([0], [0], color=(0.37, 0.0, 0.73, 0.85), lw=2),
+        Line2D([0], [0], color=(0.0, 0.51, 0.28, 0.85), lw=2),
+        Line2D([0], [0], color=(0.70, 0.22, 0.32, 0.85), lw=2)
     ]
     plt.legend(own_lines, ['Daily profile', 'Earliest congestion start',
                            'Latest congestion end', 'Highest capacity during congestion'])
