@@ -3,12 +3,12 @@ from one_time_scripts.visualisations.run_length_analysis import make_length_bar_
 from one_time_scripts.visualisations.visualise_ea_runs import visualise_ea_runs
 
 if __name__ == '__main__':
-    filenames_march = ['../../../data/new_ea_runs/individual/march_single_dist.csv',
-                       '../../../data/new_ea_runs/individual/march_double_dist.csv']
-    filenames_april = ['../../../data/new_ea_runs/individual/april_single_dist.csv',
-                       '../../../data/new_ea_runs/individual/april_double_dist.csv']
-    filenames_november = ['../../../data/new_ea_runs/individual/november_single_dist.csv',
-                          '../../../data/new_ea_runs/individual/november_double_dist.csv']
+    filenames_march = ['../../../data/new_ea_runs/individual/march_single_axis.csv',
+                       '../../../data/new_ea_runs/individual/march_multi_axis.csv']
+    filenames_april = ['../../../data/new_ea_runs/individual/april_single_axis.csv',
+                       '../../../data/new_ea_runs/individual/april_multi_axis.csv']
+    filenames_november = ['../../../data/new_ea_runs/individual/november_single_axis.csv',
+                          '../../../data/new_ea_runs/individual/november_multi_axis.csv']
     filenames_all = [filenames_march, filenames_april, filenames_november]
     base_title = 'Pairing method comparison '
     titles = [base_title + 'March', base_title + 'April', base_title + 'November']
@@ -20,15 +20,15 @@ if __name__ == '__main__':
     label_indexes = [13]
     source_folder = '../../../data/new_ea_runs/individual/'
     source_folders = [source_folder, source_folder]
-    all_suffix = ['_single_dist', '_double_dist']
+    all_suffix = ['_single_axis', '_multi_axis']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
                    title='Comparing performance of EA pairing methods', folder_label='Pairing Methods')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
-                    suffixes=['_double_dist', '_single_dist'])
+                    suffixes=['_multi_axis', '_single_axis'])
 
     make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
                            title='Comparing length of EA optimization for EA pairing methods')
-    all_suffix = ['_double_dist', '_single_dist']
+    all_suffix = ['_multi_axis', '_single_axis']
     length_statistical_test(source_folders, few_months, all_suffix)

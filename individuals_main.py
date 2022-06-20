@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     if runnable_int == 1:
         print('Running setting 1')
-        execute_ea_runs('_single_dist', run_settings_1, folder)
+        execute_ea_runs('_single_axis', run_settings_1, folder)
     else:
         print('Running setting other')
-        execute_ea_runs('_double_dist', run_settings_2, folder)
+        execute_ea_runs('_multi_axis', run_settings_2, folder)
