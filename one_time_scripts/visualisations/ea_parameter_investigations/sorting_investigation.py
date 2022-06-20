@@ -16,7 +16,7 @@ if __name__ == '__main__':
                      '../../../data/new_ea_runs/sorting/november_sort_2.csv',
                      '../../../data/new_ea_runs/sorting/november_sort_3.csv']
     filenames_all = [filenames_march, filenames_april, filenames_nov]
-    base_title = 'Sorting investigation '
+    base_title = 'Sorting methods comparison '
     titles = [base_title + 'March', base_title + 'April', base_title + 'November']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]

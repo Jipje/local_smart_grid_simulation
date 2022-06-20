@@ -243,7 +243,7 @@ def make_bar_graph(baseline_indices, source_folders, few_months=None, suffixes=N
     plt.ylabel('Total EUR', fontsize=8)
     plt.title(title)
     plt.ylim(0, 275000)
-    plt.legend(fontsize=6)
+    plt.legend(fontsize=6, loc="upper left")
     plt.show()
 
 

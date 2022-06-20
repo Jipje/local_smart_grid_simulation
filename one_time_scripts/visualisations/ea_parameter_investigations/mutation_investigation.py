@@ -13,7 +13,7 @@ if __name__ == '__main__':
                           '../../../data/new_ea_runs/mutation/november_big_random_mutation.csv',
                           '../../../data/new_ea_runs/mutation/november_big_sided_mutation.csv']
     filenames_all = [filenames_march, filenames_april, filenames_november]
-    base_title = 'Mutation investigation '
+    base_title = 'Mutation values comparison '
     titles = [base_title + 'March', base_title + 'April', base_title + 'November']
     for i in range(len(filenames_all)):
         filenames = filenames_all[i]
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     all_suffix = ['_random_mutation', '_big_random_mutation', '_big_sided_mutation']
     few_months = [2, 3, 10]
     make_bar_graph(label_indexes, source_folders=source_folders, suffixes=all_suffix, few_months=few_months,
-                   title='Comparing performance of EA mutation definitions')
+                   title='Comparing performance of EA mutation values')
 
     statistic_tests([], [source_folder, source_folder], few_months=few_months,
                     suffixes=['_random_mutation', '_big_random_mutation'])
@@ -35,5 +35,5 @@ if __name__ == '__main__':
                     suffixes=['_random_mutation', '_big_sided_mutation'])
 
     make_length_bar_graphs(source_folders, few_months=few_months, suffixes=all_suffix,
-                           title='Comparing length of EA optimization of EA mutation definitions')
+                           title='Comparing length of EA optimization of EA mutation values')
     length_statistical_test(source_folders, few_months, all_suffix)
