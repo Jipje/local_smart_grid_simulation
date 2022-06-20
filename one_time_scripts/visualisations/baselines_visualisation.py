@@ -255,7 +255,7 @@ if __name__ == '__main__':
 
     label_indexes = [3, 5, 7, 9, 13]
     make_bar_graph(label_indexes, source_folders=[], suffixes=[],
-                   title='GIGA Baseline performance with different congestion heuristics')
+                   title='GIGA Baseline applied to congestion heuristics')
 
     label_indexes = [2]
     make_bar_graph(label_indexes, source_folders=['../../data/new_ea_runs/default_runs_disregard_congestion/'],
