@@ -253,6 +253,14 @@ if __name__ == '__main__':
     source_folder_2 = '../../data/ea_runs/random_init_first_runs/'
     make_bar_graph(label_indexes, source_folders=[source_folder_1, source_folder_2])
 
+    label_indexes = [3, 1]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[],
+                   title='Baseline simulation results')
+
+    label_indexes = [3, 1, 2]
+    make_bar_graph(label_indexes, source_folders=[], suffixes=[],
+                   title='Baseline simulation results')
+
     label_indexes = [3, 5, 7, 9, 13]
     make_bar_graph(label_indexes, source_folders=[], suffixes=[],
                    title='GIGA Baseline applied to congestion heuristics')

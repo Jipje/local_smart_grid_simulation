@@ -71,7 +71,7 @@ def visualize_strategy(strategy: Strategy):
 
     strategy_matrix = [*zip(*strategy_matrix)]
     plt.title('{}'.format(strategy.name))
-    plt.ylabel('Imbalance price')
+    plt.ylabel('Imbalance price (€/MWh)')
     plt.xlabel('State of charge (SoC %)')
 
     legend_elements = [Patch(facecolor=red, edgecolor='black', label='CHARGE'),

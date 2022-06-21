@@ -23,4 +23,4 @@ if __name__ == '__main__':
         execute_ea_runs('_single_axis', run_settings_1, folder)
     else:
         print('Running setting other')
-        execute_ea_runs('_multi_axis', run_settings_2, folder)
+        execute_ea_runs('_multi_axes', run_settings_2, folder)
